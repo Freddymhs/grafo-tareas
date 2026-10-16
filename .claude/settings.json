@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(//home/fmarcosdev/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/**/.env)",
+      "Read(//home/fmarcosdev/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/**/.env.*)",
+      "Read(//home/fmarcosdev/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/**/.npmrc)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__.*__browser_.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/fmarcosdev/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/.claude/hooks/tracker-solo-lectura.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

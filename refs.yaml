@@ -1,0 +1,8 @@
+proyecto: grafo-tareas
+cliente: personal
+rama_base: main
+tracker: none                          # sin tracker de empresa (PORTAR §Capacidades opcionales): el hook de solo lectura deja usar el navegador libre
+tablero: none                          # F0-F1: apagado hasta que Freddy elija (concepto § Cómo se crea, paso 2). En F2 pasa a { kind: grafo, api, token_env }
+qa: none
+docs: { dir: docs }
+repos: {}                              # los gates (typecheck/lint/test) por repo se llenan tras inspeccionar cada plantilla en new-project

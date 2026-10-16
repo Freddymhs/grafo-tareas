@@ -1,0 +1,6 @@
+grafo-tareas.*/
+reportes/
+_docs/
+.env
+.env.*
+.claude/settings.local.json

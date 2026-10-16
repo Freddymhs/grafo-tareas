@@ -1,0 +1,34 @@
+{
+  "fuente": "docs/_CONCEPTO.md § Stack (decidido con /work:resume:new-concept; no se re-pregunta)",
+  "api": {
+    "framework": "NestJS 11 + Fastify",
+    "modules": "monolito modular, módulos por dominio",
+    "layers": "controller → service → repository",
+    "database": "Prisma 7 + Postgres (Neon)",
+    "validation": "class-validator",
+    "auth": "ninguna en v0: Tailscale"
+  },
+  "web": {
+    "framework": "Next.js 16",
+    "data_fetching": "TanStack Query vía hooks Orval",
+    "pwa": "Serwist"
+  },
+  "vr": {
+    "framework": "React 19 + Vite 8",
+    "3d": "React Three Fiber + @react-three/xr + drei",
+    "layout": "d3-force-3d, posiciones persistidas"
+  },
+  "testing": {
+    "api": "Jest + Supertest",
+    "fronts": "Vitest + Playwright"
+  },
+  "deploy": "Mac Mini (Docker), solo por Tailscale",
+  "observabilidad": "pino",
+  "externos": [
+    "Todoist (importador, una vez, solo lectura)"
+  ],
+  "especiales": [
+    "PWA",
+    "WebXR"
+  ]
+}

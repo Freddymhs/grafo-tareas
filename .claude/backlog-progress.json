@@ -1,0 +1,42 @@
+{
+  "project": "grafo-tareas",
+  "tech": "NestJS + Next.js + Vite/R3F (WebXR)",
+  "current_phase": "FASE_1",
+  "phases": {
+    "FASE_1": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 5
+    },
+    "FASE_2": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 5
+    },
+    "FASE_3": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 3
+    },
+    "FASE_4": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 3
+    },
+    "FASE_5": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 4
+    },
+    "FASE_6": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 3
+    },
+    "FASE_7": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 3
+    }
+  }
+}
