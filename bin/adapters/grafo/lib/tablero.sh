@@ -59,9 +59,9 @@ if [ -n "${TABLERO_FAKE:-}" ]; then
     jq --argjson n "$nuevo" '. + [$n]' "$1" > "$1.tmp" && mv "$1.tmp" "$1"
     printf '%s\n' "$nuevo"
   }
-  gr_listar() {   # $1 texto (contenido en el título, sin mayúsculas) · $2 tipo (opcional) → abiertos, array
-    jq -c --arg q "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" --arg t "${2:-}" \
-      '[.[] | select(.estado == "ABIERTO" and ($t == "" or .tipo == $t) and ((.titulo | ascii_downcase) | contains($q)))]' "$FAKE_NODOS"
+  gr_listar() {   # $1 texto (contenido en el título, sin mayúsculas) · $2 tipo · $3 estado (ABIERTO; TODOS = cualquiera) → array
+    jq -c --arg q "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" --arg t "${2:-}" --arg e "${3:-ABIERTO}" \
+      '[.[] | select(($e == "TODOS" or .estado == $e) and ($t == "" or .tipo == $t) and ((.titulo | ascii_downcase) | contains($q)))]' "$FAKE_NODOS"
   }
   gr_crear() { _fake_append "$FAKE_NODOS" n "$(jq -c '{estado: "ABIERTO", etiquetas: [], etapa: null} + .' <<<"$1")"; }
   gr_editar() {   # $1 id · $2 cambios JSON → el nodo editado
@@ -86,8 +86,9 @@ else
     printf '%s\n' "$cuerpo" | jq -c '.data'
   }
   gr_listar() {
-    local q; q=$(jq -rn --arg q "$1" '$q | @uri')
-    _gr_curl GET "/nodos?estado=ABIERTO&limit=$LIMITE_LISTA&q=$q${2:+&tipo=$2}" | jq -c '.data'
+    local q estado; q=$(jq -rn --arg q "$1" '$q | @uri'); estado="${3:-ABIERTO}"
+    [ "$estado" = TODOS ] && estado=""
+    _gr_curl GET "/nodos?limit=$LIMITE_LISTA&q=$q${2:+&tipo=$2}${estado:+&estado=$estado}" | jq -c '.data'
   }
   gr_crear()    { _gr_curl POST "/nodos" "$1"; }
   gr_editar()   { _gr_curl PATCH "/nodos/$1" "$2"; }
@@ -97,6 +98,23 @@ fi
 # El nodo abierto cuyo título empieza con `<prefijo>` (`[25699]`): objeto JSON, o nada.
 nodo_por_prefijo() {   # $1 prefijo · $2 tipo (opcional)
   gr_listar "$1" "${2:-}" | jq -c --arg p "$1" '[.[] | select(.titulo | startswith($p))] | first // empty'
+}
+
+# El externo con el que `importar:fases` (grafo-tareas.api) escribe las FASE: `fases-md:<proyecto>` / `fase:<n>`.
+# Es el mismo valor que `origenFases()` de la API (src/importadores/fases/traducir-fases.ts): si cambia allá, cambia acá.
+readonly ORIGEN_FASES_PREFIJO=fases-md
+
+# La FASE n de ESTE orquestador, abierta o cerrada: el mismo nodo que escribe el importador. Así el hook (por
+# `etapa`) y `importar:fases` marcan un solo nodo, y una «FASE n» de otro proyecto o de Todoist no se toca (C10).
+nodo_fase() {   # $1 número
+  local proyecto
+  proyecto=$(REF_DESDE="$ORQ" ref proyecto) || { echo "falta \`proyecto\` en refs.yaml: sin él no sé de qué orquestador es la FASE" >&2; return 1; }
+  gr_listar "FASE $1" FASE TODOS |
+    jq -c --arg o "$ORIGEN_FASES_PREFIJO:$proyecto" --arg i "fase:$1" '[.[] | select(.externoOrigen == $o and .externoId == $i)] | first // empty'
+}
+
+externo_fase() {   # $1 número → {externoOrigen, externoId} para crearla igual que el importador
+  jq -nc --arg o "$ORIGEN_FASES_PREFIJO:$(REF_DESDE="$ORQ" ref proyecto)" --arg i "fase:$1" '{externoOrigen: $o, externoId: $i}'
 }
 
 # El nodo abierto con ese título exacto y tipo: objeto JSON, o nada.

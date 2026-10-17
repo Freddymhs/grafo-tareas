@@ -1,0 +1,112 @@
+# roles.yaml — los tipos de trabajo de esta área (C11, 2026-10-17). Una FASE declara su rol con la línea
+# `**Tipo**: <marca>` de la cabecera; sin esa línea, cae en `defecto`. Es la fuente ÚNICA de:
+#   · las plantillas de FASE (`plantilla`) que usan /work:resume:new-concept y /work:create-backlog,
+#   · la etapa de cada FASE derivada de sus casillas (importar:fases de grafo-tareas, bin/fases),
+#   · las columnas de cada tablero por rol en la PWA.
+# Un rol nuevo = una entrada acá + su plantilla. Se copia a cada área con `nuevo-workspace`: cada empresa
+# ajusta los suyos sin tocar los de otra. `bash tests/test_roles.sh` (dotfiles) falla si rol y plantilla no calzan.
+#
+# Cómo se deriva la etapa: se recorren `etapas` de la última a la primera y gana la primera cuya condición
+# se cumple; si ninguna, la primera. Condiciones:
+#   siempre            — la etapa de arranque
+#   tareas_alguna      — al menos una casilla tildada en `## Tareas`
+#   grupo: <regex>     — al menos una casilla tildada bajo un `### ` de `## Tareas` cuyo título calza
+#   qa: <casilla>      — esa casilla de `## QA` tildada de verdad (una «— no aplica» no cuenta como avance)
+#   cierre_real        — URL commit, Evidencias o Wiki tildadas en `## Cierre oficial en Azure`
+#   terminada          — todas las casillas de Understand, Tareas, QA y Cierre tildadas (regla de bin/fases)
+version: 1
+defecto: producto
+
+roles:
+  producto:
+    nombre: Producto
+    para: Features y PBI — lo que mueve el trabajo
+    marcas: [producto, funcional]
+    plantilla: backlog/plantillas/plantilla-producto.md
+    grupos: {}
+    qa: [Colección, Auditoría, Listo para PR]
+    etapas:
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
+      - { clave: codigo, columna: EN CODIGO, si: tareas_alguna }
+      - { clave: coleccion, columna: Collection Created, si: { qa: Colección } }
+      - { clave: auditoria, columna: TESTEADO, si: { qa: Auditoría } }
+      - { clave: listo, columna: LISTO PARA PR, si: { qa: Listo para PR } }
+      - { clave: aprobado, columna: APROBADO, si: cierre_real }
+      - { clave: cerrado, columna: CERRADO, si: terminada }
+
+  calidad:
+    nombre: Calidad
+    para: Refactor, Sonar, performance, logs, alertas y CI — sin cambiar contrato, con tests de rojo a verde
+    marcas: [calidad]
+    plantilla: backlog/plantillas/plantilla-calidad.md
+    grupos: { amarrar: "amarrar|l[ií]nea base|arranque", red: "^red\\b|cierre de la malla|retirar", cambiar: "." }
+    qa: [Listo para PR]
+    etapas:
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
+      - { clave: amarrar, columna: "AMARRAR 🧰", si: { grupo: amarrar } }
+      - { clave: cambiar, columna: "CAMBIAR 🧰", si: { grupo: cambiar } }
+      - { clave: red, columna: "RED 🧰", si: { grupo: red } }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
+      - { clave: aprobado, columna: APROBADO, si: cierre_real }
+      - { clave: cerrado, columna: CERRADO, si: terminada }
+
+  seguridad:
+    nombre: Seguridad
+    para: Login por defecto, secretos fuera del repo, webhooks firmados, que nada se cobre o revierta dos veces
+    marcas: [seguridad]
+    plantilla: backlog/plantillas/plantilla-seguridad.md
+    grupos: { detectar: "detectar", corregir: "corregir", verificar: "verificar" }
+    qa: [Listo para PR, Mostrado al equipo]
+    etapas:
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
+      - { clave: detectar, columna: DETECTAR, si: { grupo: detectar } }
+      - { clave: corregir, columna: CORREGIR, si: { grupo: corregir } }
+      - { clave: verificar, columna: VERIFICAR, si: { grupo: verificar } }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
+      - { clave: mostrado, columna: MOSTRADO, si: { qa: Mostrado al equipo } }
+      - { clave: cerrado, columna: CERRADO, si: terminada }
+
+  devex:
+    nombre: DevEx
+    para: Herramientas y código para el equipo — hooks, linters, scripts, onboarding (no retros ni propuestas sueltas)
+    marcas: [devex]
+    plantilla: backlog/plantillas/plantilla-devex.md
+    grupos: { construir: "construir", probar: "probar" }
+    qa: [Listo para PR, Adoptado]
+    etapas:
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
+      - { clave: construir, columna: CONSTRUIR, si: { grupo: construir } }
+      - { clave: probar, columna: PROBAR, si: { grupo: probar } }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
+      - { clave: adoptado, columna: ADOPTADO, si: { qa: Adoptado } }
+      - { clave: cerrado, columna: CERRADO, si: terminada }
+
+  incidente:
+    nombre: Incidente
+    para: Un bug en producción — reproducir, arreglar, verificar y explicar qué lo causó
+    marcas: [incidente]
+    plantilla: backlog/plantillas/plantilla-incidente.md
+    grupos: { reproducir: "reproducir", arreglar: "arreglar", verificar: "verificar" }
+    qa: [Listo para PR, Desplegado, Explicado]
+    etapas:
+      - { clave: reproducir, columna: REPRODUCIR, si: siempre }
+      - { clave: arreglar, columna: ARREGLAR, si: { grupo: arreglar } }
+      - { clave: verificar, columna: VERIFICAR, si: { grupo: verificar } }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
+      - { clave: desplegado, columna: DESPLEGADO, si: { qa: Desplegado } }
+      - { clave: explicado, columna: EXPLICADO, si: { qa: Explicado } }
+      - { clave: cerrado, columna: CERRADO, si: terminada }
+
+  negocio:
+    nombre: Negocio
+    para: Detectar una necesidad, conversarla con el analista o el líder y redactar el PBI; el PBI aprobado pasa a Producto
+    marcas: [negocio]
+    plantilla: backlog/plantillas/plantilla-negocio.md
+    grupos: { detectar: "detectar", conversar: "conversar", redactar: "redactar" }
+    qa: [PBI aprobado]
+    etapas:
+      - { clave: detectar, columna: DETECTAR, si: siempre }
+      - { clave: conversar, columna: CONVERSAR, si: { grupo: conversar } }
+      - { clave: redactar, columna: REDACTAR, si: { grupo: redactar } }
+      - { clave: aprobado, columna: PBI APROBADO, si: { qa: PBI aprobado } }
+      - { clave: cerrado, columna: CERRADO, si: terminada }

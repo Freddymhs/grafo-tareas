@@ -12,6 +12,7 @@ T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 # se copia entero a un árbol temporal para que lea esta configuración y no la real.
 mkdir -p "$T/orq/bin/adapters" && cp -r "$A" "$T/orq/bin/adapters/grafo"
 cat > "$T/orq/refs.yaml" <<'YAML'
+proyecto: prueba
 tablero:
   kind: grafo
   api: http://localhost:0/api/v1
@@ -50,6 +51,13 @@ caso etapa_desconocida      "etapa desconocida"     64 "$OP/etapa" 25699 volando
 caso etapa_sin_tarjeta_4    "no hay tarjeta"        4 "$OP/etapa" 99999 listo
 caso etapa_crea_con_titulo  "creada en «LISTO PARA PR»" 0 "$OP/etapa" "FASE 30" listo --titulo "husky"
 caso etapa_fase_nodo        '"tipo":"FASE","titulo":"FASE 30"' 0 bash -c "jq -c '.[-1] | {tipo, titulo}' '$NODOS'"
+caso etapa_fase_externo    '"externoOrigen":"fases-md:prueba","externoId":"fase:30"' 0 bash -c "jq -c '.[-1] | {externoOrigen, externoId}' '$NODOS'"
+# La «FASE 31» que dejó el importador (cerrada) y otra «FASE 31» de Todoist: se mueve la del importador, no se crea otra.
+jq '. + [{id:"imp31", tipo:"FASE", titulo:"FASE 31", estado:"CERRADO", etapa:"CERRADO", etiquetas:[], externoOrigen:"fases-md:prueba", externoId:"fase:31"},
+         {id:"tod31", tipo:"FASE", titulo:"FASE 31", estado:"ABIERTO", etapa:null, etiquetas:[], externoOrigen:"todoist", externoId:"fase:31"}]' "$NODOS" > "$NODOS.tmp" && mv "$NODOS.tmp" "$NODOS"
+caso etapa_fase_del_importador "imp31"               0 "$OP/etapa" "FASE 31" listo
+caso etapa_fase_otra_intacta   'null'                0 jq -r '.[] | select(.id == "tod31") | .etapa' "$NODOS"
+caso etapa_fase_sin_duplicar   "2"                   0 bash -c "jq '[.[] | select(.titulo == \"FASE 31\")] | length' '$NODOS'"
 
 printf 'especificación\nde la pieza\n' > "$T/spec.md"
 caso borrador_crea          "2️⃣ 20379 · 3.1"       0 "$OP/borrador" "C · Recepción" "2️⃣ 20379 · 3.1 · Iniciar" --descripcion-archivo "$T/spec.md"

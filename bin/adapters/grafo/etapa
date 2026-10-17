@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# etapa — mueve la tarjeta de una task (`[<id>]`, TAREA por prefijo) o una FASE (`FASE <n>`, nodo FASE con
-# ese título exacto, como los deja el importador) a su etapa. Es la proyección del estado del PBI en el
+# etapa — mueve la tarjeta de una task (`[<id>]`, TAREA por prefijo) o una FASE (`FASE <n>`: el nodo FASE de este
+# orquestador, por el mismo externo que usa `importar:fases`, abierto o cerrado) a su etapa. Es la proyección del estado del PBI en el
 # tablero (/flow:todo §6): la mueven /flow:pbi:get, /flow:paircoding y el hook fase-tilde, nunca una mano.
 #
 #   etapa <id | "FASE <n>"> <etapa> [--titulo <título corto>]
@@ -19,8 +19,10 @@ done
 
 NOMBRE=$(cfg "secciones.$ETAPA") || { echo "etapa desconocida: $ETAPA (no está en tablero.secciones)" >&2; exit 64; }
 if [[ "$ID" == FASE\ * ]]; then
-  NODO=$(nodo_por_titulo "$ID" FASE)
-  NUEVO=$(jq -nc --arg ti "$ID" --arg d "$TITULO" --arg et "$NOMBRE" '{tipo: "FASE", titulo: $ti, descripcion: $d, etapa: $et}')
+  NUMERO="${ID#FASE }"
+  NODO=$(nodo_fase "$NUMERO")
+  NUEVO=$(jq -nc --arg ti "$ID" --arg d "$TITULO" --arg et "$NOMBRE" --argjson ex "$(externo_fase "$NUMERO")" \
+    '{tipo: "FASE", titulo: $ti, descripcion: $d, etapa: $et} + $ex')
 else
   NODO=$(nodo_por_prefijo "[$ID]" TAREA)
   NUEVO=$(jq -nc --arg ti "[$ID] $TITULO" --arg et "$NOMBRE" --arg e "$(cfg label)" '{tipo: "TAREA", titulo: $ti, etapa: $et, etiquetas: [$e]}')

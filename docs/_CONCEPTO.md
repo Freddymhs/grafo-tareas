@@ -224,6 +224,7 @@ repos:
 - **FASE 5 tarea 1 ✅ (2026-10-17, en el orquestador):** `bin/adapters/grafo/` cumple el contrato del tablero contra la API (27/27 casos fake + smoke real limpio). Pendiente al cortar (tarea 2, con Freddy): las etapas `EN CODIGO` y `Collection Created` del Laboratorio no existen en `ETAPAS` de la API.
 - **Desvío corregido por reclamo de Freddy:** ahora las tareas se toman con `/work:backlog:next`, se auditan con `/work:backlog:review` y se sellan con `/work:sellar:run`; los commits los corre Freddy salvo que diga "hazlo". Reglas aprendidas en `CLAUDE.md` del orquestador (§Trampas: inyección de `fetch`, CLI desde `dist`, e2e en serie, prettier en generados, specs sin `let`, derivado sobre TAREAS, políticas de pnpm 10, CI con la versión de `packageManager`).
 - **Lo que Freddy explicó con `fases.html`/`calidad.html`:** los `FASE_x.md` son el corazón; sus casillas dan la etapa en dos tableros (flujo normal y calidad). Todoist aporta conexiones y tarjetas sueltas. El grafo junta ambos; el 3D hace visibles las conexiones. → FASE 5: importador de `FASE_*.md` como nodos FASE con etapa derivada de las casillas (como `bin/fases`).
+- **FASE 8 — roles (2026-10-17, tarde, sin commit):** la API lee `roles.yaml` (`ROLES_ARCHIVO`; `GET /roles`, `GET /nodos?rol=`, `GET /etapas` = tablero ∪ columnas), `importar:fases` deriva rol y etapa con él (paridad con `test_roles.py` 43/43) y la PWA tiene pestañas por rol con tareas y FASE. Dependencia nueva `yaml` (OK de Freddy). API 57 unit · 24 e2e; web vitest 13 · Playwright 5; VR 30. Detalle en `FASE_8_ROLES.md`.
 
 **Sin probar en real:** `pendiente`, `tarjeta`, `etapa`, `borrador` contra Todoist (solo `buscar` corrió real). Se verá en el primer `/flow:todo` o tilde de FASE.
 
@@ -266,6 +267,16 @@ Copiar funciones de Todoist · multiusuario · móvil nativo · sincronización 
 
 ## Para confirmar
 
+- **C11 (2026-10-17, en conversación con Freddy) — roles y complementos.** Lo confirmado y lo abierto:
+  - **Roles = tipo de trabajo, cada uno con sus columnas.** Confirmados: **Producto** (features/PBI), **Calidad** (Sonar, refactor, performance, tests rojo→verde; absorbe la "Confiabilidad": logs, alertas, CI), **Seguridad**, **DevEx** (solo código y herramientas del equipo), **Incidente** (bug en producción), **Negocio** (detectar, conversar con el analista o Fabián, redactar el PBI; el PBI aprobado pasa a Producto y queda conectado a su origen). Descartado: Investigación. Regla: todo rol que no sea Producto termina en «adoptado/mostrado», no en «hecho» (evidencia: en DOT el commit de tooling `85636aa` quedó fuera de `main`/`dev` y el `ARCHITECTURAL_REVIEW.md` quedó en una carpeta gitignoreada).
+  - **Las FASE del Laboratorio no se editan:** el rol sale de `**Tipo**:` (35 FASE: 11 `calidad`, 4 `funcional`, 20 sin línea → Producto). Abierto: si «funcional» pasa a ser el nombre oficial de Producto.
+  - **SSOT propuesto:** `roles.yaml` con nombre, marca `**Tipo**`, secciones de tareas, columnas, derivación de etapa y plantilla de FASE; lo leen `new-concept`/`create-backlog`, `importar:fases`, la PWA y `bin/fases`. Abierto: dónde vive (propuesta: `dotfiles`, como parte del método).
+  - **Complementos = no son roles, se cuelgan de un PBI** (12 tipos encontrados leyendo las 141 tarjetas de TRABAJO y Draft): duda de negocio · duda de código · dolor (PBI vs código) · supuesto · decisión (duda contestada: quién, cuándo, dónde quedó registrada) · para decir (daily, retro, 1:1, mensaje) · propuesta · trámite · apunte de dominio · evidencia · trabajo de otro · captura rápida.
+  - **Escalera de una duda (Freddy):** de negocio → contrastar con el código → analista funcional (Carabantes) → senior del área (Tomás Soto back, Nicolás front); de código → Tomás Soto → Carabantes si toca negocio → otro. La escalera es del **área** (`refs.yaml`), no del método: las personas son del cliente. Evidencia en TRABAJO: «Para Tomás Carabantes (derivada por Thomas)».
+  - **PBI sin número = PBI borrador** (nodo HISTORIA sin número ni FASE); las tareas sueltas y las piezas del Draft se cuelgan de él. Las subtareas «falta URL commit y Evidencias» no se crean a mano: salen de las casillas abiertas de `## Cierre oficial` de cada FASE.
+  - **Hecho 2026-10-17 (en Changes de `dotfiles`, sin commit):** `workspace-template/docs/roles.yaml` con los 6 roles (marca `**Tipo**`, grupos de `## Tareas`, casillas de `## QA`, columnas y la regla para derivar la etapa) y `docs/backlog/plantillas/plantilla-<rol>.md` (no `FASE_*.md`: los hooks las tratarían como FASE reales). `nuevo-workspace` las copia a cada área: cada empresa ajusta sus roles. `tests/test_roles.sh` valida rol ↔ plantilla, derivación (vacía → primera etapa, llena → cerrado) y su caso rojo. **Paridad 42/42**: la derivación de `roles.yaml` da la misma etapa que `importar:fases` en las 35 FASE del Laboratorio y las 7 de este proyecto. Freddy aceptó que viva en `dotfiles`. **FASE 8 (2026-10-17, sin commit): ya lo leen** `importar:fases` (port de `test_roles.py`, paridad TS = Python 43/43), la API (`GET /roles`, `GET /nodos?rol=`, y `GET /etapas` = lista del tablero **∪** columnas de los roles — no solo la unión: las tarjetas de Todoist usan `❓ DUDAS EN ESPERA` y `🔎 Precheck`, que ningún rol tiene) y la PWA (pestañas Todo + un rol, tareas y FASE, las FASE en solo lectura por D10). Falta: los complementos.
+  - **Ideas «a pedido», para DESPUÉS de la base (Freddy, 2026-10-17):** (1) el parte del día para Fabián (terminé / queda / detenido) leído del grafo, sin botón de WhatsApp todavía; (2) revisar en Azure qué tasks propias no tienen URL commit o evidencias y dejarlo como tarjeta de trámites (la lógica ya existe en `bin/fases`); (3) mostrar con claridad las dos tarjetas en curso y si alguna está bloqueada (Freddy trabaja dos a la vez a propósito: no se limita a una). Lo que Fabián le pidió sobre el proceso se junta con `/flow:observaciones` y el complemento «para decir» colgado del 1:1 con Fabián. Contexto: memoria `project-evaluacion1-fabian`.
+
 - **C10 (2026-10-17, abierto):** el grafo guarda FASEs de varios orquestadores (SAG vía Todoist, grafo-tareas vía `FASE_*.md`) y «FASE n» se repite. Propuesta: una RAMA (o nodo PROYECTO) por orquestador, FASE `PERTENECE_A` ella, y los importadores/el adaptador buscan dentro de la rama. Mientras tanto nada adopta por título y conviven dos «FASE 6».
 
 - **C1 (código) — ✅ CONFIRMADO por Freddy 2026-10-16:** decidí que "bloqueado / libera" se calcula en la API (`WITH RECURSIVE` sobre `Conexion`) y los fronts solo lo reciben, porque con tres repos una regla duplicada se desincroniza · ¿confirmás?
@@ -279,17 +290,36 @@ Copiar funciones de Todoist · multiusuario · móvil nativo · sincronización 
 ## Prompt para retomar (pegarlo tal cual en una sesión nueva o después de /compact)
 
 ```text
-Retomamos grafo-tareas. Antes de hacer nada, lee entero ~/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/docs/_CONCEPTO.md (§ "Lo que decide el resultado — Pareto" y § "Estado al 2026-10-16" —incluye lo hecho el 2026-10-17— primero), después docs/backlog/README.md y docs/backlog/FASE_4_PWA_LISTA.md, y el CLAUDE.md del orquestador (§ Trampas). Esa es la única fuente: el chat anterior no existe.
+Retomamos grafo-tareas y el método portable (ignorar lo de juegos del Quest). Antes de hacer nada, leé entero
+~/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/docs/_CONCEPTO.md (§ Pareto, § Estado — lo del 2026-10-17 —
+y § Para confirmar: C10 y C11), después docs/backlog/README.md, FASE_5_ADAPTADOR_GRAFO_Y_CORTE.md (D10 y el plan
+del corte) y el CLAUDE.md del orquestador (§ Lo que vive en este orquestador y § Trampas). Esa es la única fuente.
 
-Reglas para esta sesión:
-- No re-decidas nada de § Stack, § Pareto ni las decisiones C1-C9 / N1-N2 / D1-D9 ya tomadas. Si algo choca, lo marcas y me preguntas.
-- El método: cada tarea se toma con /work:backlog:next, se audita con /work:backlog:review y se sella con /work:sellar:run. Los commits los corro yo salvo que te diga "hazlo". Pushear y crear repos es publicar: me preguntas.
-- Mis reglas globales (~/.claude/CLAUDE.md) aplican a todo el código: nunca `let`, sin `any`, SSOT, read-before-write, y todo chequeo tiene que poder fallar.
-- Instalar dependencias es instalador: me confirmas antes (react-markdown para la descripción está pendiente de preguntar).
-- Entorno: pnpm es `npx -y pnpm@10.34.7` (la versión de packageManager; `latest` rompe el CI). Base local: `docker start grafo-tareas-postgres` (127.0.0.1:5433, bases grafo_tareas y grafo_tareas_test). API: `pnpm build && node dist/main` con su .env (puerto 3000). Web: `NEXT_PUBLIC_API_URL=http://localhost:3000 pnpm dev -p 3001`.
-- Para el visor, siempre ~/bin/quest-despierto -- <cmd> (memoria quest-3s-setup).
+Reglas: no re-decidir nada ya decidido (Stack, C1-C11, D1-D10); si algo choca, lo marco y pregunto. Método:
+/work:backlog:next → /work:backlog:review → /work:sellar:run; commits los corre Freddy salvo «hazlo»; pushear es
+publicar → preguntar. Instaladores → confirmar. Reglas globales (~/.claude/CLAUDE.md): sin let, sin any, SSOT,
+read-before-write, todo chequeo tiene que poder fallar. pnpm = npx -y pnpm@10.34.7. Bash para scripts (zsh no
+parte variables). Nunca pkill -f.
 
-Estado: FASE 1 ✅, FASE 2 ✅ salvo el deploy (criterio 4), FASE 3 ✅, FASE 4 ✅ (falta usarla una semana), FASE 5 2/3 (falta el corte y C10), FASE 6 ✅ y FASE 7 ✅ (falta medir FPS en el visor). Los 4 repos pusheados el 2026-10-17 con CI verde. API y web servidas por `bin/servir-tailnet` en https://thinkerpad.tail1798c7.ts.net (no sobrevive a un reinicio).
+Estado (2026-10-17, tarde): api, web y vr pusheados con CI verde (f06384c, aa187db, 954652d); FASE 1-4, 6 y 7 ✅,
+FASE 5 2/3, FASE 8 (roles) 3/3 tareas, 2/2 criterios, review ✅ y sellada: STAGED SIN COMMIT, mensajes en
+/tmp/commit-grafo-tareas-{api,web,vr}-main.txt y /tmp/commit-grafo-tareas-main.txt (el commit lo corre Freddy). Incluye: api (módulo roles, GET /roles, ?rol=, importador por roles.yaml, dependencia yaml, openapi.json), web (tablero
+por rol, FASE en solo lectura, e2e tablero-roles) y vr (solo el cliente Orval regenerado); orquestador (FASE 8,
+docs/roles.yaml + plantillas, adaptador grafo busca la FASE por externo fases-md:<proyecto>, test 31/31, D10, plan
+del corte, bin/dev con ROLES_ARCHIVO, refs.yaml con bloque grafo comentado, CLAUDE.md, _CONCEPTO C11); dotfiles
+(workspace-template/docs/roles.yaml + docs/backlog/plantillas/plantilla-<rol>.md + tests/test_roles.{py,sh} +
+README; los cambios en claude/metodo.md y claude/settings.json NO son míos); ~/bin/claude-bifurcar (parte el
+pane con foco). Corriendo: bin/dev (API watch :3000 —se reinicia sola al cambiar código, verificado en 3 s;
+roles.yaml se lee solo al arrancar—, PWA next dev :3001). tailscale serve sigue apuntando a 3001/3000: con la web en dev apunta a la API local y
+en el teléfono no anda → correr bin/servir-tailnet cuando se quiera la PWA en el teléfono.
 
-Primer paso: con el visor puesto, `bin/probar-en-visor --api --abrir` y anotar FPS en FASE 6 c1 y FASE 7 c2. Abrir https://thinkerpad.tail1798c7.ts.net en el teléfono (correr `bin/servir-tailnet` si el PC se reinició) e instalarla. Las decisiones abiertas son el corte (FASE 5 tarea 2) y C10.
+Siguiente, en orden:
+1. FASE 8: que Freddy corra los 4 git commit -F (y decida el push); después, tildar Listo para PR.
+2. FASE 9 (borrador escrito): Freddy contesta las 6 decisiones; recién ahí, código. Complementos colgados de un PBI (C11): duda de negocio/código con escalera de personas en refs.yaml del área,
+   dolor, supuesto, decisión, para decir (ritual: daily/retro/1:1 — DAILY_ITEM/EN_DAILY_DE), propuesta, trámite,
+   apunte, evidencia, trabajo de otro, captura rápida; PBI sin número = HISTORIA borrador.
+3. Recién después, ideas a pedido: parte para Fabián, revisar cierres en Azure, mostrar las 2 tarjetas en curso.
+Abierto con Freddy: el corte (FASE 5 t2), C10, si «funcional» es el nombre oficial de Producto, deploy Mac Mini +
+Neon, FPS en el visor, instalador de un comando para el método (y probarlo en Mac/WSL), detectar el PR desde Azure.
+Contexto personal: memoria project-evaluacion1-fabian (evaluación 2 ~22-24 oct → indefinido).
 ```

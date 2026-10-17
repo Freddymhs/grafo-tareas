@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# dev [--parar] — la API y la PWA en modo desarrollo, para revisar en vivo: cada cambio en el código se ve solo.
+#
+#   API  http://localhost:3000   compila en watch (tsc), reescribe los alias `@config/…` (tsc-alias -w) y reinicia
+#                                al cambiar dist/ (node --watch). `nest start --watch` solo NO sirve: arranca antes
+#                                de que tsc-alias corrija los imports y muere con «Cannot find module '@config/…'».
+#   PWA  http://localhost:3001   `next dev` con recarga en caliente (sin service worker: en dev está apagado).
+#
+# Reemplaza lo que esté escuchando en 3000/3001 (p. ej. lo de `servir-tailnet`, que es build de producción). Logs en $LOGS.
+#   --parar   corta los procesos de dev (por puerto y por pid guardado, nunca con pkill -f).
+set -euo pipefail
+
+ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+API_DIR="${GRAFO_API_DIR:-$ORQ/grafo-tareas.api}"
+WEB_DIR="${GRAFO_WEB_DIR:-$ORQ/grafo-tareas.web}"
+ROLES="${ROLES_ARCHIVO:-$ORQ/docs/roles.yaml}"   # los roles del área: GET /roles y las columnas de cada tablero (FASE 8)
+LOGS="${GRAFO_LOGS:-${XDG_STATE_HOME:-$HOME/.local/state}/grafo-tareas}"
+PIDS="$LOGS/dev.pids"
+PUERTO_API=3000
+PUERTO_WEB=3001
+PNPM=(npx -y pnpm@10.34.7)
+mkdir -p "$LOGS"
+
+parar_puerto() {
+  local pid
+  pid=$(ss -ltnpH "sport = :$1" | grep -oP 'pid=\K[0-9]+' | head -1 || true)
+  [ -z "$pid" ] || kill "$pid"
+  while ss -ltnH "sport = :$1" | grep -q LISTEN; do sleep 0.3; done
+}
+parar_guardados() {
+  [ -f "$PIDS" ] || return 0
+  while read -r pid; do kill "$pid" 2>/dev/null || true; done < "$PIDS"
+  rm -f "$PIDS"
+}
+esperar() {   # $1 url · $2 qué es · $3 log
+  for _ in $(seq 1 120); do
+    [ "$(curl -s -o /dev/null -w '%{http_code}' "$1")" = 200 ] && { echo "$2: $1"; return 0; }
+    sleep 1
+  done
+  echo "$2 no levantó: mirá $3" >&2; exit 1
+}
+
+parar_guardados
+parar_puerto "$PUERTO_API"; parar_puerto "$PUERTO_WEB"
+[ "${1:-}" = "--parar" ] && { echo "dev: parado"; exit 0; }
+[ $# -eq 0 ] || { echo "uso: dev [--parar]" >&2; exit 64; }
+
+cd "$API_DIR"
+"${PNPM[@]}" build > "$LOGS/api-build.log" 2>&1   # dist completo y con alias antes de arrancar
+# tsc --watch y no `nest build --watch`: éste borra dist/ entero en cada cambio (`deleteOutDir` de nest-cli.json) y
+# `node --watch` queda vigilando una carpeta que ya no existe: la API no vuelve a levantar.
+nohup npx tsc -p tsconfig.build.json --watch --preserveWatchOutput > "$LOGS/api-compila.log" 2>&1 & echo $! >> "$PIDS"
+nohup npx tsc-alias -w -p tsconfig.json > "$LOGS/api-alias.log" 2>&1 & echo $! >> "$PIDS"
+# NODE_ENV=production solo apaga pino-pretty: su hilo (thread-stream) muere bajo `node --watch` con «this should not
+# happen: undefined». Los logs quedan en JSON en el archivo; nada más depende de NODE_ENV en la API (grep).
+ROLES_ARCHIVO="$ROLES" NODE_ENV=production nohup node --watch-path=dist dist/main > "$LOGS/api-dev.log" 2>&1 & echo $! >> "$PIDS"
+esperar "http://localhost:$PUERTO_API/api/v1/health" "API (watch)" "$LOGS/api-dev.log"
+
+cd "$WEB_DIR"
+NEXT_PUBLIC_API_URL="http://localhost:$PUERTO_API" nohup "${PNPM[@]}" dev -p "$PUERTO_WEB" > "$LOGS/web-dev.log" 2>&1 & echo $! >> "$PIDS"
+esperar "http://localhost:$PUERTO_WEB/" "PWA (dev)" "$LOGS/web-dev.log"
+echo "Swagger: http://localhost:$PUERTO_API/docs · logs: $LOGS · parar: bin/dev --parar"

@@ -13,9 +13,11 @@ y lleva `## Understand`, `## QA` y `## Cierre oficial en Azure` (esta última, *
 | [2 · API del grafo](FASE_2_API_GRAFO.md) | F1.1 | una fuente de verdad para importador, VR y PWA | `grafo-tareas.api` | 🟡 código verde · falta desplegar (criterio 4) |
 | [3 · Importador Todoist](FASE_3_IMPORTADOR_TODOIST.md) | F1.2 | ver el trabajo real (pide N1, N2, C1-C4 confirmados) | `grafo-tareas.api` | ✅ importado (134 tareas → 158 nodos) · `04cbbd6` |
 | [4 · PWA tipo lista](FASE_4_PWA_LISTA.md) | F2 | trabajar el día sin Todoist | `grafo-tareas.web` | ✅ 4/4 · offline, Markdown, servida por HTTPS del tailnet (`bin/servir-tailnet`) · falta que Freddy la abra en el teléfono/Quest y la use una semana (criterio 1) |
-| [5 · Adaptador `grafo` y corte](FASE_5_ADAPTADOR_GRAFO_Y_CORTE.md) | F2 | `tablero.kind: grafo`, Todoist apagado | método (`bin/adapters/grafo/`) | 🟡 2/3 · adaptador (27 casos) + importador de `FASE_*.md`/§ABIERTO · el corte (tarea 2) y C10 son de Freddy |
+| [5 · Adaptador `grafo` y corte](FASE_5_ADAPTADOR_GRAFO_Y_CORTE.md) | F2 | `tablero.kind: grafo`, Todoist apagado | método (`bin/adapters/grafo/`) | 🟡 2/3 · adaptador (31 casos, 9 etapas probadas contra la API) + importador de `FASE_*.md`/§ABIERTO · Understand hecho · plan del corte escrito; el corte y C10 son de Freddy |
 | [6 · VR solo lectura](FASE_6_VR_SOLO_LECTURA.md) | F1.3 | el mapa real en el visor: otra vista del mismo dato | `grafo-tareas.vr` | ✅ 3/3 · API, posiciones guardadas, bloqueo de la API · falta medir FPS en el visor |
 | [7 · Editar desde el visor](FASE_7_EDITAR_DESDE_VR.md) | F3 | conectar y cerrar dentro del 3D | `grafo-tareas.vr` | ✅ 3/3 · conectar con el rayo, cerrar y ver qué libera, Zustand · falta medir FPS en el visor |
+| [8 · Roles](FASE_8_ROLES.md) | C11 | un tablero por tipo de trabajo, y las FASE junto a las tarjetas | `api` + `web` + `roles.yaml` | 🟡 3/3 tareas · criterios 2/2 · review ✅ · sellado (staged, el commit lo corre Freddy) · falta Listo para PR |
+| [9 · Complementos](FASE_9_COMPLEMENTOS.md) | C11 | dudas con escalera, decisiones y «para decir» colgados del PBI | `api` + `web` + `roles.yaml`/`refs.yaml` | ⏳ borrador · 6 decisiones para Freddy antes de codear |
 
 **Orden (Freddy, 2026-10-16, con la FASE 1 verde):** backend → clon de Todoist → corte → VR. La VR es otra vista de lo que muestra la PWA; el riesgo del 3D ya lo descartó la FASE 1. F4 del concepto (Redis + cola, OAuth) no tiene FASE: solo si hace falta.
 **La FASE 1 corta:** si en el visor no rinde o no se lee, se para y se revisa la decisión del 3D antes de la FASE 2.
