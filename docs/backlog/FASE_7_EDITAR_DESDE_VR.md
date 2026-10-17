@@ -3,7 +3,7 @@
 **Destraba**: reordenar el trabajo donde se ve — conectar, cerrar y ver qué se libera sin salir del 3D
 **Listo para PR**: no · FASE escrita el 2026-10-16
 **Prioridad**: Baja
-**Dependencias**: **FASE 4**
+**Dependencias**: **FASE 6** (VR solo lectura)
 **Fuente**: `docs/_CONCEPTO.md` § Fases F3
 
 ## Understand

@@ -1,9 +1,9 @@
-# FASE 6: ADAPTADOR `grafo` DEL TABLERO Y CORTE DE TODOIST
+# FASE 5: ADAPTADOR `grafo` DEL TABLERO Y CORTE DE TODOIST
 
 **Destraba**: que el método escriba en el grafo en vez de Todoist — `tablero.kind: grafo` y Todoist apagado para trabajo y proyectos
 **Listo para PR**: no · FASE escrita el 2026-10-16
 **Prioridad**: Media
-**Dependencias**: **FASE 5** (la PWA reemplaza el uso diario) · FASE 3 (la migración)
+**Dependencias**: **FASE 4** (la PWA reemplaza el uso diario) · FASE 3 (la migración)
 **Fuente**: `docs/_CONCEPTO.md` § Cómo se conecta el grafo · `~/dotfiles/claude/PORTAR.md` §El contrato del tablero (5 operaciones)
 
 > **Alcance:** método, no API. El adaptador vive en `bin/adapters/grafo/` de cada orquestador que lo use y cumple **el mismo

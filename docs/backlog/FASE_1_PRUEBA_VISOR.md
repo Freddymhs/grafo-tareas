@@ -7,7 +7,7 @@
 **Fuente**: `docs/_CONCEPTO.md` § Fases (F1.0), § Stack, § Por qué R3F, § Riesgos (legibilidad) · memoria `quest-3s-setup`
 
 > **Alcance:** un repo (`grafo-tareas.vr`), una escena, datos falsos. Nada de lo que se escribe acá asume la forma de la API:
-> el generador sintético produce `Nodo`/`Conexion` con los nombres del modelo de dominio, y en la FASE 4 se reemplaza por los
+> el generador sintético produce `Nodo`/`Conexion` con los nombres del modelo de dominio, y en la FASE 6 se reemplaza por los
 > hooks de Orval sin tocar la escena.
 
 ---
@@ -37,7 +37,7 @@ la del nodo seleccionado. Si parpadea, subir `framebufferScaleFactor` (reporte e
 
 ### D4 · El layout se calcula una vez, fuera del render
 `d3-force-3d` corre N ticks al cargar (función pura, en un Web Worker si pasa de ~200 ms) y devuelve `posicion {x,y,z}`; la escena
-solo las lee. Es lo que en la FASE 4 se persiste en la API (C2). Sin tipos: un `src/lib/d3-force-3d.d.ts` declara **solo** lo que se usa.
+solo las lee. Es lo que en la FASE 6 se persiste en la API (C2). Sin tipos: un `src/lib/d3-force-3d.d.ts` declara **solo** lo que se usa.
 
 ### D5 · Datos sintéticos deterministas
 Generador con semilla fija (PRNG propio, sin `Math.random`: regla React 19 `react-hooks/purity` y reproducibilidad) que imita lo medido

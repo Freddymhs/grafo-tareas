@@ -1,4 +1,4 @@
-# FASE 4: VR SOLO LECTURA CONTRA LA API — EL MAPA DE VERDAD
+# FASE 6: VR SOLO LECTURA CONTRA LA API — EL MAPA DE VERDAD
 
 **Destraba**: el entregable de F1 (concepto § Fases): Freddy ve su trabajo real como red dentro del visor, con qué bloquea a qué
 **Listo para PR**: no · FASE escrita el 2026-10-16

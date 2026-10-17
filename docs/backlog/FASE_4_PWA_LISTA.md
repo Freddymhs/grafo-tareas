@@ -1,9 +1,9 @@
-# FASE 5: LA PWA TIPO LISTA — LO QUE SE USA DE TODOIST, MÁS LO QUE NO PUEDE
+# FASE 4: LA PWA TIPO LISTA — LO QUE SE USA DE TODOIST, MÁS LO QUE NO PUEDE
 
-**Destraba**: poder trabajar el día a día sin Todoist (la FASE 6 apaga Todoist solo si esto existe)
+**Destraba**: poder trabajar el día a día sin Todoist (la FASE 5 apaga Todoist solo si esto existe)
 **Listo para PR**: no · FASE escrita el 2026-10-16
 **Prioridad**: Media
-**Dependencias**: **FASE 2** (OpenAPI) · idealmente FASE 4 cerrada (F1 entregado)
+**Dependencias**: **FASE 2** (OpenAPI) · FASE 3 (datos reales importados)
 **Fuente**: `docs/_CONCEPTO.md` § Fases F2 (lo medido de Todoist), § Stack (PWA, Contrato)
 
 > **Alcance:** `grafo-tareas.web/` (de `template-nextjs-tanstack`). **Solo lo que Freddy usa:** secciones por etapa, etiquetas

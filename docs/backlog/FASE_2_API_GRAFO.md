@@ -1,6 +1,6 @@
 # FASE 2: LA API DEL GRAFO — NODOS, CONEXIONES, RAMAS Y LO DERIVADO
 
-**Destraba**: que el grafo tenga una fuente de verdad: la FASE 3 (importador) escribe en ella, la FASE 4 (VR) y la FASE 5 (PWA) la leen por Orval
+**Destraba**: que el grafo tenga una fuente de verdad: la FASE 3 (importador) escribe en ella, la FASE 4 (PWA) y la FASE 6 (VR) la leen por Orval
 **Listo para PR**: no · FASE escrita el 2026-10-16; se detalla con `archivo:línea` al tomarla
 **Prioridad**: Alta
 **Dependencias**: **FASE 1 verde** (`DECISION_3D.md` dice que sigue R3F). Sin eso, esta FASE no arranca
@@ -44,7 +44,7 @@
 - [ ] Test rojo primero: un ciclo `A→B→A` no cuelga la consulta
 
 ### Tarea 4: OpenAPI publicado y CI agnóstico
-- El JSON de Swagger se exporta a un archivo versionado (lo consume Orval en las FASE 4 y 5). Paso de CI con el grep agnóstico.
+- El JSON de Swagger se exporta a un archivo versionado (lo consume Orval en las FASE 4 y 6). Paso de CI con el grep agnóstico.
 - [ ] Hecha
 
 ### Tarea 5: borrar `src/modules/example/` y su test

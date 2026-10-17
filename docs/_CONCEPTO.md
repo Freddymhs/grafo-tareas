@@ -74,6 +74,12 @@ Derivado (lo calcula la API, nunca los fronts)
 
 ## Fases — F1 protegida
 
+> **Reordenado por Freddy el 2026-10-16, con la FASE 1 verde** (72 FPS con 500 nodos, `docs/decisions/DECISION_3D.md`):
+> el riesgo del 3D ya está descartado, así que el orden pasa a ser **backend → clon de Todoist (PWA) → corte de Todoist → VR**.
+> La VR es otra vista del mismo dato que muestra la PWA; el objetivo número uno es reemplazar Todoist (§ Pareto 1).
+> Backlog: FASE 2 API · 3 importador · 4 PWA · 5 adaptador `grafo` y corte · 6 VR solo lectura · 7 editar desde VR.
+> Lo que sigue de esta sección es el plan original; las F1/F2/F3 de abajo valen como contenido, no como orden.
+
 **F0 — PORTAR: el contrato del tablero. ✅ HECHA y commiteada el 2026-10-16** (ver § Estado al 2026-10-16). Falta solo probar en uso real las operaciones que escriben.
 
 **F1 — el mínimo que entrega valor real: ver el mapa.**

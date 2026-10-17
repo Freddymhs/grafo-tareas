@@ -1,6 +1,6 @@
 # FASE 3: IMPORTADOR TODOIST — UNA DIRECCIÓN, UNA VEZ, IDEMPOTENTE
 
-**Destraba**: ver el trabajo real en el grafo: la FASE 4 (VR solo lectura) muestra datos de verdad y no sintéticos
+**Destraba**: ver el trabajo real en el grafo: la FASE 4 (PWA) y la FASE 6 (VR) muestran datos de verdad y no sintéticos
 **Listo para PR**: no · FASE escrita el 2026-10-16
 **Prioridad**: Alta
 **Dependencias**: **FASE 2**. Y antes de importar datos reales: **N1, N2 y C1-C4 confirmados** (`docs/_CONCEPTO.md` § Para confirmar)

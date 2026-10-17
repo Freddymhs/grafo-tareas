@@ -29,4 +29,4 @@ TypeScript + R3F mantiene un solo lenguaje en los tres repos y la escena declara
 ## Lo que queda abierto (no frena la FASE 2)
 
 - Orden visual del grafo (agrupar por rama, distancia por relevancia): "lo veremos en el futuro" — Freddy.
-- Medir de nuevo con datos reales (FASE 4): el grafo real puede tener otra densidad que el sintético.
+- Medir de nuevo con datos reales (FASE 6, VR contra la API): el grafo real puede tener otra densidad que el sintético.
