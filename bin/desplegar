@@ -41,6 +41,9 @@ ssh "$HOST_SSH" bash -s -- "$DIR_REMOTO" "$GITHUB" "$RAMA" "$PUERTO_API" "$PUERT
   "$URL_API" "$URL_WEB" "${REPOS_INTERNOS[@]}" <<'REMOTO'
 set -euo pipefail
 export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"   # ssh no carga el .zshrc: sin esto no hay docker
+# Sin la attestation de procedencia (lleva la hora del build) el mismo código da la misma imagen y `up --build` no
+# recrea nada. Va por variable: compose 2.x construye con bake y no respeta `provenance: false` (medido 2026-10-17).
+export BUILDX_NO_DEFAULT_ATTESTATIONS=1
 TAILSCALE=/Applications/Tailscale.app/Contents/MacOS/Tailscale
 DIR="$HOME/$1"; GITHUB=$2; RAMA=$3
 export PUERTO_API=$4 PUERTO_WEB=$5; HTTPS_API=$6; HTTPS_WEB=$7; export URL_API=$8 URL_WEB=$9

@@ -26,11 +26,7 @@ services:
 
   api:
     <<: *reinicio
-    build:
-      context: ../grafo-tareas.api
-      # Sin la attestation de procedencia de BuildKit (lleva la hora del build) dos builds del mismo código dan la misma
-      # imagen y `up --build` no recrea nada: bin/desplegar es idempotente (medido 2026-10-17, Docker 29.4).
-      provenance: false
+    build: ../grafo-tareas.api
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,7 +52,6 @@ services:
     <<: *reinicio
     build:
       context: ../grafo-tareas.web
-      provenance: false   # ver api
       args:
         NEXT_PUBLIC_API_URL: ${URL_API:?falta URL_API}
     depends_on:
