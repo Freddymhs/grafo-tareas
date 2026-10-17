@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# probar-en-visor [--dev] [--abrir] [--nodos N] — FASE 1, tarea 5: sirve grafo-tareas.vr y lo deja en el
+# `localhost` del Quest (adb reverse). WebXR exige contexto seguro y `localhost` lo es: sin certificados.
+#
+#   (sin flags)  build de producción + `vite preview`: es lo que se MIDE (React en dev rinde menos)
+#   --dev        `vite` con recarga en caliente, para iterar
+#   --abrir      además abre la URL en el Quest Browser (si no, se escribe a mano)
+#   --nodos N    cuántos nodos (default 500; 30..2000)
+#
+# El servidor queda en primer plano: Ctrl+C lo corta. El adb va envuelto en quest-despierto (memoria quest-3s-setup).
+set -euo pipefail
+
+ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+VR="${GRAFO_VR_DIR:-$ORQ/grafo-tareas.vr}"
+ADB="${QUEST_ADB:-$HOME/Android/sdk/platform-tools/adb}"
+SERIAL="${QUEST_NET:-quest-3s:5555}"
+DESPIERTO="${QUEST_DESPIERTO:-$HOME/bin/quest-despierto}"
+PUERTO_PREVIEW=4173
+PUERTO_DEV=5173
+NAVEGADOR_QUEST=com.oculus.browser
+
+MODO=preview; ABRIR=0; NODOS=500
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dev) MODO=dev ;;
+    --abrir) ABRIR=1 ;;
+    --nodos) NODOS="${2:?--nodos pide un número}"; shift ;;
+    *) echo "uso: probar-en-visor [--dev] [--abrir] [--nodos N]" >&2; exit 64 ;;
+  esac
+  shift
+done
+
+PUERTO=$([ "$MODO" = dev ] && echo "$PUERTO_DEV" || echo "$PUERTO_PREVIEW")
+URL="http://localhost:$PUERTO/?nodos=$NODOS"
+
+cd "$VR"
+[ "$MODO" = preview ] && npm run -s build
+
+"$DESPIERTO" -- "$ADB" -s "$SERIAL" reverse "tcp:$PUERTO" "tcp:$PUERTO"
+echo "visor: $URL → Entrar en VR · FPS abajo a la izquierda (verde ≥ 72)"
+if [ "$ABRIR" = 1 ]; then
+  "$DESPIERTO" -- "$ADB" -s "$SERIAL" shell am start -a android.intent.action.VIEW -d "'$URL'" "$NAVEGADOR_QUEST" >/dev/null
+fi
+
+if [ "$MODO" = dev ]; then
+  exec npx vite --port "$PUERTO" --strictPort
+fi
+exec npx vite preview --port "$PUERTO" --strictPort
