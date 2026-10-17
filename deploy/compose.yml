@@ -1,7 +1,7 @@
 # grafo-tareas en el Mac Mini (FASE 12). Lo levanta `bin/desplegar`; a mano solo para mirar (`docker compose ps`).
 # Rutas relativas a esta carpeta: el orquestador en ~/apps/grafo-tareas y los repos adentro, como en el PC.
 # Nada se publica en la LAN: Postgres sin puerto, API y PWA en 127.0.0.1; afuera solo `tailscale serve` (HTTPS).
-# Las variables salen de deploy/.env (lo crea bin/desplegar la primera vez, chmod 600, fuera de git).
+# Las variables salen de deploy/.env: lo escribe bin/desplegar en cada despliegue (conserva la contraseña), 600, fuera de git.
 name: grafo-tareas
 
 x-reinicio: &reinicio
@@ -26,7 +26,11 @@ services:
 
   api:
     <<: *reinicio
-    build: ../grafo-tareas.api
+    build:
+      context: ../grafo-tareas.api
+      # Sin la attestation de procedencia de BuildKit (lleva la hora del build) dos builds del mismo código dan la misma
+      # imagen y `up --build` no recrea nada: bin/desplegar es idempotente (medido 2026-10-17, Docker 29.4).
+      provenance: false
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,6 +56,7 @@ services:
     <<: *reinicio
     build:
       context: ../grafo-tareas.web
+      provenance: false   # ver api
       args:
         NEXT_PUBLIC_API_URL: ${URL_API:?falta URL_API}
     depends_on:

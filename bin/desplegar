@@ -56,21 +56,26 @@ traer "$DIR" grafo-tareas
 for repo in "$@"; do traer "$DIR/$repo" "$repo"; done
 
 ENV="$DIR/deploy/.env"
-if [ ! -f "$ENV" ]; then
-  umask 077
-  printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > "$ENV"
-  echo "deploy/.env creado (contraseña nueva de Postgres, 600)"
-fi
+# deploy/.env es el `.env` que compose lee solo desde deploy/: así un `docker compose ps` a mano también funciona.
+# La contraseña se crea una vez y se conserva; puertos y URLs se reescriben en cada despliegue (su fuente es este script).
+CLAVE=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$ENV" 2>/dev/null || true)
+[ -n "$CLAVE" ] || { CLAVE=$(openssl rand -hex 24); echo "contraseña nueva de Postgres en deploy/.env"; }
+umask 077
+printf 'POSTGRES_PASSWORD=%s\nPUERTO_API=%s\nPUERTO_WEB=%s\nURL_API=%s\nURL_WEB=%s\n' \
+  "$CLAVE" "$PUERTO_API" "$PUERTO_WEB" "$URL_API" "$URL_WEB" > "$ENV.nuevo" && mv "$ENV.nuevo" "$ENV"
+umask 022
 mkdir -p "$DIR/deploy/respaldos"
 
-docker compose -f "$DIR/deploy/compose.yml" --env-file "$ENV" up -d --build --remove-orphans 2>&1 | grep -vE '^ *#|^$' | tail -12
+cd "$DIR/deploy"
+docker compose up -d --build --remove-orphans 2>&1 | grep -vE '^ *#|^$' | tail -12
 
 "$TAILSCALE" serve --bg --https="$HTTPS_API" "http://127.0.0.1:$PUERTO_API" >/dev/null
 "$TAILSCALE" serve --bg --https="$HTTPS_WEB" "http://127.0.0.1:$PUERTO_WEB" >/dev/null
 
 echo "--- contenedores (puerto publicado · reinicio)"
-CONTENEDORES=$(docker compose -f "$DIR/deploy/compose.yml" --env-file "$ENV" ps -q)
-[ "$(wc -w <<<"$CONTENEDORES")" = 4 ] || { echo "FALLA: se esperaban 4 contenedores corriendo" >&2; exit 1; }
+CONTENEDORES=$(docker compose ps -q)
+set -- $CONTENEDORES   # contar con $# y no con `wc -w`: el wc de macOS rellena con espacios y "   4" ≠ "4"
+[ $# = 4 ] || { echo "FALLA: se esperaban 4 contenedores corriendo y hay $#" >&2; exit 1; }
 for c in $CONTENEDORES; do
   docker inspect -f '{{.Name}} · {{range $p, $b := .HostConfig.PortBindings}}{{range $b}}{{.HostIp}}:{{.HostPort}} {{end}}{{end}}· {{.HostConfig.RestartPolicy.Name}}' "$c"
   # D2 y la convención del Mac Mini: nada en la LAN, y todo vuelve solo tras un reinicio.
