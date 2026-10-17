@@ -1,7 +1,7 @@
 {
   "project": "grafo-tareas",
   "tech": "NestJS + Next.js + Vite/R3F (WebXR)",
-  "current_phase": "FASE_10",
+  "current_phase": "FASE_5",
   "phases": {
     "FASE_1": {
       "status": "done",
@@ -49,7 +49,7 @@
       "total": 3
     },
     "FASE_10": {
-      "status": "in_progress",
+      "status": "done",
       "tasks": 4,
       "total": 4
     }

@@ -18,7 +18,7 @@ y lleva `## Understand`, `## QA` y `## Cierre oficial en Azure` (esta última, *
 | [7 · Editar desde el visor](FASE_7_EDITAR_DESDE_VR.md) | F3 | conectar y cerrar dentro del 3D | `grafo-tareas.vr` | ✅ 3/3 · conectar con el rayo, cerrar y ver qué libera, Zustand · falta medir FPS en el visor |
 | [8 · Roles](FASE_8_ROLES.md) | C11 | un tablero por tipo de trabajo, y las FASE junto a las tarjetas | `api` + `web` + `roles.yaml` | ✅ 3/3 · `2dd7dad` api · `d3113ff` web · tablero por rol, FASE en solo lectura |
 | [9 · Complementos](FASE_9_COMPLEMENTOS.md) | C11 | dudas con escalera, decisiones y «para decir» colgados del PBI | `api` + `web` + `roles.yaml`/`refs.yaml` | ✅ 3/3 · `c69086c` api · `ec572f9` web · escalar, decidir, rituales |
-| [10 · El día](FASE_10_EL_DIA.md) | C11 | el parte para Fabián, lo que está en curso y los trámites de cierre, leídos del grafo | `api` + `web` + `roles.yaml` | 🟡 4/4 · criterios 3/3 · auditoría ✅ · commit en curso |
+| [10 · El día](FASE_10_EL_DIA.md) | C11 | el parte para Fabián, lo que está en curso y los trámites de cierre, leídos del grafo | `api` + `web` + `roles.yaml` | ✅ 4/4 · `1ea1e2a` api · `d608901` web · parte para copiar, aviso de más de 2 en curso, trámites de cierre |
 
 **Orden (Freddy, 2026-10-16, con la FASE 1 verde):** backend → clon de Todoist → corte → VR. La VR es otra vista de lo que muestra la PWA; el riesgo del 3D ya lo descartó la FASE 1. F4 del concepto (Redis + cola, OAuth) no tiene FASE: solo si hace falta.
 **La FASE 1 corta:** si en el visor no rinde o no se lee, se para y se revisa la decisión del 3D antes de la FASE 2.

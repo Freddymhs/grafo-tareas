@@ -1,7 +1,7 @@
 # FASE 10: EL DÍA — EL PARTE, LO QUE ESTÁ EN CURSO Y LOS TRÁMITES DE CIERRE
 
 **Destraba**: llegar a la daily con el parte hecho (terminé / en curso / detenido) sin armarlo a mano, ver de un vistazo si hay más tarjetas en curso de las que se pueden llevar, y que ningún cierre («falta URL commit», evidencias, wiki) se quede sin hacer — lo que pidió Fabián en la evaluación 1
-**Listo para PR**: no · FASE escrita el 2026-10-17 (Freddy: «complétalo todo, fase tras fase»)
+**Listo para PR**: sí · FASE escrita y cerrada el 2026-10-17 (Freddy: «complétalo todo, fase tras fase»)
 **Prioridad**: Alta
 **Dependencias**: FASE 8 (roles) · FASE 9 (complementos: «para decir», trámite)
 **Fuente**: `docs/_CONCEPTO.md` § C11 «Ideas a pedido» (1) parte, (2) cierres, (3) dos tarjetas en curso · memoria `project-evaluacion1-fabian`
@@ -43,7 +43,7 @@
 
 - [x] Colección — no aplica: proyecto personal, sin Postman
 - [x] Auditoría — 2026-10-17: API 70 unit · 37 e2e, contrato regenerado; web tsc, eslint, vitest 16, Playwright 7; VR; rojos probados en cada tarea (uno no aplicaba el cambio —`sed` sobre una línea que prettier había partido— y se repitió hasta que falló de verdad).
-- [ ] Listo para PR
+- [x] Listo para PR — 2026-10-17: commiteada (api `1ea1e2a`, web `d608901`, vr `7f9c99c`, orquestador `f38d1d7`); sin push.
 
 ## Cierre oficial en Azure
 
