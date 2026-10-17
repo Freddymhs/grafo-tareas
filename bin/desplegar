@@ -68,6 +68,9 @@ traer() {   # traer <dir> <repo>: clona la primera vez; después solo avanza (nu
   echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
 }
 mkdir -p "$(dirname "$DIR")"
+# La API lee roles.yaml y refs.yaml SOLO al arrancar: si el despliegue los cambia, hay que reiniciarla (abajo).
+huella_area() { cat "$DIR/docs/roles.yaml" "$DIR/refs.yaml" 2>/dev/null | shasum | cut -c1-40; }
+AREA_ANTES=$(huella_area)
 traer "$DIR" grafo-tareas
 for repo in "$@"; do traer "$DIR/$repo" "$repo"; done
 
@@ -84,6 +87,9 @@ mkdir -p "$DIR/deploy/respaldos"
 
 cd "$DIR/deploy"
 docker compose up -d --build --remove-orphans 2>&1 | grep -vE '^ *#|^$' | tail -12
+if [ "$AREA_ANTES" != "$(huella_area)" ]; then
+  docker compose restart api >/dev/null 2>&1 && echo "roles.yaml o refs.yaml cambiaron: API reiniciada para leerlos"
+fi
 
 "$TAILSCALE" serve --bg --https="$HTTPS_API" "http://127.0.0.1:$PUERTO_API" >/dev/null
 "$TAILSCALE" serve --bg --https="$HTTPS_WEB" "http://127.0.0.1:$PUERTO_WEB" >/dev/null
