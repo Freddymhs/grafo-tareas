@@ -1,7 +1,7 @@
 # FASE 8: ROLES — UN TABLERO POR TIPO DE TRABAJO
 
 **Destraba**: ver en la PWA el trabajo de cada rol con sus propias columnas (Producto, Calidad, Seguridad, DevEx, Incidente, Negocio) y las FASE junto a las tarjetas — C11, la base antes de los complementos
-**Listo para PR**: no · FASE escrita el 2026-10-17
+**Listo para PR**: sí · FASE escrita y cerrada el 2026-10-17
 **Prioridad**: Alta
 **Dependencias**: FASE 4 (la PWA) · FASE 5 (el importador de `FASE_*.md`)
 **Fuente**: `docs/_CONCEPTO.md` § Para confirmar C11 · `~/dotfiles/workspace-template/docs/roles.yaml` (la fuente única, con `tests/test_roles.py` como derivación de referencia)
@@ -36,7 +36,7 @@
 
 - [x] Colección — no aplica: proyecto personal, sin Postman
 - [x] Auditoría — 2026-10-17: `/work:backlog:review` sin errores (⭐⭐⭐⭐☆). Sin TestSprite (Freddy: «no quiero complicarme con eso»): el gate de la FASE es Playwright — `e2e/tablero-roles.spec.ts` con la API simulada y Chrome real contra la API real (Todo/Producto/Calidad/Negocio, 0 errores de consola) — más API 57 unit · 24 e2e, web vitest 13 · Playwright 5, VR 30, y tres casos rojos probados.
-- [ ] Listo para PR
+- [x] Listo para PR — 2026-10-17: commiteada (api `2dd7dad`, web `d3113ff`, vr `d144b4e`, orquestador `1711655`); sin push.
 
 ## Cierre oficial en Azure
 

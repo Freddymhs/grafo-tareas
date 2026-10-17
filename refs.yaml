@@ -13,3 +13,11 @@ tablero: none                          # F0-F1: apagado hasta que Freddy elija (
 qa: none
 docs: { dir: docs }
 repos: {}                              # los gates (typecheck/lint/test) por repo se llenan tras inspeccionar cada plantilla en new-project
+
+# Escalera de una duda y rituales (C11, FASE 9). Son del ÁREA: las personas son del cliente. La API los lee por
+# REFS_ARCHIVO. Este orquestador es personal y no tiene a quién escalar: el bloque del SAG (Carabantes, Tomás Soto,
+# Nicolás) va en el refs.yaml del Laboratorio, al cortar. Formato:
+#   escalera:
+#     negocio: { antes: contrastar con el código, personas: [Tomás Carabantes, Tomás Soto] }
+#     codigo:  { personas: [Tomás Soto, Tomás Carabantes] }
+rituales: { daily: Daily, retro: Retro }

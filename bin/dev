@@ -14,6 +14,7 @@ ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 API_DIR="${GRAFO_API_DIR:-$ORQ/grafo-tareas.api}"
 WEB_DIR="${GRAFO_WEB_DIR:-$ORQ/grafo-tareas.web}"
 ROLES="${ROLES_ARCHIVO:-$ORQ/docs/roles.yaml}"   # los roles del área: GET /roles y las columnas de cada tablero (FASE 8)
+REFS="${REFS_ARCHIVO:-$ORQ/refs.yaml}"   # escaleras de dudas y rituales del área (FASE 9)
 LOGS="${GRAFO_LOGS:-${XDG_STATE_HOME:-$HOME/.local/state}/grafo-tareas}"
 PIDS="$LOGS/dev.pids"
 PUERTO_API=3000
@@ -53,8 +54,14 @@ nohup npx tsc -p tsconfig.build.json --watch --preserveWatchOutput > "$LOGS/api-
 nohup npx tsc-alias -w -p tsconfig.json > "$LOGS/api-alias.log" 2>&1 & echo $! >> "$PIDS"
 # NODE_ENV=production solo apaga pino-pretty: su hilo (thread-stream) muere bajo `node --watch` con «this should not
 # happen: undefined». Los logs quedan en JSON en el archivo; nada más depende de NODE_ENV en la API (grep).
-ROLES_ARCHIVO="$ROLES" NODE_ENV=production nohup node --watch-path=dist dist/main > "$LOGS/api-dev.log" 2>&1 & echo $! >> "$PIDS"
+ROLES_ARCHIVO="$ROLES" REFS_ARCHIVO="$REFS" NODE_ENV=production nohup node --watch-path=dist dist/main > "$LOGS/api-dev.log" 2>&1 & echo $! >> "$PIDS"
 esperar "http://localhost:$PUERTO_API/api/v1/health" "API (watch)" "$LOGS/api-dev.log"
+# El 3000 puede tenerlo OTRA API (un `nest start --watch` olvidado la revive apenas se libera el puerto): health da 200
+# igual. La nuestra tiene roles si el área los tiene; si no los trae, no es ésta. (Real 2026-10-17, 2,5 h sin verlo.)
+if [ -f "$ROLES" ] && curl -s "http://localhost:$PUERTO_API/api/v1/roles" | grep -q '"roles":\[\]'; then
+  echo "el $PUERTO_API lo atiende otra API, sin roles: $(ps -o pid=,args= -p "$(ss -ltnpH "sport = :$PUERTO_API" | grep -oP 'pid=\K[0-9]+' | head -1)")" >&2
+  exit 1
+fi
 
 cd "$WEB_DIR"
 NEXT_PUBLIC_API_URL="http://localhost:$PUERTO_API" nohup "${PNPM[@]}" dev -p "$PUERTO_WEB" > "$LOGS/web-dev.log" 2>&1 & echo $! >> "$PIDS"

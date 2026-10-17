@@ -6,6 +6,10 @@
 # Un rol nuevo = una entrada acá + su plantilla. Se copia a cada área con `nuevo-workspace`: cada empresa
 # ajusta los suyos sin tocar los de otra. `bash tests/test_roles.sh` (dotfiles) falla si rol y plantilla no calzan.
 #
+# Complementos (C11, FASE 9 de grafo-tareas): lo que cuelga de un PBI sin ser un rol. Cada uno es un nodo `nodo` con la
+# etiqueta `complemento:<clave>`, conectado PERTENECE_A su PBI. `accionable: false` = nota: no entra en «hoy puedo» ni en el
+# tablero, se ve en el detalle del PBI. `escalera` (solo en DUDA) nombra la escalera de `refs.yaml` del área.
+#
 # Cómo se deriva la etapa: se recorren `etapas` de la última a la primera y gana la primera cuya condición
 # se cumple; si ninguna, la primera. Condiciones:
 #   siempre            — la etapa de arranque
@@ -110,3 +114,17 @@ roles:
       - { clave: redactar, columna: REDACTAR, si: { grupo: redactar } }
       - { clave: aprobado, columna: PBI APROBADO, si: { qa: PBI aprobado } }
       - { clave: cerrado, columna: CERRADO, si: terminada }
+
+complementos:
+  duda-negocio:   { nombre: Duda de negocio, nodo: DUDA, escalera: negocio }
+  duda-codigo:    { nombre: Duda de código, nodo: DUDA, escalera: codigo }
+  dolor:          { nombre: Dolor (PBI vs código), nodo: TAREA, accionable: false }
+  supuesto:       { nombre: Supuesto, nodo: TAREA, accionable: false }
+  decision:       { nombre: Decisión, nodo: TAREA, accionable: false }
+  para-decir:     { nombre: Para decir, nodo: DAILY_ITEM }
+  propuesta:      { nombre: Propuesta, nodo: TAREA, accionable: true }
+  tramite:        { nombre: Trámite, nodo: TAREA, accionable: true }
+  apunte:         { nombre: Apunte de dominio, nodo: TAREA, accionable: false }
+  evidencia:      { nombre: Evidencia, nodo: TAREA, accionable: false }
+  trabajo-de-otro: { nombre: Trabajo de otro, nodo: TAREA, accionable: false }
+  captura:        { nombre: Captura rápida, nodo: TAREA, accionable: true }
