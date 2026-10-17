@@ -5,3 +5,4 @@ _docs/
 .env.*
 .claude/settings.local.json
 deploy/respaldos/
+deploy/importar/

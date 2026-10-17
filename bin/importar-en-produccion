@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# importar-en-produccion — corre los importadores de la API contra la base DESPLEGADA (FASE 12), no la del PC.
+#
+#   importar-en-produccion todoist --proyecto <id-de-todoist> [--seco]
+#   importar-en-produccion fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco]
+#
+# todoist: el token viaja por stdin (sale de ~/.zsh_secrets; nunca en una línea de comandos ni en el Mac Mini).
+# fases:   copia al Mac Mini SOLO lo que el importador lee —`FASE_*.md` y `Tareas/<id>/entendimiento.md`—, lo monta en
+#          un contenedor de un solo uso de la API (`docker compose run`) y lo borra al terminar. El proyecto es la clave
+#          `proyecto` del refs.yaml del orquestador (el origen `fases-md:<proyecto>`); los roles, los del despliegue.
+# Siempre conviene `--seco` primero: cuenta contra la base real sin escribir (corre lo mismo y deshace la transacción).
+set -euo pipefail
+
+ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+desde_refs() { REF_DESDE="$ORQ" ref "despliegue.$1" || { echo "importar-en-produccion: falta despliegue.$1 en refs.yaml" >&2; exit 1; }; }
+HOST_SSH="${GRAFO_HOST_SSH:-$(desde_refs ssh)}"
+DIR_REMOTO="apps/$(desde_refs app)"
+USO="uso: importar-en-produccion todoist --proyecto <id> [--seco] | fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco]"
+
+falla() { echo "importar-en-produccion: $*" >&2; exit 1; }
+# El mismo prólogo en cada ssh: PATH de docker (ssh no carga el .zshrc) y la carpeta del compose.
+remoto() { ssh "$HOST_SSH" "export PATH=/usr/local/bin:\$PATH; cd \"\$HOME/$DIR_REMOTO/deploy\" && $1"; }
+
+importar_todoist() {
+  local proyecto="" seco=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --proyecto) proyecto="${2:?--proyecto pide el id}"; shift ;;
+      --seco) seco=--seco ;;
+      *) falla "$USO" ;;
+    esac
+    shift
+  done
+  [ -n "$proyecto" ] || falla "$USO"
+  bash -c 'set +u; source ~/.zsh_secrets >/dev/null 2>&1; printf "%s\n" "${TODOIST_API_KEY:-}"' |
+    remoto "read -r TODOIST_API_KEY; [ -n \"\$TODOIST_API_KEY\" ] || { echo 'sin TODOIST_API_KEY en ~/.zsh_secrets del PC' >&2; exit 1; }; export TODOIST_API_KEY; docker compose exec -T -e TODOIST_API_KEY api node dist/importadores/todoist/cli.js --proyecto '$proyecto' $seco"
+}
+
+importar_fases() {
+  local orquestador="${1:?$USO}"; shift
+  local extra=() proyecto=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --proyecto) proyecto="${2:?--proyecto pide el nombre}"; shift ;;   # sin él, la clave `proyecto` de su refs.yaml
+      --adoptar) extra+=(--adoptar "${2:?--adoptar pide el origen}"); shift ;;
+      --seco) extra+=(--seco) ;;
+      *) falla "$USO" ;;
+    esac
+    shift
+  done
+  orquestador="$(cd "$orquestador" && pwd)"
+  local docs
+  [ -n "$proyecto" ] || proyecto=$(REF_DESDE="$orquestador" ref proyecto) || falla "$orquestador/refs.yaml no tiene \`proyecto:\` (es el origen fases-md:<proyecto>)"
+  docs=$(REF_DESDE="$orquestador" ref docs.dir) || falla "$orquestador/refs.yaml no tiene docs.dir"
+  [ -d "$docs/backlog" ] || falla "no existe $docs/backlog"
+  local carpeta="importar/$proyecto"   # relativa a deploy/ del Mac Mini (ignorada por git)
+
+  remoto "rm -rf '$carpeta' && mkdir -p '$carpeta/backlog' '$carpeta/Tareas'"
+  rsync -a --prune-empty-dirs --include='FASE_*.md' --exclude='*' "$docs/backlog/" "$HOST_SSH:$DIR_REMOTO/deploy/$carpeta/backlog/"
+  [ -d "$orquestador/Tareas" ] && rsync -a --prune-empty-dirs --include='*/' --include='entendimiento.md' --exclude='*' \
+    "$orquestador/Tareas/" "$HOST_SSH:$DIR_REMOTO/deploy/$carpeta/Tareas/"
+  echo "copiado: $(remoto "find '$carpeta/backlog' -name 'FASE_*.md' | wc -l | tr -d ' '") FASE · $(remoto "find '$carpeta/Tareas' -name entendimiento.md | wc -l | tr -d ' '") entendimiento.md"
+
+  # Contenedor de un solo uso con la misma imagen y el mismo DATABASE_URL que la API; lo copiado, montado de solo lectura.
+  remoto "docker compose run --rm -T -v \"\$PWD/$carpeta:/importar:ro\" api node dist/importadores/fases/cli.js \
+    --backlog /importar/backlog --tareas /importar/Tareas --roles /area/roles.yaml --proyecto '$proyecto' ${extra[*]:-}; \
+    estado=\$?; rm -rf '$carpeta'; exit \$estado"
+}
+
+modo="${1:-}"; [ $# -gt 0 ] && shift
+case "$modo" in
+  todoist) importar_todoist "$@" ;;
+  fases) importar_fases "$@" ;;
+  *) falla "$USO" ;;
+esac
