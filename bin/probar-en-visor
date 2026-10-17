@@ -12,6 +12,7 @@
 #   --reordenar  con --api: rehace el layout entero con las conexiones de hoy y lo guarda (FASE 13: el árbol cambió)
 #
 # El servidor queda en primer plano: Ctrl+C lo corta. El adb va envuelto en quest-despierto (memoria quest-3s-setup).
+# Con el build de producción, deja el visor mostrando ESE build (bin/lib/recargar-visor.mjs) y lo dice: ✓ o ✗.
 set -euo pipefail
 
 ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
@@ -22,6 +23,8 @@ DESPIERTO="${QUEST_DESPIERTO:-$HOME/bin/quest-despierto}"
 PUERTO_PREVIEW=4173
 PUERTO_DEV=5173
 NAVEGADOR_QUEST=com.oculus.browser
+PUERTO_CDP=9333   # 9222 lo usa otro proceso del PC
+ESPERA_SERVIDOR_S=60
 
 MODO=preview; ABRIR=0; NODOS=500; API=0; REORDENAR=0
 while [ $# -gt 0 ]; do
@@ -60,7 +63,17 @@ if [ "$ABRIR" = 1 ]; then
   "$DESPIERTO" -- "$ADB" -s "$SERIAL" shell am start -a android.intent.action.VIEW -d "'$URL'" "$NAVEGADOR_QUEST" >/dev/null
 fi
 
+# El Quest guarda la VR en su service worker: sin esto puede seguir mostrando el build anterior (trampa en CLAUDE.md).
+# Cuando el servidor responde, borra el worker de este origen, recarga las pestañas y comprueba el build.
+refrescar_visor() {
+  for _ in $(seq 1 "$ESPERA_SERVIDOR_S"); do curl -sf -o /dev/null "http://localhost:$PUERTO/" && break; sleep 1; done
+  "$DESPIERTO" -- "$ADB" -s "$SERIAL" forward "tcp:$PUERTO_CDP" localabstract:chrome_devtools_remote >/dev/null
+  node "$ORQ/bin/lib/recargar-visor.mjs" "$PUERTO_CDP" "http://localhost:$PUERTO" \
+    "$(basename "$(ls "$VR"/dist/assets/index-*.js)")" || true
+}
+
 if [ "$MODO" = dev ]; then
   exec npx vite --port "$PUERTO" --strictPort
 fi
+refrescar_visor &
 exec npx vite preview --port "$PUERTO" --strictPort
