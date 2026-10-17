@@ -39,7 +39,8 @@ done
 PUERTO=$([ "$MODO" = dev ] && echo "$PUERTO_DEV" || echo "$PUERTO_PREVIEW")
 URL="http://localhost:$PUERTO/?nodos=$NODOS"
 if [ "$API" = 1 ]; then
-  URL="http://localhost:$PUERTO/$([ "$REORDENAR" = 1 ] && echo "?reordenar")"
+  CONSULTA=""; [ "$REORDENAR" = 0 ] || CONSULTA="?reordenar"   # un `$([ ] && echo)` que da 1 mata el script por set -e
+  URL="http://localhost:$PUERTO/$CONSULTA"
   API_URL="${GRAFO_API_URL:-$(REF_DESDE="$ORQ" ref despliegue.api)}"
   curl -sf -o /dev/null -m 10 "$API_URL/api/v1/health" ||
     { echo "la API no responde en $API_URL (¿bin/desplegar? ¿bin/dev para la del PC?)" >&2; exit 1; }
