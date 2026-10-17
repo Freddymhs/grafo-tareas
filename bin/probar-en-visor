@@ -9,6 +9,7 @@
 #   --api        el grafo REAL (FASE 6): sin `?nodos`, contra la API desplegada (`despliegue.api` de refs.yaml,
 #                FASE 12), que el visor alcanza por el tailnet. Para la API de desarrollo del PC:
 #                GRAFO_API_URL=http://localhost:3000 (y entonces también ese puerto va por adb reverse)
+#   --reordenar  con --api: rehace el layout entero con las conexiones de hoy y lo guarda (FASE 13: el árbol cambió)
 #
 # El servidor queda en primer plano: Ctrl+C lo corta. El adb va envuelto en quest-despierto (memoria quest-3s-setup).
 set -euo pipefail
@@ -22,14 +23,15 @@ PUERTO_PREVIEW=4173
 PUERTO_DEV=5173
 NAVEGADOR_QUEST=com.oculus.browser
 
-MODO=preview; ABRIR=0; NODOS=500; API=0
+MODO=preview; ABRIR=0; NODOS=500; API=0; REORDENAR=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --dev) MODO=dev ;;
     --abrir) ABRIR=1 ;;
     --nodos) NODOS="${2:?--nodos pide un número}"; shift ;;
     --api) API=1 ;;
-    *) echo "uso: probar-en-visor [--dev] [--abrir] [--api | --nodos N]" >&2; exit 64 ;;
+    --reordenar) REORDENAR=1 ;;
+    *) echo "uso: probar-en-visor [--dev] [--abrir] [--api [--reordenar] | --nodos N]" >&2; exit 64 ;;
   esac
   shift
 done
@@ -37,7 +39,7 @@ done
 PUERTO=$([ "$MODO" = dev ] && echo "$PUERTO_DEV" || echo "$PUERTO_PREVIEW")
 URL="http://localhost:$PUERTO/?nodos=$NODOS"
 if [ "$API" = 1 ]; then
-  URL="http://localhost:$PUERTO/"
+  URL="http://localhost:$PUERTO/$([ "$REORDENAR" = 1 ] && echo "?reordenar")"
   API_URL="${GRAFO_API_URL:-$(REF_DESDE="$ORQ" ref despliegue.api)}"
   curl -sf -o /dev/null -m 10 "$API_URL/api/v1/health" ||
     { echo "la API no responde en $API_URL (¿bin/desplegar? ¿bin/dev para la del PC?)" >&2; exit 1; }
