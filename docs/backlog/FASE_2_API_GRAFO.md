@@ -52,7 +52,7 @@
 
 ## Criterios de Aceptación
 
-- [x] 1 · `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm test:e2e` en verde — 2026-10-16: 0 · 0 · 17/17 · 11/11
+- [x] 1 · `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm test:e2e` en verde — 2026-10-16: 0 · 0 · 17/17 · 11/11; **CI de GitHub verde** en `7f53643` (dos tropiezos de config, no de código: `version: 10` chocaba con `packageManager`, y lint-staged reformateaba `openapi.json` → el script ahora pasa Prettier)
 - [x] 2 · `hoyPuedo` y `libera` correctos — 2026-10-16: sobre el escenario del concepto (persona → duda → tareas, ciclo), en e2e; el generador sintético de la FASE 1 queda para la FASE 6, cuando la VR lea de la API
 - [x] 3 · — 0 hits, y en el CI · `grep -rnE "sag\.laboratorio|Laboratorio/|dev\.azure|6VhFQg6v45qcJHPc|todoist" src` → 0 hits fuera de `importadores/`
 - [ ] 4 · Corre en el Mac Mini (Docker) contra Neon y responde por Tailscale

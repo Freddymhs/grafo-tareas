@@ -100,8 +100,8 @@ en Todoist: ~6 ramas de color, nodos en 1-2 ramas, ~1,5 conexiones por nodo, alg
 ## QA
 
 - [x] Colección — no aplica: no hay API en esta FASE
-- [ ] Auditoría
-- [ ] Listo para PR
+- [x] Auditoría — sin TestSprite (no instalado): Freddy acepta el cierre sin testing automatizado externo (opción c, 2026-10-16). Lo que lo cubre: 13 tests unit, e2e Playwright con Chrome headless y la medición en el Quest 3S (72 FPS)
+- [x] Listo para PR — commiteado en `grafo-tareas.vr` `2a79187`
 
 ## Cierre oficial en Azure
 
