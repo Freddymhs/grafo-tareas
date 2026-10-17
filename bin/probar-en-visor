@@ -6,8 +6,9 @@
 #   --dev        `vite` con recarga en caliente, para iterar
 #   --abrir      además abre la URL en el Quest Browser (si no, se escribe a mano)
 #   --nodos N    la prueba de la FASE 1: N nodos sintéticos (default 500; 30..2000)
-#   --api        el grafo REAL (FASE 6): sin `?nodos`, y también el puerto de la API (3000) por adb reverse.
-#                La API tiene que estar corriendo en el PC (`pnpm build && node dist/main` en grafo-tareas.api)
+#   --api        el grafo REAL (FASE 6): sin `?nodos`, contra la API desplegada (`despliegue.api` de refs.yaml,
+#                FASE 12), que el visor alcanza por el tailnet. Para la API de desarrollo del PC:
+#                GRAFO_API_URL=http://localhost:3000 (y entonces también ese puerto va por adb reverse)
 #
 # El servidor queda en primer plano: Ctrl+C lo corta. El adb va envuelto en quest-despierto (memoria quest-3s-setup).
 set -euo pipefail
@@ -19,7 +20,6 @@ SERIAL="${QUEST_NET:-quest-3s:5555}"
 DESPIERTO="${QUEST_DESPIERTO:-$HOME/bin/quest-despierto}"
 PUERTO_PREVIEW=4173
 PUERTO_DEV=5173
-PUERTO_API=3000
 NAVEGADOR_QUEST=com.oculus.browser
 
 MODO=preview; ABRIR=0; NODOS=500; API=0
@@ -38,15 +38,20 @@ PUERTO=$([ "$MODO" = dev ] && echo "$PUERTO_DEV" || echo "$PUERTO_PREVIEW")
 URL="http://localhost:$PUERTO/?nodos=$NODOS"
 if [ "$API" = 1 ]; then
   URL="http://localhost:$PUERTO/"
-  curl -sf -o /dev/null "http://localhost:$PUERTO_API/api/v1/health" ||
-    { echo "la API no responde en el puerto $PUERTO_API: levantala antes (grafo-tareas.api: node dist/main)" >&2; exit 1; }
+  API_URL="${GRAFO_API_URL:-$(REF_DESDE="$ORQ" ref despliegue.api)}"
+  curl -sf -o /dev/null -m 10 "$API_URL/api/v1/health" ||
+    { echo "la API no responde en $API_URL (¿bin/desplegar? ¿bin/dev para la del PC?)" >&2; exit 1; }
+  export VITE_API_URL="$API_URL"   # la VR la fija en el build (src/lib/constants/api.ts)
 fi
 
 cd "$VR"
 [ "$MODO" = preview ] && npm run -s build
 
 "$DESPIERTO" -- "$ADB" -s "$SERIAL" reverse "tcp:$PUERTO" "tcp:$PUERTO"
-[ "$API" = 1 ] && "$DESPIERTO" -- "$ADB" -s "$SERIAL" reverse "tcp:$PUERTO_API" "tcp:$PUERTO_API"
+# Solo una API en el localhost del PC necesita el túnel; la desplegada se alcanza por el tailnet.
+if [ "$API" = 1 ] && [[ "$API_URL" =~ ^http://localhost:([0-9]+)$ ]]; then
+  "$DESPIERTO" -- "$ADB" -s "$SERIAL" reverse "tcp:${BASH_REMATCH[1]}" "tcp:${BASH_REMATCH[1]}"
+fi
 echo "visor: $URL → Entrar en VR · FPS abajo a la izquierda (verde ≥ 72)"
 if [ "$ABRIR" = 1 ]; then
   "$DESPIERTO" -- "$ADB" -s "$SERIAL" shell am start -a android.intent.action.VIEW -d "'$URL'" "$NAVEGADOR_QUEST" >/dev/null

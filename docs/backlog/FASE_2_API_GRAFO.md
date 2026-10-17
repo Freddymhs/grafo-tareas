@@ -1,7 +1,7 @@
 # FASE 2: LA API DEL GRAFO — NODOS, CONEXIONES, RAMAS Y LO DERIVADO
 
 **Destraba**: que el grafo tenga una fuente de verdad: la FASE 3 (importador) escribe en ella, la FASE 4 (PWA) y la FASE 6 (VR) la leen por Orval
-**Listo para PR**: casi · 2026-10-16: tareas 1-5 hechas y verdes (tsc 0 · lint 0 · 17 unit · 11 e2e · build · grep agnóstico 0); falta el criterio 4 (correr en el Mac Mini contra Neon), que es despliegue y no código
+**Listo para PR**: sí · criterios 1-4 ✅; el 4 (despliegue) lo cerró la FASE 12 el 2026-10-17, con Postgres en Docker en vez de Neon
 **Prioridad**: Alta
 **Dependencias**: **FASE 1 verde** (`DECISION_3D.md` dice que sigue R3F). Sin eso, esta FASE no arranca
 **Fuente**: `docs/_CONCEPTO.md` § Modelo de dominio, § Stack (Backend, Plantilla API, Neon, Contrato), § Para confirmar C1-C3
@@ -59,7 +59,7 @@
 - [x] 1 · `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm test:e2e` en verde — 2026-10-16: 0 · 0 · 17/17 · 11/11; **CI de GitHub verde** en `7f53643` (dos tropiezos de config, no de código: `version: 10` chocaba con `packageManager`, y lint-staged reformateaba `openapi.json` → el script ahora pasa Prettier)
 - [x] 2 · `hoyPuedo` y `libera` correctos — 2026-10-16: sobre el escenario del concepto (persona → duda → tareas, ciclo), en e2e; el generador sintético de la FASE 1 queda para la FASE 6, cuando la VR lea de la API
 - [x] 3 · — 0 hits, y en el CI · `grep -rnE "sag\.laboratorio|Laboratorio/|dev\.azure|6VhFQg6v45qcJHPc|todoist" src` → 0 hits fuera de `importadores/`
-- [ ] 4 · Corre en el Mac Mini (Docker) contra Neon y responde por Tailscale
+- [x] 4 · Corre en el Mac Mini (Docker) y responde por Tailscale — 2026-10-17, FASE 12: `https://mac-mini-server.tail1798c7.ts.net:8443`, health 200, datos reales migrados. **Contra Postgres en Docker y no Neon** (Freddy, 2026-10-17; N1: los datos del cliente no salen de sus máquinas); Neon = cambiar `DATABASE_URL`
 
 ## QA
 

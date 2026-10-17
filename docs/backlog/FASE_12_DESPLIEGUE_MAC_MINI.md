@@ -1,7 +1,7 @@
 # FASE 12: DESPLIEGUE EN EL MAC MINI — API, BASE Y PWA SIEMPRE ENCENDIDAS, SOLO POR EL TAILNET
 
 **Destraba**: el corte de Todoist (FASE 5 tarea 2) y el criterio 4 de la FASE 2: el grafo deja de depender de que el PC esté prendido, y hay **una sola** base de verdad
-**Listo para PR**: no · FASE escrita el 2026-10-17 (Freddy: «Mac Mini + Postgres Docker», Neon después; «el corte, después del deploy»)
+**Listo para PR**: casi · 2026-10-17: desplegado y verificado desde el PC por el tailnet (tareas 1-4 ✅, 5 casi); falta lo de Freddy: abrir la PWA en el teléfono (criterio 1) y agregar los 2 monitores en Uptime Kuma (pide su contraseña)
 **Prioridad**: Alta
 **Dependencias**: FASE 2 (API), FASE 4 (PWA). Mac Mini: Docker 29.4 arm64, acceso a GitHub, `tailscale serve` con el 443 ya ocupado (proxy a `:18789`, no es nuestro)
 **Fuente**: `docs/_CONCEPTO.md` § Stack (fila Despliegue: «API y fronts en el Mac Mini (Docker), acceso solo por Tailscale»), § Para confirmar N1 · reglas globales §9 (Docker)
@@ -39,30 +39,31 @@ Una vez que el grafo reemplaza a Todoist, perder la base es perder el trabajo. `
 
 ### Tarea 1: imágenes que cumplen §9
 - `grafo-tareas.api`: `.dockerignore` (`.env`, `.env.*`, `node_modules`, `dist`, `.git`…), `USER node`, pnpm fijado por `packageManager` (no `pnpm@latest`), migraciones al arrancar. `grafo-tareas.web`: `Dockerfile` (build con `NEXT_PUBLIC_API_URL` como argumento) y `.dockerignore`.
-- [ ] Hecha
-- [ ] Las dos imágenes construyen y corren como usuario no-root
+- [x] Hecha — 2026-10-17: api `3884047`, web `c76fc1f`
+- [x] Las dos imágenes construyen y corren como usuario no-root — `id -un` = `node` en los dos contenedores del Mac Mini; sin `.env` adentro; el build de la web **falla** sin `NEXT_PUBLIC_API_URL` (probado en rojo)
 
 ### Tarea 2: `deploy/compose.yml` + `bin/desplegar`
-- [ ] Hecha
-- [ ] `bin/desplegar` corrido dos veces seguidas: la segunda no cambia nada (idempotente)
+- [x] Hecha — 2026-10-17: `deploy/compose.yml` (api, postgres, web, respaldo) y `bin/desplegar` (lee `refs.yaml` → `despliegue`; reintenta los cortes de GitHub)
+- [x] Idempotente — dos corridas seguidas: 0 contenedores recreados. Tres tropiezos medidos (CLAUDE.md § Trampas): la attestation de BuildKit recreaba todo en cada corrida (`BUILDX_NO_DEFAULT_ATTESTATIONS=1`; `provenance: false` no sirve con bake), `wc -w` de macOS rellena con espacios, y las variables solo en el entorno rompían un `docker compose` a mano (ahora en `deploy/.env`)
 
 ### Tarea 3: los datos del PC al Mac Mini, una vez
-- [ ] Hecha — conteo de nodos y conexiones igual en las dos bases
+- [x] Hecha — 2026-10-17: `pg_dump` del PC → `pg_restore` en el Mac Mini con la API detenida y la base vacía comprobada antes (guard). **PC 214 nodos · 137 conexiones · 2 migraciones · última edición 16:46:47 = Mac Mini, idéntico**; sha256 de la copia verificado
 
 ### Tarea 4: respaldo diario
-- [ ] Hecha — un respaldo corrido a mano y restaurado en una base de prueba
+- [x] Hecha — 2026-10-17: contenedor `respaldo` (`unless-stopped`, cada 24 h, 14 copias en `deploy/respaldos/`); forzado con datos reales (68 KB) y restaurado en `grafo_prueba_respaldo`: 214 · 137; la base de prueba se borró
 
 ### Tarea 5: los consumidores apuntan al Mac Mini
 - `refs.yaml` (bloque `tablero` comentado, para el corte), `bin/probar-en-visor --api`, CLAUDE.md del orquestador, la tabla «Apps corriendo» del `~/CLAUDE.md` del Mac Mini y un monitor INTERNO en Uptime Kuma (checklist del Mac Mini, punto 12).
-- [ ] Hecha
+- [x] `refs.yaml` → `despliegue: { ssh, app, api, web }` (la fuente; el bloque `tablero` del corte apunta a `despliegue.api`) · `probar-en-visor --api` contra el Mac Mini (bundle con su URL, sin `adb reverse` del 3000; probado con adb falso) · CLAUDE.md del orquestador · `~/CLAUDE.md` del Mac Mini (fila nueva, respaldo `.antes-grafo-*`) · `tailscale serve` del PC apagado (sus rutas apuntaban a la API local, ya sin uso)
+- [ ] Monitores INTERNOS en Uptime Kuma — **Freddy**: agregados a la lista de `~/uptime-kuma-setup.py` (`grafo-api` → `http://host.docker.internal:3007/api/v1/health`, `grafo-web` → `:3008`, los dos alcanzables desde el contenedor, medido); crearlos pide su usuario de Kuma — en la UI son 2 monitores HTTP, o correr el script (ojo: borra y recrea todos)
 
 ## Criterios de Aceptación
 
-- [ ] 1 · Desde el PC y desde el teléfono (tailnet): `GET https://<mac-mini>:8443/api/v1/health` = 200 y la PWA en `:10000` carga el tablero con los datos reales
-- [ ] 2 · El preflight `OPTIONS` con `PATCH` desde el origen de la PWA devuelve el método permitido (trampa CORS de la FASE 4)
-- [ ] 3 · Nada escucha en la LAN del Mac Mini: 3007/3008 solo en `127.0.0.1`, Postgres sin puerto; los cuatro contenedores con `restart: unless-stopped`
-- [ ] 4 · Con el PC apagado (o `bin/dev --parar`) la PWA sigue andando
-- [ ] 5 · Los contenedores corren como no-root y la imagen no trae `.env`
+- [ ] 1 · Desde el PC y desde el teléfono (tailnet): `GET https://<mac-mini>:8443/api/v1/health` = 200 y la PWA en `:10000` carga el tablero con los datos reales — **PC ✅ 2026-10-17** (Chrome: tablero con columnas, FASE y tarjetas reales, 0 errores de consola/CORS; los `ERR_ABORTED` eran prefetch de Next, su RSC directo da 200); **teléfono: Freddy**
+- [x] 2 · Preflight `PATCH` desde `https://…:10000` → `GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS` (lo verifica `bin/desplegar` en cada corrida)
+- [x] 3 · Desde la LAN `192.168.1.11:3007/3008/5432` → sin respuesta; control positivo: Home Assistant `:8123` → 200 (el chequeo puede fallar). Los 4 con `unless-stopped` (lo verifica `bin/desplegar`)
+- [x] 4 · Medido con la API del PC apagada (nada en 3000/3001): la PWA del Mac Mini carga el tablero completo
+- [x] 5 · `node` en api y web; `/app/.env` no existe en ninguna de las dos
 
 ## QA
 

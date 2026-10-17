@@ -9,7 +9,7 @@
       "total": 5
     },
     "FASE_2": {
-      "status": "in_progress",
+      "status": "completed",
       "tasks": 6,
       "total": 6
     },
@@ -60,7 +60,7 @@
     },
     "FASE_12": {
       "status": "in_progress",
-      "tasks": 0,
+      "tasks": 4,
       "total": 5
     }
   },

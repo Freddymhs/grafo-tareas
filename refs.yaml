@@ -5,12 +5,17 @@ tracker: none                          # sin tracker de empresa (PORTAR §Capaci
 tablero: none                          # F0-F1: apagado hasta que Freddy elija (concepto § Cómo se crea, paso 2). El corte (FASE 5 tarea 2) lo cambia por el bloque de abajo
 # tablero:                             # adaptador `grafo` (bin/adapters/grafo/, FASE 5): mismo contrato que Laboratorio/bin/adapters/todoist
 #   kind: grafo
-#   api: http://localhost:3000/api/v1   # en producción, la URL por Tailscale
+#   api: https://mac-mini-server.tail1798c7.ts.net:8443/api/v1   # despliegue.api + /api/v1 (FASE 12)
 #   token_env: GRAFO_TOKEN              # opcional hasta que la API pida login (hoy no)
 #   label: board
 #   secciones: { entendimiento: ENTENDIMIENTO, codigo: EN CODIGO, coleccion: Collection Created, auditoria: TESTEADO, listo: LISTO PARA PR, amarrar: "AMARRAR 🧰", cambiar: "CAMBIAR 🧰", red: "RED 🧰", pr: Pull Request }   # las 9 de GET /etapas (smoke 2026-10-17)
 #   entrada: { proyecto: grafo-tareas, seccion: Entrada }   # /flow:pbi:repartir la lee; sin ella pregunta. El adaptador no la usa: el carril es una RAMA
 qa: none
+despliegue:                            # FASE 12: dónde corre el grafo. La leen bin/desplegar, bin/probar-en-visor y el corte (tablero.api)
+  ssh: mac-mini                        # alias de ~/.ssh/config
+  app: grafo-tareas                    # vive en ~/apps/<app> del Mac Mini (convención de su ~/CLAUDE.md)
+  api: https://mac-mini-server.tail1798c7.ts.net:8443    # tailscale serve → 127.0.0.1:3007
+  web: https://mac-mini-server.tail1798c7.ts.net:10000   # tailscale serve → 127.0.0.1:3008
 docs: { dir: docs }
 repos: {}                              # los gates (typecheck/lint/test) por repo se llenan tras inspeccionar cada plantilla en new-project
 

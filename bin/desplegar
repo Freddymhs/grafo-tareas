@@ -3,34 +3,41 @@
 # deploy/compose.yml. Repetible: correrlo dos veces seguidas no cambia nada.
 #
 #   1. aquí: lo que no está en GitHub no se despliega → aborta si algún `main` local va adelante de origin
-#   2. allá (ssh): clona o trae los tres repos a ~/apps/grafo-tareas, crea deploy/.env la primera vez (contraseña de
-#      Postgres al azar, chmod 600), `docker compose up -d --build`, `tailscale serve` 8443 → API y 10000 → PWA
+#   2. allá (ssh): clona o trae los tres repos a ~/apps/<app>, escribe deploy/.env (la contraseña de Postgres se crea
+#      una vez y se conserva; 600), `docker compose up -d --build`, `tailscale serve` del puerto de cada URL
 #   3. aquí: verifica por el tailnet health, PWA, CORS de PATCH, puertos solo en 127.0.0.1 y restart unless-stopped
 #
 # El runner de GitHub del Mac Mini solo toma repos de fmarcos-labs (su ~/CLAUDE.md); éstos son de Freddymhs: por eso ssh.
 set -euo pipefail
 
 ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
-HOST_SSH="${GRAFO_HOST_SSH:-mac-mini}"
-DIR_REMOTO="${GRAFO_DIR_REMOTO:-apps/grafo-tareas}"            # relativo al HOME del Mac Mini (su convención: ~/apps/<app>)
-HOST_TAILNET="${GRAFO_HOST_TAILNET:-mac-mini-server.tail1798c7.ts.net}"
+# Dónde corre sale de refs.yaml (`despliegue`), no de este script: lo leen también probar-en-visor y el corte.
+desde_refs() { REF_DESDE="$ORQ" ref "despliegue.$1" || { echo "desplegar: falta despliegue.$1 en refs.yaml" >&2; exit 1; }; }
+HOST_SSH="${GRAFO_HOST_SSH:-$(desde_refs ssh)}"
+DIR_REMOTO="apps/$(desde_refs app)"                               # convención del Mac Mini: ~/apps/<app>
+URL_API="$(desde_refs api)"
+URL_WEB="$(desde_refs web)"
 GITHUB="${GRAFO_GITHUB:-git@github.com:Freddymhs}"
 REPOS_INTERNOS=(grafo-tareas.api grafo-tareas.web)
 RAMA=main
-PUERTO_API=3007                                                  # apps generales del Mac Mini: 3001-3009
+PUERTO_API=3007                                                  # 127.0.0.1 del Mac Mini; apps generales: 3001-3009
 PUERTO_WEB=3008
-HTTPS_API=8443                                                   # tailscale serve solo da HTTPS en 443, 8443 y 10000
-HTTPS_WEB=10000                                                  # (el 443 del Mac Mini es de otro servicio)
-URL_API="https://$HOST_TAILNET:$HTTPS_API"
-URL_WEB="https://$HOST_TAILNET:$HTTPS_WEB"
+HTTPS_API="${URL_API##*:}"                                       # tailscale serve solo da HTTPS en 443, 8443 y 10000
+HTTPS_WEB="${URL_WEB##*:}"                                       # (el 443 del Mac Mini es de otro servicio)
 SEGUNDOS_ESPERA=180
+INTENTOS_GIT=3
 
 falla() { echo "desplegar: $*" >&2; exit 1; }
+reintentar() {   # GitHub corta a veces el ssh (`Connection reset by peer`, medido 2026-10-17): un corte no es un error
+  local n
+  for n in $(seq "$INTENTOS_GIT"); do "$@" && return 0; echo "reintento $n/$INTENTOS_GIT: $*" >&2; sleep 5; done
+  return 1
+}
 
 # 1. Lo publicado es lo que se despliega.
 for repo in "" "${REPOS_INTERNOS[@]}"; do
   dir="$ORQ${repo:+/$repo}"; nombre="${repo:-grafo-tareas}"
-  git -C "$dir" fetch -q origin "$RAMA"
+  reintentar git -C "$dir" fetch -q origin "$RAMA" || falla "no pude traer $nombre de GitHub"
   adelante=$(git -C "$dir" rev-list --count "origin/$RAMA..$RAMA")
   [ "$adelante" = 0 ] || falla "$nombre tiene $adelante commit(s) sin pushear: lo que no está en GitHub no se despliega"
   [ -z "$(git -C "$dir" status --porcelain)" ] || echo "aviso: $nombre tiene cambios sin commitear; no viajan (se despliega origin/$RAMA)"
@@ -49,9 +56,15 @@ DIR="$HOME/$1"; GITHUB=$2; RAMA=$3
 export PUERTO_API=$4 PUERTO_WEB=$5; HTTPS_API=$6; HTTPS_WEB=$7; export URL_API=$8 URL_WEB=$9
 shift 9
 
+reintentar() {   # el mismo corte de GitHub puede pasar acá; bash 3.2 (el de macOS): nada de mapfile ni `local -n`
+  for n in 1 2 3; do "$@" && return 0; echo "reintento $n/3: $*" >&2; sleep 5; done
+  return 1
+}
 traer() {   # traer <dir> <repo>: clona la primera vez; después solo avanza (nunca pisa: --ff-only)
-  if [ -d "$1/.git" ]; then git -C "$1" fetch -q origin "$RAMA" && git -C "$1" checkout -q "$RAMA" && git -C "$1" merge -q --ff-only "origin/$RAMA"
-  else git clone -q --branch "$RAMA" "$GITHUB/$2.git" "$1"; fi
+  if [ -d "$1/.git" ]; then
+    reintentar git -C "$1" fetch -q origin "$RAMA"
+    git -C "$1" checkout -q "$RAMA" && git -C "$1" merge -q --ff-only "origin/$RAMA"
+  else reintentar git clone -q --branch "$RAMA" "$GITHUB/$2.git" "$1"; fi
   echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
 }
 mkdir -p "$(dirname "$DIR")"

@@ -228,6 +228,7 @@ repos:
 - **FASE 9 — complementos (2026-10-17, tarde, sin commit):** catálogo de 12 en `roles.yaml` (nodo, accionable, escalera), `POST/GET /nodos/:id/complementos`, `escalar`, `decidir`, rituales y escaleras desde `refs.yaml` (`REFS_ARCHIVO`, `GET /area`), notas fuera de «hoy puedo» y del tablero; PWA con la sección Complementos en el detalle. API 65 unit · 31 e2e; web Playwright 6. Detalle en `FASE_9_COMPLEMENTOS.md`.
 - **FASE 10 — el día (2026-10-17, noche):** `GET /derivado/dia` (terminé, en curso según `curso: true` de `roles.yaml`, detenido, para decir, trámites) y la vista `/dia` con «Copiar el parte» y el aviso de más de 2 en curso (con datos reales: 11). Los importadores solo escriben lo que cambió (`updatedAt` honesto). Trámites de cierre automáticos desde las casillas de `## Cierre oficial`; con los datos del Laboratorio: 5 trámites, y 8 FASE (23-30) con PR mergeado pero sin «Listo para PR» tildado en su `.md`.
 - **FASE 11 — un tablero que se entiende (2026-10-17, desde la primera prueba de Freddy):** las FASE como en `fases.html` (nombre, task, avance en verde/rojo), cada columna con su `que`, «Entrada» → «Sin etapa» explicada, las 35 FASE del Laboratorio importadas adoptando las 18 de Todoist (C10), columnas con scroll propio (la página pasó de 8.300 a 971 px).
+- **FASE 12 — despliegue en el Mac Mini (2026-10-17, tarde):** API + Postgres + PWA + respaldo diario en Docker, solo `127.0.0.1`, publicados por `tailscale serve` (`:8443` API, `:10000` PWA). Postgres en Docker y no Neon (Freddy; N1). `bin/desplegar` idempotente (BuildKit: `BUILDX_NO_DEFAULT_ATTESTATIONS=1`) y `refs.yaml` → `despliegue` como fuente de dónde corre. Datos del PC migrados (214 · 137, idéntico); respaldo restaurado en base de prueba. Pendiente de Freddy: teléfono y Uptime Kuma.
 
 **Sin probar en real:** `pendiente`, `tarjeta`, `etapa`, `borrador` contra Todoist (solo `buscar` corrió real). Se verá en el primer `/flow:todo` o tilde de FASE.
 
@@ -306,17 +307,20 @@ publicar → preguntar. Instaladores → confirmar. Reglas globales (~/.claude/C
 read-before-write, todo chequeo tiene que poder fallar. pnpm = npx -y pnpm@10.34.7. Bash para scripts (zsh no
 parte variables). Nunca pkill -f.
 
-Estado (2026-10-17, noche): FASE 1-4, 6-11 ✅ (8 roles, 9 complementos, 10 el día, 11 tablero que se entiende), FASE 5 2/3; todo commiteado en
-api, web, vr, orquestador y dotfiles, SIN PUSH (Freddy decide). Lo de Freddy: el corte (FASE 5 t2), deploy Mac Mini + Neon
-(FASE 2 c4), FPS en el visor (FASE 6-7), usar la PWA una semana (FASE 4 c1). Corriendo: bin/dev (API watch :3000 con
-ROLES_ARCHIVO y REFS_ARCHIVO; PWA next dev :3001). Con bin/dev corriendo no correr `pnpm build` de la API (borra dist).
-tailscale serve apunta a 3001/3000: para el teléfono, bin/servir-tailnet. ~/bin/claude-bifurcar sin commitear (Freddy:
+Estado (2026-10-17, tarde-noche): FASE 1-4, 6-11 ✅, FASE 12 (despliegue) 4/5, FASE 5 2/3. Todo pusheado.
+**Producción en el Mac Mini (FASE 12):** PWA https://mac-mini-server.tail1798c7.ts.net:10000 · API :8443, Postgres en
+Docker (no Neon: Freddy 2026-10-17), datos del PC migrados (214 · 137), respaldo diario en ~/apps/grafo-tareas/deploy/
+respaldos. ESA es la base de verdad; la del PC (bin/dev, bin/servir-tailnet) es de desarrollo. Desplegar = pushear +
+bin/desplegar (idempotente; dónde corre = refs.yaml → despliegue). ~/bin/claude-bifurcar sin commitear (Freddy:
 «olvídate de bifurcar»); dotfiles claude/metodo.md y claude/settings.json NO son míos.
 
 Siguiente, en orden:
-1. FASE 8, 9 y 10 commiteadas (sin push). Lo que queda es de Freddy: probar la PWA (/dia, complementos, tablero por rol),
-   tildar «Listo para PR» en las FASE 23-30 del Laboratorio, el bloque escalera en el refs.yaml del Laboratorio, y decidir push.
-Abierto con Freddy: el corte (FASE 5 t2), C10, si «funcional» es el nombre oficial de Producto, deploy Mac Mini +
-Neon, FPS en el visor, instalador de un comando para el método (y probarlo en Mac/WSL), detectar el PR desde Azure.
+1. El corte (FASE 5 tarea 2, Freddy: «después del deploy» → ya se puede): tablero.kind: grafo con api = despliegue.api +
+   /api/v1, en este orquestador y en el Laboratorio (con su bloque escalera), según el plan de FASE_5 (D10).
+2. Lo de Freddy: abrir la PWA del Mac Mini en el teléfono e instalarla (FASE 12 c1), 2 monitores en Uptime Kuma
+   (FASE 12 t5, pide su contraseña), FPS en el visor (FASE 6-7: bin/probar-en-visor --api --abrir), usar la PWA una
+   semana (FASE 4 c1), tildar «Listo para PR» en las FASE 23-30 del Laboratorio.
+Abierto con Freddy: C10, si «funcional» es el nombre oficial de Producto, Neon (N1), instalador de un comando para el
+método (y probarlo en Mac/WSL), detectar el PR desde Azure.
 Contexto personal: memoria project-evaluacion1-fabian (evaluación 2 ~22-24 oct → indefinido).
 ```
