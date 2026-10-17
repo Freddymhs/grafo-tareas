@@ -1,7 +1,7 @@
 # FASE 9: COMPLEMENTOS — LO QUE CUELGA DE UN PBI
 
 **Destraba**: que dudas, decisiones y «para decir» vivan pegadas a su PBI y una duda sepa a quién se escala después — C11, sobre la base de la FASE 8
-**Listo para PR**: no · FASE escrita el 2026-10-17; las 6 decisiones, aceptadas por Freddy el mismo día
+**Listo para PR**: sí · FASE escrita y cerrada el 2026-10-17; las 6 decisiones, de Freddy
 **Prioridad**: Alta
 **Dependencias**: FASE 8 (roles)
 **Fuente**: `docs/_CONCEPTO.md` § Para confirmar C11 (complementos, escalera, PBI borrador)
@@ -51,7 +51,7 @@
 
 - [x] Colección — no aplica: proyecto personal, sin Postman
 - [x] Auditoría — 2026-10-17: revisión propia (fecha local, `ritual` de más), gates de los 3 repos (API 65 unit · 31 e2e, contrato al día; web tsc, eslint, vitest 13, `next build`, Playwright 6; VR 30), smoke real en Chrome y rojos probados.
-- [ ] Listo para PR
+- [x] Listo para PR — 2026-10-17: commiteada (api `c69086c`, web `ec572f9`, vr `1eb1c66`, orquestador `c0b42f2`; plantilla en dotfiles); sin push.
 
 ## Cierre oficial en Azure
 

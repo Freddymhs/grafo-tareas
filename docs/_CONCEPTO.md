@@ -226,6 +226,7 @@ repos:
 - **Lo que Freddy explicó con `fases.html`/`calidad.html`:** los `FASE_x.md` son el corazón; sus casillas dan la etapa en dos tableros (flujo normal y calidad). Todoist aporta conexiones y tarjetas sueltas. El grafo junta ambos; el 3D hace visibles las conexiones. → FASE 5: importador de `FASE_*.md` como nodos FASE con etapa derivada de las casillas (como `bin/fases`).
 - **FASE 8 — roles (2026-10-17, tarde, sin commit):** la API lee `roles.yaml` (`ROLES_ARCHIVO`; `GET /roles`, `GET /nodos?rol=`, `GET /etapas` = tablero ∪ columnas), `importar:fases` deriva rol y etapa con él (paridad con `test_roles.py` 43/43) y la PWA tiene pestañas por rol con tareas y FASE. Dependencia nueva `yaml` (OK de Freddy). API 57 unit · 24 e2e; web vitest 13 · Playwright 5; VR 30. Detalle en `FASE_8_ROLES.md`.
 - **FASE 9 — complementos (2026-10-17, tarde, sin commit):** catálogo de 12 en `roles.yaml` (nodo, accionable, escalera), `POST/GET /nodos/:id/complementos`, `escalar`, `decidir`, rituales y escaleras desde `refs.yaml` (`REFS_ARCHIVO`, `GET /area`), notas fuera de «hoy puedo» y del tablero; PWA con la sección Complementos en el detalle. API 65 unit · 31 e2e; web Playwright 6. Detalle en `FASE_9_COMPLEMENTOS.md`.
+- **FASE 10 — el día (2026-10-17, noche):** `GET /derivado/dia` (terminé, en curso según `curso: true` de `roles.yaml`, detenido, para decir, trámites) y la vista `/dia` con «Copiar el parte» y el aviso de más de 2 en curso (con datos reales: 11). Los importadores solo escriben lo que cambió (`updatedAt` honesto). Trámites de cierre automáticos desde las casillas de `## Cierre oficial`; con los datos del Laboratorio: 5 trámites, y 8 FASE (23-30) con PR mergeado pero sin «Listo para PR» tildado en su `.md`.
 
 **Sin probar en real:** `pendiente`, `tarjeta`, `etapa`, `borrador` contra Todoist (solo `buscar` corrió real). Se verá en el primer `/flow:todo` o tilde de FASE.
 
@@ -303,25 +304,16 @@ publicar → preguntar. Instaladores → confirmar. Reglas globales (~/.claude/C
 read-before-write, todo chequeo tiene que poder fallar. pnpm = npx -y pnpm@10.34.7. Bash para scripts (zsh no
 parte variables). Nunca pkill -f.
 
-Estado (2026-10-17, tarde): api, web y vr pusheados con CI verde (f06384c, aa187db, 954652d); FASE 1-4, 6 y 7 ✅,
-FASE 5 2/3, FASE 8 (roles) 3/3 tareas, 2/2 criterios, review ✅ y sellada: STAGED SIN COMMIT, mensajes en
-/tmp/commit-grafo-tareas-{api,web,vr}-main.txt y /tmp/commit-grafo-tareas-main.txt (el commit lo corre Freddy). Incluye: api (módulo roles, GET /roles, ?rol=, importador por roles.yaml, dependencia yaml, openapi.json), web (tablero
-por rol, FASE en solo lectura, e2e tablero-roles) y vr (solo el cliente Orval regenerado); orquestador (FASE 8,
-docs/roles.yaml + plantillas, adaptador grafo busca la FASE por externo fases-md:<proyecto>, test 31/31, D10, plan
-del corte, bin/dev con ROLES_ARCHIVO, refs.yaml con bloque grafo comentado, CLAUDE.md, _CONCEPTO C11); dotfiles
-(workspace-template/docs/roles.yaml + docs/backlog/plantillas/plantilla-<rol>.md + tests/test_roles.{py,sh} +
-README; los cambios en claude/metodo.md y claude/settings.json NO son míos); ~/bin/claude-bifurcar (parte el
-pane con foco). Corriendo: bin/dev (API watch :3000 —se reinicia sola al cambiar código, verificado en 3 s;
-roles.yaml se lee solo al arrancar—, PWA next dev :3001). tailscale serve sigue apuntando a 3001/3000: con la web en dev apunta a la API local y
-en el teléfono no anda → correr bin/servir-tailnet cuando se quiera la PWA en el teléfono.
+Estado (2026-10-17, noche): FASE 1-4, 6-10 ✅ (8 roles, 9 complementos, 10 el día), FASE 5 2/3; todo commiteado en
+api, web, vr, orquestador y dotfiles, SIN PUSH (Freddy decide). Lo de Freddy: el corte (FASE 5 t2), deploy Mac Mini + Neon
+(FASE 2 c4), FPS en el visor (FASE 6-7), usar la PWA una semana (FASE 4 c1). Corriendo: bin/dev (API watch :3000 con
+ROLES_ARCHIVO y REFS_ARCHIVO; PWA next dev :3001). Con bin/dev corriendo no correr `pnpm build` de la API (borra dist).
+tailscale serve apunta a 3001/3000: para el teléfono, bin/servir-tailnet. ~/bin/claude-bifurcar sin commitear (Freddy:
+«olvídate de bifurcar»); dotfiles claude/metodo.md y claude/settings.json NO son míos.
 
 Siguiente, en orden:
-1. FASE 8: que Freddy corra los 4 git commit -F (y decida el push); después, tildar Listo para PR.
-2. FASE 9 (complementos) 3/3 y 2/2, en Changes: después del commit de la FASE 8, /work:backlog:review y /work:sellar:run.
-   Para usar Escalar con el trabajo real: el bloque escalera en el refs.yaml del Laboratorio y REFS_ARCHIVO apuntando ahí. Complementos colgados de un PBI (C11): duda de negocio/código con escalera de personas en refs.yaml del área,
-   dolor, supuesto, decisión, para decir (ritual: daily/retro/1:1 — DAILY_ITEM/EN_DAILY_DE), propuesta, trámite,
-   apunte, evidencia, trabajo de otro, captura rápida; PBI sin número = HISTORIA borrador.
-3. Recién después, ideas a pedido: parte para Fabián, revisar cierres en Azure, mostrar las 2 tarjetas en curso.
+1. FASE 8, 9 y 10 commiteadas (sin push). Lo que queda es de Freddy: probar la PWA (/dia, complementos, tablero por rol),
+   tildar «Listo para PR» en las FASE 23-30 del Laboratorio, el bloque escalera en el refs.yaml del Laboratorio, y decidir push.
 Abierto con Freddy: el corte (FASE 5 t2), C10, si «funcional» es el nombre oficial de Producto, deploy Mac Mini +
 Neon, FPS en el visor, instalador de un comando para el método (y probarlo en Mac/WSL), detectar el PR desde Azure.
 Contexto personal: memoria project-evaluacion1-fabian (evaluación 2 ~22-24 oct → indefinido).
