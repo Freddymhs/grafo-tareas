@@ -19,6 +19,7 @@
 #   cierre_real        — URL commit, Evidencias o Wiki tildadas en `## Cierre oficial en Azure`
 #   terminada          — todas las casillas de Understand, Tareas, QA y Cierre tildadas (regla de bin/fases)
 #
+# `que:` en una etapa = una línea que explica la columna (la que muestran fases.html/calidad.html bajo cada título).
 # `curso: true` en una etapa = trabajo en curso (FASE 10 de grafo-tareas): lo que cuenta para «en curso» en el parte del día
 # y en el aviso de más de dos a la vez. Entender, esperar el PR o estar aprobado no es estar haciendo.
 version: 1
@@ -33,13 +34,13 @@ roles:
     grupos: {}
     qa: [Colección, Auditoría, Listo para PR]
     etapas:
-      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
-      - { clave: codigo, columna: EN CODIGO, si: tareas_alguna, curso: true }
-      - { clave: coleccion, columna: Collection Created, si: { qa: Colección }, curso: true }
-      - { clave: auditoria, columna: TESTEADO, si: { qa: Auditoría }, curso: true }
-      - { clave: listo, columna: LISTO PARA PR, si: { qa: Listo para PR }, curso: true }
-      - { clave: aprobado, columna: APROBADO, si: cierre_real }
-      - { clave: cerrado, columna: CERRADO, si: terminada }
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre, que: "revisar la HU y los criterios" }
+      - { clave: codigo, columna: EN CODIGO, si: tareas_alguna, curso: true, que: "las tareas de la FASE" }
+      - { clave: coleccion, columna: Collection Created, si: { qa: Colección }, curso: true, que: "construir/actualizar la colección Postman" }
+      - { clave: auditoria, columna: TESTEADO, si: { qa: Auditoría }, curso: true, que: "correr newman y armar la historia" }
+      - { clave: listo, columna: LISTO PARA PR, si: { qa: Listo para PR }, curso: true, que: "cerrar con el auditor la guía de pruebas" }
+      - { clave: aprobado, columna: APROBADO, si: cierre_real, que: "mergeado: URL commit, evidencias, Wiki" }
+      - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
   calidad:
     nombre: Calidad
@@ -49,13 +50,13 @@ roles:
     grupos: { amarrar: "amarrar|l[ií]nea base|arranque", red: "^red\\b|cierre de la malla|retirar", cambiar: "." }
     qa: [Listo para PR]
     etapas:
-      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
-      - { clave: amarrar, columna: "AMARRAR 🧰", si: { grupo: amarrar }, curso: true }
-      - { clave: cambiar, columna: "CAMBIAR 🧰", si: { grupo: cambiar }, curso: true }
-      - { clave: red, columna: "RED 🧰", si: { grupo: red }, curso: true }
-      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
-      - { clave: aprobado, columna: APROBADO, si: cierre_real }
-      - { clave: cerrado, columna: CERRADO, si: terminada }
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre, que: "la tarjeta y el código" }
+      - { clave: amarrar, columna: "AMARRAR 🧰", si: { grupo: amarrar }, curso: true, que: "línea base y tests contra el código sin tocar" }
+      - { clave: cambiar, columna: "CAMBIAR 🧰", si: { grupo: cambiar }, curso: true, que: "el arreglo" }
+      - { clave: red, columna: "RED 🧰", si: { grupo: red }, curso: true, que: "roturas, tsc, suite, alcance" }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR }, que: "PR abierto" }
+      - { clave: aprobado, columna: APROBADO, si: cierre_real, que: "mergeado: URL commit, evidencias, Wiki" }
+      - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
   seguridad:
     nombre: Seguridad
@@ -65,13 +66,13 @@ roles:
     grupos: { detectar: "detectar", corregir: "corregir", verificar: "verificar" }
     qa: [Listo para PR, Mostrado al equipo]
     etapas:
-      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
-      - { clave: detectar, columna: DETECTAR, si: { grupo: detectar }, curso: true }
-      - { clave: corregir, columna: CORREGIR, si: { grupo: corregir }, curso: true }
-      - { clave: verificar, columna: VERIFICAR, si: { grupo: verificar }, curso: true }
-      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
-      - { clave: mostrado, columna: MOSTRADO, si: { qa: Mostrado al equipo } }
-      - { clave: cerrado, columna: CERRADO, si: terminada }
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre, que: "qué se expone y a quién" }
+      - { clave: detectar, columna: DETECTAR, si: { grupo: detectar }, curso: true, que: "encontrar y medir el problema" }
+      - { clave: corregir, columna: CORREGIR, si: { grupo: corregir }, curso: true, que: "el arreglo" }
+      - { clave: verificar, columna: VERIFICAR, si: { grupo: verificar }, curso: true, que: "probar que ya no pasa" }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR }, que: "PR abierto" }
+      - { clave: mostrado, columna: MOSTRADO, si: { qa: Mostrado al equipo }, que: "contado al equipo" }
+      - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
   devex:
     nombre: DevEx
@@ -81,12 +82,12 @@ roles:
     grupos: { construir: "construir", probar: "probar" }
     qa: [Listo para PR, Adoptado]
     etapas:
-      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre }
-      - { clave: construir, columna: CONSTRUIR, si: { grupo: construir }, curso: true }
-      - { clave: probar, columna: PROBAR, si: { grupo: probar }, curso: true }
-      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
-      - { clave: adoptado, columna: ADOPTADO, si: { qa: Adoptado } }
-      - { clave: cerrado, columna: CERRADO, si: terminada }
+      - { clave: entendimiento, columna: ENTENDIMIENTO, si: siempre, que: "qué le duele al equipo" }
+      - { clave: construir, columna: CONSTRUIR, si: { grupo: construir }, curso: true, que: "la herramienta" }
+      - { clave: probar, columna: PROBAR, si: { grupo: probar }, curso: true, que: "probada en un repo real" }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR }, que: "PR abierto" }
+      - { clave: adoptado, columna: ADOPTADO, si: { qa: Adoptado }, que: "el equipo la usa" }
+      - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
   incidente:
     nombre: Incidente
@@ -96,13 +97,13 @@ roles:
     grupos: { reproducir: "reproducir", arreglar: "arreglar", verificar: "verificar" }
     qa: [Listo para PR, Desplegado, Explicado]
     etapas:
-      - { clave: reproducir, columna: REPRODUCIR, si: siempre }
-      - { clave: arreglar, columna: ARREGLAR, si: { grupo: arreglar }, curso: true }
-      - { clave: verificar, columna: VERIFICAR, si: { grupo: verificar }, curso: true }
-      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR } }
-      - { clave: desplegado, columna: DESPLEGADO, si: { qa: Desplegado } }
-      - { clave: explicado, columna: EXPLICADO, si: { qa: Explicado } }
-      - { clave: cerrado, columna: CERRADO, si: terminada }
+      - { clave: reproducir, columna: REPRODUCIR, si: siempre, que: "verlo fallar" }
+      - { clave: arreglar, columna: ARREGLAR, si: { grupo: arreglar }, curso: true, que: "el arreglo" }
+      - { clave: verificar, columna: VERIFICAR, si: { grupo: verificar }, curso: true, que: "probar que ya no falla" }
+      - { clave: pr, columna: Pull Request, si: { qa: Listo para PR }, que: "PR abierto" }
+      - { clave: desplegado, columna: DESPLEGADO, si: { qa: Desplegado }, que: "en producción" }
+      - { clave: explicado, columna: EXPLICADO, si: { qa: Explicado }, que: "qué lo causó, contado" }
+      - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
   negocio:
     nombre: Negocio
@@ -112,11 +113,11 @@ roles:
     grupos: { detectar: "detectar", conversar: "conversar", redactar: "redactar" }
     qa: [PBI aprobado]
     etapas:
-      - { clave: detectar, columna: DETECTAR, si: siempre, curso: true }
-      - { clave: conversar, columna: CONVERSAR, si: { grupo: conversar }, curso: true }
-      - { clave: redactar, columna: REDACTAR, si: { grupo: redactar }, curso: true }
-      - { clave: aprobado, columna: PBI APROBADO, si: { qa: PBI aprobado } }
-      - { clave: cerrado, columna: CERRADO, si: terminada }
+      - { clave: detectar, columna: DETECTAR, si: siempre, curso: true, que: "la necesidad" }
+      - { clave: conversar, columna: CONVERSAR, si: { grupo: conversar }, curso: true, que: "con el analista o el líder" }
+      - { clave: redactar, columna: REDACTAR, si: { grupo: redactar }, curso: true, que: "el PBI" }
+      - { clave: aprobado, columna: PBI APROBADO, si: { qa: PBI aprobado }, que: "el PBI aprobado pasa a Producto" }
+      - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
 complementos:
   duda-negocio:   { nombre: Duda de negocio, nodo: DUDA, escalera: negocio }

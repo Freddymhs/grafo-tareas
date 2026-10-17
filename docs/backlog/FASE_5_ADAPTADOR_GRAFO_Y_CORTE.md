@@ -32,8 +32,8 @@ Para que las dos marcas caigan en el mismo nodo, el adaptador busca la FASE por 
 
 **Plan del corte (escrito 2026-10-17, para hacerlo juntos).** Antes: (a) la API tiene que estar siempre prendida donde la lean los comandos — hoy corre en el ThinkPad y no sobrevive a un reinicio; el lugar previsto es el Mac Mini + Neon (FASE 2, criterio 4). (b) Decidir C10 o aceptar que conviven las «FASE n» de dos orquestadores.
 1. Congelar Todoist TRABAJO: no crear más tarjetas ahí desde ese momento.
-2. Última importación: `pnpm importar:todoist -- --proyecto 6VhFQg6v45qcJHPc` y `pnpm importar:fases -- --backlog <Laboratorio>/docs/backlog --tareas <Laboratorio>/Tareas` (con `--proyecto laboratorio`).
-3. Copiar `bin/adapters/grafo/` al Laboratorio y, en su `refs.yaml`, reemplazar el bloque `tablero:` por el de `grafo` (el que está comentado en el `refs.yaml` de este orquestador, con `api:` apuntando a la API permanente).
+2. Última importación: `pnpm importar:todoist -- --proyecto 6VhFQg6v45qcJHPc` y `pnpm importar:fases -- --backlog <Laboratorio>/docs/backlog --tareas <Laboratorio>/Tareas --roles <grafo-tareas>/docs/roles.yaml --proyecto laboratorio --adoptar todoist` (así se corrió el 2026-10-17, FASE 11: las 18 «FASE n» de Todoist quedaron adoptadas).
+3. Copiar `bin/adapters/grafo/` al Laboratorio y, en su `refs.yaml`, **agregar `proyecto: laboratorio`** (hoy no lo tiene y el adaptador lo exige: es el `fases-md:laboratorio` de la importación) y reemplazar el bloque `tablero:` por el de `grafo` (el que está comentado en el `refs.yaml` de este orquestador, con `api:` apuntando a la API permanente).
 4. Probar en el Laboratorio, sin red de Todoist: `bash bin/tests/test_tablero.sh` (copiado) y una pasada real de `/flow:todo informe "prueba de corte"` → la tarjeta aparece en la PWA.
 5. Mover una tarjeta con el hook: tildar una casilla de Understand en una FASE de prueba → `fase-tilde` la mueve en el grafo.
 **Volver atrás:** restaurar el bloque `tablero: kind: todoist` (está en git del Laboratorio). Lo creado en el grafo durante la prueba se borra desde la PWA; Todoist no se tocó.
