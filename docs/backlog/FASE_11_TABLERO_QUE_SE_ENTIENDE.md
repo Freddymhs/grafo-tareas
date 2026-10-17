@@ -1,7 +1,7 @@
 # FASE 11: UN TABLERO QUE SE ENTIENDE
 
 **Destraba**: que Freddy abra el tablero y entienda cada columna y cada tarjeta sin preguntar — con las FASE como en `fases.html`/`calidad.html` (nombre, task, avance) y no como «FASE 32» suelto
-**Listo para PR**: no · FASE escrita el 2026-10-17, desde la primera prueba de Freddy
+**Listo para PR**: sí · FASE escrita y cerrada el 2026-10-17, desde la primera prueba de Freddy
 **Prioridad**: Alta
 **Dependencias**: FASE 8 (roles) · FASE 10 (avance de las FASE)
 **Fuente**: feedback de Freddy, 2026-10-17 (primera prueba de la PWA, con capturas de `fases.html` y `calidad.html`)
@@ -43,7 +43,7 @@
 
 - [x] Colección — no aplica: proyecto personal, sin Postman
 - [x] Auditoría — 2026-10-17: API 71 unit · 38 e2e, contrato al día; web y VR verdes; rojos probados en las 4 tareas.
-- [ ] Listo para PR
+- [x] Listo para PR — 2026-10-17: commiteada (api `8ae618c`, web `f967329`, vr `6aa0bc6`, orquestador `9ed998e`); sin push.
 
 ## Cierre oficial en Azure
 
