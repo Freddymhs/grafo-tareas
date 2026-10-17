@@ -3,7 +3,7 @@
 **Destraba**: ver el trabajo real en el grafo: la FASE 4 (PWA) y la FASE 6 (VR) muestran datos de verdad y no sintéticos
 **Listo para PR**: no · FASE escrita el 2026-10-16
 **Prioridad**: Alta
-**Dependencias**: **FASE 2**. Y antes de importar datos reales: **N1, N2 y C1-C4 confirmados** (`docs/_CONCEPTO.md` § Para confirmar)
+**Dependencias**: **FASE 2** (código verde 2026-10-16). N1, N2 y C1-C4 ya confirmados: **solo `TRABAJO`** (134 tareas), **nombres reales** de personas, base local en Docker
 **Fuente**: `docs/_CONCEPTO.md` § Lo que Todoist no deja ver, § Fases F1.2, § Cómo se conecta el grafo (Migración), § Riesgos (importador frágil)
 
 > **Alcance:** módulo `importadores/todoist` de `grafo-tareas.api` — **el único lugar del repo que nombra Todoist**. Lee, nunca
@@ -11,12 +11,12 @@
 
 ## Understand
 
-- [ ] Entendimiento — medir de nuevo, solo lectura, `TRABAJO` completo (134 tareas, se leyeron 100) y `🚀 Draft trabajo`
+- [ ] Entendimiento — medir de nuevo, solo lectura, `TRABAJO` completo (134 tareas, se leyeron 100). El Draft queda fuera (N2)
 
 ## Tareas
 
 ### Tarea 1: fixtures reales anonimizados
-- Exportar por REST (`~/bin/lib/todoist-api.sh`, ya pagina bien) a `test/fixtures/todoist/`. Nombres de personas anonimizados si N1 lo pide.
+- Exportar por REST (`~/bin/lib/todoist-api.sh`, ya pagina bien) a `test/fixtures/todoist/`. Nombres reales (N1); el fixture no se publica fuera de este repo privado.
 - [ ] Hecha
 
 ### Tarea 2: reglas de traducción, una por test
