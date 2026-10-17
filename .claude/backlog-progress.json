@@ -64,8 +64,8 @@
       "total": 5
     },
     "FASE_13": {
-      "status": "pending",
-      "tasks": 0,
+      "status": "completed",
+      "tasks": 4,
       "total": 4
     }
   },

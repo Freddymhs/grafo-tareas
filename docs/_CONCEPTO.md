@@ -292,7 +292,7 @@ VR, puntos grises sin forma). Todo lo que falta está escrito en formatos fijos 
 
 ## Para confirmar
 
-- **C12 (2026-10-17, abierto — bloquea el modelo del árbol; respondido por las fuentes, falta el «sí» de Freddy):** (1) HU = PBI, un nivel; debajo Tasks; FASE = Task — `Laboratorio/docs/referencia/equipo-y-proceso.md` § Vocabulario (verificado en Azure el 2026-09-13). (2) Tarjeta y FASE = la misma task vista dos veces; la tarjeta `PERTENECE_A` su FASE (D10 las marca a las dos). (3) La pieza es la misma tarjeta que pasa a TRABAJO (`/flow:pbi:repartir` §5) → un nodo. Reglas en `docs/backlog/FASE_13_EL_ARBOL_HU_PIEZA_TASK.md`. Lo original: (1) ¿19565 es una HU o un PBI, y 24972 (la de la FASE 10) es un PBI o una
+- **C12 — ✅ CONFIRMADO por Freddy 2026-10-17 («sí, constrúyelo»), construido en la FASE 13:** (1) HU = PBI, un nivel; debajo Tasks; FASE = Task — `Laboratorio/docs/referencia/equipo-y-proceso.md` § Vocabulario (verificado en Azure el 2026-09-13). (2) Tarjeta y FASE = la misma task vista dos veces; la tarjeta `PERTENECE_A` su FASE (D10 las marca a las dos). (3) La pieza es la misma tarjeta que pasa a TRABAJO (`/flow:pbi:repartir` §5) → un nodo. Reglas en `docs/backlog/FASE_13_EL_ARBOL_HU_PIEZA_TASK.md`. Lo original: (1) ¿19565 es una HU o un PBI, y 24972 (la de la FASE 10) es un PBI o una
   task? La FASE dice «task 24972 (padre HU 19565)» y el README del Laboratorio «tasks… del PBI 19565». (2) La tarjeta `[25476]` de TRABAJO
   y la «FASE 32 · … · 25476» del `.md`: ¿un solo nodo o la tarjeta pertenece a la FASE? (3) La pieza «3.1» del Draft que pasa a TRABAJO
   como `[263xx]`: ¿la misma cosa que avanza, o la del Draft queda como plan?

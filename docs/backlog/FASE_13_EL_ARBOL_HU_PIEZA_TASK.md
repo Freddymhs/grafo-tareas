@@ -2,7 +2,7 @@
 
 **Destraba**: que la VR muestre el trabajo real como red y no como nube: cada HU un racimo, sus piezas por crear y tomadas, y qué
 espera a quién. Hoy 48 de 85 tareas abiertas están sueltas (medido 2026-10-17 en producción)
-**Listo para PR**: no · **BORRADOR 2026-10-17 — no se construye hasta que Freddy confirme el modelo (C12 del concepto)**
+**Listo para PR**: sí · Freddy confirmó el modelo el 2026-10-17 («sí, constrúyelo»); api `d778d50`, vr `cb656bf`, orquestador `526b8ca` + `80831b8`. Falta solo que Freddy lo mire en el visor (`bin/probar-en-visor --api --abrir`)
 **Prioridad**: Alta — es lo que Freddy quiere ver («donde voy a apreciar el resultado es en la VR»)
 **Dependencias**: FASE 3 (importador Todoist), FASE 5 tarea 3 (importador de FASE), FASE 12 (se importa contra producción)
 **Fuente**: `docs/_CONCEPTO.md` § Cómo trabaja Freddy · Azure leído el 2026-10-17 (solo lectura, `bin/adapters/azure` del Laboratorio) ·
@@ -26,7 +26,7 @@ espera a quién. Hoy 48 de 85 tareas abiertas están sueltas (medido 2026-10-17 
 
 ## Las reglas (para confirmar con Freddy, C12)
 
-- **R1 · HU:** un nodo HISTORIA por PBI (`externo` `azure:<id>`), titulado con su nombre de Azure. Lo citan las FASE (`padre HU <n>`),
+- **R1 · HU:** un nodo HISTORIA por PBI (`externo` `tracker`/`hu:<id>`), titulado con su nombre del tracker. **Cambió al construir:** el mapa task → HU no sale de la prosa de la FASE (solo 21 de 35 la nombran, con cinco redacciones, y las 15-21 de la 20379 no la dicen) sino del tracker: `bin/importar-en-produccion` lo lee de Azure con el adaptador del orquestador (solo GET) y lo pasa como `--padres <json>`; la API no nombra Azure. Lo citan las FASE (`padre HU <n>`),
   las piezas (`HU <n>`) y las tarjetas que nombran la HU.
 - **R2 · FASE → su HU:** cada FASE `PERTENECE_A` la HU de su cabecera.
 - **R3 · Tarjeta → su FASE:** una tarjeta que cita el id de Azure de una FASE `PERTENECE_A` esa FASE (no se fusionan: la tarjeta es la
@@ -37,27 +37,27 @@ espera a quién. Hoy 48 de 85 tareas abiertas están sueltas (medido 2026-10-17 
 
 ## Understand
 
-- [x] Entendimiento — 2026-10-17: Freddy explicó su flujo; Azure y los formatos medidos (arriba). Falta su confirmación del modelo (C12)
+- [x] Entendimiento — 2026-10-17: Freddy explicó su flujo; Azure y los formatos medidos (arriba); modelo confirmado por Freddy
 
 ## Tareas
 
 ### Tarea 1: R1 + R2 en el importador de FASE
-- [ ] Hecha
+- [x] Hecha — 2026-10-17: `traducir-fases.ts` (`Padres`, `nodoHistoria`), `--padres` en el CLI, validación del JSON; `NodoPlan.origen`/`soloSiFalta` para la HU compartida; unit 3 casos
 
-### Tarea 2: R3 en el importador Todoist (y en la reimportación de FASE)
-- [ ] Hecha
+### Tarea 2: R3 — la tarjeta cuelga de su FASE
+- [x] Hecha — 2026-10-17, en el importador de FASE (es el que sabe qué task tiene cada FASE): `engancharTarjetas`, id como número entero (e2e: `249721` no engancha `24972`)
 
 ### Tarea 3: R4 — el Draft
-- [ ] Hecha
+- [x] Hecha — 2026-10-17: `traducir.ts` reconoce la pieza por la cabecera de `repartir` (no por el título, que cambia al tomarla); carriles `A · zona` → RAMA con color; unit 5 casos sobre 3 tarjetas reales
 
 ### Tarea 4: medir y mirar
-- [ ] Sueltas antes/después (hoy 48 de 85) y captura de la VR con el racimo de la HU 20379
+- [x] 2026-10-17 en producción: **tareas abiertas sueltas 48 → 35** (de 92: + las 7 piezas); HU 19565 con 25 conexiones, HU 20379 con 16; **64 tarjetas** colgando de su FASE; 15 «FASE n» fusionadas, 0 duplicadas. VR: `?reordenar` (las posiciones guardadas no se movían con las conexiones nuevas, C2) + HU dorada con nombre fijo, FASE lila, aristas del árbol visibles; captura: el racimo de la 19565 alrededor de su HU. **Las 35 que quedan** son notas (retros, propuestas, «para Thomas») que ninguna regla de este modelo toca: si se quieren conectar, otra FASE con su regla aprobada
 
 ## Criterios de Aceptación
 
-- [ ] 1 · Cada regla con su e2e sobre fixtures reales (las tarjetas y FASE de arriba)
-- [ ] 2 · En producción, `--seco` primero; después, las tareas abiertas sueltas bajan de 48 y cada una que queda tiene un motivo
-- [ ] 3 · La VR muestra las HU 19565 y 20379 como racimos (captura) — y Freddy lo confirma en el visor
+- [x] 1 · Cada regla con su test sobre fixtures reales — API unit 79 · e2e 42 · VR 33
+- [x] 2 · `--seco` primero en los tres pasos; sueltas 48 → 35, las que quedan son notas sin regla
+- [ ] 3 · La VR muestra las HU como racimos — **captura ✅ (19565)**; **Freddy lo confirma en el visor**
 
 ## QA
 
