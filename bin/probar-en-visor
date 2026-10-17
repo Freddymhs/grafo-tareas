@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# probar-en-visor [--dev] [--abrir] [--nodos N] — FASE 1, tarea 5: sirve grafo-tareas.vr y lo deja en el
-# `localhost` del Quest (adb reverse). WebXR exige contexto seguro y `localhost` lo es: sin certificados.
+# probar-en-visor [--dev] [--abrir] [--api | --nodos N] — sirve grafo-tareas.vr y lo deja en el `localhost`
+# del Quest (adb reverse). WebXR exige contexto seguro y `localhost` lo es: sin certificados.
 #
 #   (sin flags)  build de producción + `vite preview`: es lo que se MIDE (React en dev rinde menos)
 #   --dev        `vite` con recarga en caliente, para iterar
 #   --abrir      además abre la URL en el Quest Browser (si no, se escribe a mano)
-#   --nodos N    cuántos nodos (default 500; 30..2000)
+#   --nodos N    la prueba de la FASE 1: N nodos sintéticos (default 500; 30..2000)
+#   --api        el grafo REAL (FASE 6): sin `?nodos`, y también el puerto de la API (3000) por adb reverse.
+#                La API tiene que estar corriendo en el PC (`pnpm build && node dist/main` en grafo-tareas.api)
 #
 # El servidor queda en primer plano: Ctrl+C lo corta. El adb va envuelto en quest-despierto (memoria quest-3s-setup).
 set -euo pipefail
@@ -17,26 +19,34 @@ SERIAL="${QUEST_NET:-quest-3s:5555}"
 DESPIERTO="${QUEST_DESPIERTO:-$HOME/bin/quest-despierto}"
 PUERTO_PREVIEW=4173
 PUERTO_DEV=5173
+PUERTO_API=3000
 NAVEGADOR_QUEST=com.oculus.browser
 
-MODO=preview; ABRIR=0; NODOS=500
+MODO=preview; ABRIR=0; NODOS=500; API=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --dev) MODO=dev ;;
     --abrir) ABRIR=1 ;;
     --nodos) NODOS="${2:?--nodos pide un número}"; shift ;;
-    *) echo "uso: probar-en-visor [--dev] [--abrir] [--nodos N]" >&2; exit 64 ;;
+    --api) API=1 ;;
+    *) echo "uso: probar-en-visor [--dev] [--abrir] [--api | --nodos N]" >&2; exit 64 ;;
   esac
   shift
 done
 
 PUERTO=$([ "$MODO" = dev ] && echo "$PUERTO_DEV" || echo "$PUERTO_PREVIEW")
 URL="http://localhost:$PUERTO/?nodos=$NODOS"
+if [ "$API" = 1 ]; then
+  URL="http://localhost:$PUERTO/"
+  curl -sf -o /dev/null "http://localhost:$PUERTO_API/api/v1/health" ||
+    { echo "la API no responde en el puerto $PUERTO_API: levantala antes (grafo-tareas.api: node dist/main)" >&2; exit 1; }
+fi
 
 cd "$VR"
 [ "$MODO" = preview ] && npm run -s build
 
 "$DESPIERTO" -- "$ADB" -s "$SERIAL" reverse "tcp:$PUERTO" "tcp:$PUERTO"
+[ "$API" = 1 ] && "$DESPIERTO" -- "$ADB" -s "$SERIAL" reverse "tcp:$PUERTO_API" "tcp:$PUERTO_API"
 echo "visor: $URL → Entrar en VR · FPS abajo a la izquierda (verde ≥ 72)"
 if [ "$ABRIR" = 1 ]; then
   "$DESPIERTO" -- "$ADB" -s "$SERIAL" shell am start -a android.intent.action.VIEW -d "'$URL'" "$NAVEGADOR_QUEST" >/dev/null

@@ -2,7 +2,13 @@ proyecto: grafo-tareas
 cliente: personal
 rama_base: main
 tracker: none                          # sin tracker de empresa (PORTAR §Capacidades opcionales): el hook de solo lectura deja usar el navegador libre
-tablero: none                          # F0-F1: apagado hasta que Freddy elija (concepto § Cómo se crea, paso 2). En F2 pasa a { kind: grafo, api, token_env }
+tablero: none                          # F0-F1: apagado hasta que Freddy elija (concepto § Cómo se crea, paso 2). El corte (FASE 5 tarea 2) lo cambia por el bloque de abajo
+# tablero:                             # adaptador `grafo` (bin/adapters/grafo/, FASE 5): mismo contrato que Laboratorio/bin/adapters/todoist
+#   kind: grafo
+#   api: http://localhost:3000/api/v1   # en producción, la URL por Tailscale
+#   token_env: GRAFO_TOKEN              # opcional hasta que la API pida login (hoy no)
+#   label: board
+#   secciones: { entendimiento: ENTENDIMIENTO, auditoria: TESTEADO, listo: LISTO PARA PR, amarrar: "AMARRAR 🧰", cambiar: "CAMBIAR 🧰", red: "RED 🧰", pr: Pull Request }   # nombres de GET /etapas; `codigo` y `coleccion` no existen en la API: decidir al cortar
 qa: none
 docs: { dir: docs }
 repos: {}                              # los gates (typecheck/lint/test) por repo se llenan tras inspeccionar cada plantilla en new-project

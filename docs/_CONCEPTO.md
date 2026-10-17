@@ -212,6 +212,19 @@ repos:
 - **FASE 2, código verde (2026-10-16, noche):** API con nodos, conexiones, ramas y derivado (`bloqueado`, `hoy-puedo`, `libera` con SQL recursivo); C1-C3 confirmados; `openapi.json` versionado; 17 unit + 11 e2e. Base local en Docker (`127.0.0.1:5433`); Neon y el Mac Mini quedan para cuando haya datos reales (criterio 4). **Siguiente: FASE 3, el importador de Todoist** — antes, N1 y N2 (§ Para confirmar).
 - **new-project:** `grafo-tareas.api` ← `template-nest`, `grafo-tareas.web` ← `template-nextjs-tanstack`, `grafo-tareas.vr` ← `template-react-vite` (git propio cada uno, rama `main`); `docs/_CONCEPTO.md` plantado; draft en `resume.json`.
 
+**Hecho el 2026-10-17 (madrugada):**
+- **FASE 3 ✅** (`04cbbd6`): importador Todoist, 134 tareas → 158 nodos / 86 conexiones en la base LOCAL (`grafo-tareas-postgres`, 127.0.0.1:5433); idempotente (2ª corrida 0 nuevos). Solo `TRABAJO` (N2), nombres reales (N1).
+- **C9 ✅ en la API** (`113012e`, `88f762b`, CI verde): `etapa` (lista fija = las etapas del método, `GET /etapas`, `ETAPAS` env), `etiquetas`, `prioridad`, `vence`, filtros `etapa/etiqueta/rama/q`, `GET nodos` → `{data,total}`, `limit` ≤ 500. Reimportado: 23 ENTENDIMIENTO, 29 CERRADO, 42 sin etapa, p1 12, p2 33, daily 10 — igual que Todoist.
+- **FASE 4 tareas 1 ✅ (`1769969`+) y 2 ✅ (`61aaa9f`; review con 2 arreglos SSOT, entraron en `aa187db`):** Orval + 4 vistas + detalle contra datos reales.
+- **FASE 4 tarea 3 ✅ (2026-10-17, `aa187db` web · `f06384c` api):** crear (alta rápida en el tablero), cerrar/reabrir y mover de etapa (detalle), conectar/quitar con buscador por `q` y títulos reales. Probado con Chrome contra la API real. Dos arreglos en la API que la PWA destapó: **CORS** (`@fastify/cors` solo deja `GET,HEAD,POST` por defecto → `src/config/cors.ts`, con e2e del preflight) y `PATCH etapa: null` para volver a la entrada. Falta Markdown de la descripción (dependencia: preguntar).
+- **FASE 4 tarea 4 (2026-10-17, `aa187db`; cerrada esa noche con `bin/servir-tailnet`):** Serwist (offline de lectura probado sin red: tablero y hoy puedo desde caché, fallback `~offline`), manifest, íconos (cierra el 404 del favicon), `next build --webpack`. Falta abrir por Tailscale en teléfono/Quest con Freddy y decidir webpack vs modo configurator (`@serwist/cli`). **Incidente:** los e2e de la API borraron la base dev (corrían contra `grafo_tareas`); guard `test/setup-e2e.ts` + reimportado (158/86/80, igual que antes).
+- **Noche del 2026-10-17 — "terminalo tú" (Freddy), todo commiteado en local, sin push** (api `f06384c`, web `61aaa9f` + `aa187db`, vr `954652d`, y el orquestador): FASE 4 ✅ (Markdown con `react-markdown`, `bin/servir-tailnet`: PWA por HTTPS del tailnet probada con vista de teléfono, offline incluido) · FASE 6 ✅ (VR contra la API con Orval + TanStack Query, posiciones guardadas una vez y estables, bloqueo preguntado a la API, `bloqueo.ts` borrado, texto 3D sin emojis) · FASE 7 ✅ (panel 3D: cerrar y resaltar lo que libera, conectar apuntando, Zustand; probado VR → API → PWA). **Queda en manos de Freddy:** push de los 4 repos, abrir la PWA en el teléfono/Quest y usarla una semana (FASE 4 criterio 1), medir FPS en el visor con datos reales (FASE 6 c1, FASE 7 c2), el corte (FASE 5 tarea 2), C10, y el deploy a Mac Mini + Neon (FASE 2 criterio 4).
+- **FASE 4 criterios 2 y 3 ✅ (2026-10-17):** gates completos incluido Playwright (4/4; config corregida: 3001, sin SW) e hidratación sin warnings. **FASE 6 tarea 1 bloqueada por instalador** (`orval` + `@tanstack/react-query` en la VR): preguntar.
+- **FASE 5 tarea 3 ✅ (2026-10-17, `f06384c`):** importador de `FASE_*.md` (etapa derivada de las casillas como `fases.html`/`calidad.html`, Dependencias → `DEPENDE_DE`) y de `entendimiento.md` §ABIERTO (DUDAs que frenan a su task). `ETAPAS` por defecto suma `EN CODIGO` y `Collection Created`. Corrido sobre este orquestador: 7 FASEs, 10 dependencias. **C10 abierto:** «FASE n» choca entre orquestadores (pisó la FASE 6 del SAG, revertido): hace falta la dimensión proyecto.
+- **FASE 5 tarea 1 ✅ (2026-10-17, en el orquestador):** `bin/adapters/grafo/` cumple el contrato del tablero contra la API (27/27 casos fake + smoke real limpio). Pendiente al cortar (tarea 2, con Freddy): las etapas `EN CODIGO` y `Collection Created` del Laboratorio no existen en `ETAPAS` de la API.
+- **Desvío corregido por reclamo de Freddy:** ahora las tareas se toman con `/work:backlog:next`, se auditan con `/work:backlog:review` y se sellan con `/work:sellar:run`; los commits los corre Freddy salvo que diga "hazlo". Reglas aprendidas en `CLAUDE.md` del orquestador (§Trampas: inyección de `fetch`, CLI desde `dist`, e2e en serie, prettier en generados, specs sin `let`, derivado sobre TAREAS, políticas de pnpm 10, CI con la versión de `packageManager`).
+- **Lo que Freddy explicó con `fases.html`/`calidad.html`:** los `FASE_x.md` son el corazón; sus casillas dan la etapa en dos tableros (flujo normal y calidad). Todoist aporta conexiones y tarjetas sueltas. El grafo junta ambos; el 3D hace visibles las conexiones. → FASE 5: importador de `FASE_*.md` como nodos FASE con etapa derivada de las casillas (como `bin/fases`).
+
 **Sin probar en real:** `pendiente`, `tarjeta`, `etapa`, `borrador` contra Todoist (solo `buscar` corrió real). Se verá en el primer `/flow:todo` o tilde de FASE.
 
 **Huecos de PORTAR que quedan (no frenan al grafo):** `/sigsa:documentar` sin mudar al método · `api.bff` y `api.solicitudes` sin aprobar el import de `metodo.md` (lo hace Freddy abriendo una sesión interactiva en cada uno) · un solo adaptador por contrato (el segundo será `grafo`).
@@ -253,6 +266,8 @@ Copiar funciones de Todoist · multiusuario · móvil nativo · sincronización 
 
 ## Para confirmar
 
+- **C10 (2026-10-17, abierto):** el grafo guarda FASEs de varios orquestadores (SAG vía Todoist, grafo-tareas vía `FASE_*.md`) y «FASE n» se repite. Propuesta: una RAMA (o nodo PROYECTO) por orquestador, FASE `PERTENECE_A` ella, y los importadores/el adaptador buscan dentro de la rama. Mientras tanto nada adopta por título y conviven dos «FASE 6».
+
 - **C1 (código) — ✅ CONFIRMADO por Freddy 2026-10-16:** decidí que "bloqueado / libera" se calcula en la API (`WITH RECURSIVE` sobre `Conexion`) y los fronts solo lo reciben, porque con tres repos una regla duplicada se desincroniza · ¿confirmás?
 - **C2 (código) — ✅ CONFIRMADO por Freddy 2026-10-16:** decidí guardar `posicion {x,y,z}` en `Nodo` para que el mapa 3D sea estable entre sesiones · ¿confirmás?
 - **C3 (código) — ✅ CONFIRMADO por Freddy 2026-10-16:** decidí que todo importador sea idempotente por `externo { origen, id }`, no por título · ¿confirmás?
@@ -264,17 +279,17 @@ Copiar funciones de Todoist · multiusuario · móvil nativo · sincronización 
 ## Prompt para retomar (pegarlo tal cual en una sesión nueva o después de /compact)
 
 ```text
-Retomamos grafo-tareas. Antes de hacer nada, lee entero ~/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/docs/_CONCEPTO.md (§ "Lo que decide el resultado — Pareto" y § "Estado al 2026-10-16" primero) y docs/backlog/README.md + FASE_1_PRUEBA_VISOR.md. Esa es la única fuente: el chat anterior no existe.
+Retomamos grafo-tareas. Antes de hacer nada, lee entero ~/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/docs/_CONCEPTO.md (§ "Lo que decide el resultado — Pareto" y § "Estado al 2026-10-16" —incluye lo hecho el 2026-10-17— primero), después docs/backlog/README.md y docs/backlog/FASE_4_PWA_LISTA.md, y el CLAUDE.md del orquestador (§ Trampas). Esa es la única fuente: el chat anterior no existe.
 
 Reglas para esta sesión:
-- No re-decidas nada de § Stack ni de § Pareto. Si algo choca con el concepto, lo marcas y me preguntas.
-- Hechas: F-1, orquestador, backlog, FASE 1 (72 FPS, DECISION_3D) y el código de la FASE 2 (API, docs/backlog/FASE_2_API_GRAFO.md). Orden vigente: backend → PWA (FASE 4) → corte (FASE 5) → VR (FASE 6). Ahora: FASE 3 (importador Todoist), que pide N1 y N2 confirmados antes de tocar datos reales.
-- Instalar dependencias (npm i) es instalador: me confirmas antes.
-- Crear repos o pushear es publicar: me preguntas en ese momento.
-- Commits: por /work:sellar:run, y los corro yo salvo que te pida que los corras tú.
-- Mis reglas globales (~/.claude/CLAUDE.md) aplican a todo el código.
-- Para trabajar por adb con el visor, siempre ~/bin/quest-despierto -- <cmd> (memoria quest-3s-setup).
-- Lo abierto (N1, N2, C1-C4 en § Para confirmar) se confirma antes de importar datos reales de Todoist (FASE 3).
+- No re-decidas nada de § Stack, § Pareto ni las decisiones C1-C9 / N1-N2 / D1-D9 ya tomadas. Si algo choca, lo marcas y me preguntas.
+- El método: cada tarea se toma con /work:backlog:next, se audita con /work:backlog:review y se sella con /work:sellar:run. Los commits los corro yo salvo que te diga "hazlo". Pushear y crear repos es publicar: me preguntas.
+- Mis reglas globales (~/.claude/CLAUDE.md) aplican a todo el código: nunca `let`, sin `any`, SSOT, read-before-write, y todo chequeo tiene que poder fallar.
+- Instalar dependencias es instalador: me confirmas antes (react-markdown para la descripción está pendiente de preguntar).
+- Entorno: pnpm es `npx -y pnpm@10.34.7` (la versión de packageManager; `latest` rompe el CI). Base local: `docker start grafo-tareas-postgres` (127.0.0.1:5433, bases grafo_tareas y grafo_tareas_test). API: `pnpm build && node dist/main` con su .env (puerto 3000). Web: `NEXT_PUBLIC_API_URL=http://localhost:3000 pnpm dev -p 3001`.
+- Para el visor, siempre ~/bin/quest-despierto -- <cmd> (memoria quest-3s-setup).
 
-Primer paso: FASE 3, Understand — medir TRABAJO y Draft de nuevo (solo lectura) y confirmar N1/N2 conmigo antes de escribir el importador. Parado en grafo-tareas.api/. Base local: `docker start grafo-tareas-postgres`.
+Estado: FASE 1 ✅, FASE 2 ✅ salvo el deploy (criterio 4), FASE 3 ✅, FASE 4 ✅ (falta usarla una semana), FASE 5 2/3 (falta el corte y C10), FASE 6 ✅ y FASE 7 ✅ (falta medir FPS en el visor). Todo commiteado en local en los 4 repos (api, web, vr, orquestador) el 2026-10-17 y SIN PUSH. API y web servidas por `bin/servir-tailnet` en https://thinkerpad.tail1798c7.ts.net (no sobrevive a un reinicio).
+
+Primer paso: `git log origin/main..HEAD` en los 4 repos para ver lo commiteado la noche del 17; si te cierra, push de los 4 y mirar el CI. Después, con el visor puesto: `bin/probar-en-visor --api --abrir` y anotar FPS en FASE 6 c1 y FASE 7 c2. Abrir https://thinkerpad.tail1798c7.ts.net en el teléfono (correr `bin/servir-tailnet` si el PC se reinició) e instalarla. Las decisiones abiertas son el corte (FASE 5 tarea 2) y C10.
 ```

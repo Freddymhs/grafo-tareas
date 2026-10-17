@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# servir-tailnet [--apagar] — la PWA y la API por HTTPS dentro del tailnet (FASE 4, tarea 4), para abrirlas e
+# instalarlas en el teléfono y en el Quest. El service worker y la instalación exigen contexto seguro: el
+# certificado lo pone `tailscale serve` (MagicDNS + HTTPS del tailnet). Nada queda expuesto fuera del tailnet.
+#
+#   https://<este-pc>.<tailnet>.ts.net        → la web   (localhost:3001)
+#   https://<este-pc>.<tailnet>.ts.net:8443   → la API   (localhost:3000)
+#
+# Levanta la API y la web si no están (la web se construye con NEXT_PUBLIC_API_URL apuntando a la API del
+# tailnet, y la API arranca con ese origen en CORS_ORIGINS). Los procesos quedan en segundo plano con sus logs
+# en $LOGS; NO sobreviven a un reinicio del PC: después de reiniciar, se corre de nuevo.
+#   --apagar   saca las dos rutas de `tailscale serve` (los procesos siguen; se matan por puerto).
+set -euo pipefail
+
+ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+API_DIR="${GRAFO_API_DIR:-$ORQ/grafo-tareas.api}"
+WEB_DIR="${GRAFO_WEB_DIR:-$ORQ/grafo-tareas.web}"
+LOGS="${GRAFO_LOGS:-${XDG_STATE_HOME:-$HOME/.local/state}/grafo-tareas}"
+PUERTO_WEB=3001
+PUERTO_API=3000
+HTTPS_WEB=443
+HTTPS_API=8443
+PNPM=(npx -y pnpm@10.34.7)   # la versión de packageManager (CLAUDE.md § Trampas)
+ORIGENES_LOCALES="http://localhost:3001,http://localhost:5173,http://localhost:4173"
+
+if [ "${1:-}" = "--apagar" ]; then
+  tailscale serve --https="$HTTPS_WEB" off || true
+  tailscale serve --https="$HTTPS_API" off || true
+  echo "tailscale serve: rutas de grafo-tareas apagadas"
+  exit 0
+fi
+[ $# -eq 0 ] || { echo "uso: servir-tailnet [--apagar]" >&2; exit 64; }
+
+HOST=$(tailscale status --json | jq -r '.Self.DNSName | rtrimstr(".")')
+[ -n "$HOST" ] && [ "$HOST" != null ] || { echo "Tailscale no responde: ¿está conectado?" >&2; exit 1; }
+tailscale status --json | jq -e --arg h "$HOST" '.CertDomains // [] | index($h)' >/dev/null ||
+  { echo "el tailnet no tiene certificados HTTPS para $HOST (habilitar HTTPS en la consola de Tailscale)" >&2; exit 1; }
+URL_WEB="https://$HOST"
+URL_API="https://$HOST:$HTTPS_API"
+mkdir -p "$LOGS"
+
+escucha() { ss -ltnH "sport = :$1" | grep -q LISTEN; }
+pid_de() { ss -ltnpH "sport = :$1" | grep -oP 'pid=\K[0-9]+' | head -1 || true; }
+esperar() {   # $1 puerto · $2 qué es
+  for _ in $(seq 1 60); do escucha "$1" && return 0; sleep 1; done
+  echo "$2 no levantó en el puerto $1: mirá $LOGS" >&2; exit 1
+}
+
+# La API: se reinicia siempre, para que tome el origen del tailnet en CORS.
+pid=$(pid_de "$PUERTO_API"); [ -z "$pid" ] || { kill "$pid"; while escucha "$PUERTO_API"; do sleep 0.2; done; }
+( cd "$API_DIR" && "${PNPM[@]}" build > "$LOGS/api-build.log" 2>&1 )
+( cd "$API_DIR" && CORS_ORIGINS="$ORIGENES_LOCALES,$URL_WEB" nohup node dist/main > "$LOGS/api.log" 2>&1 & )
+esperar "$PUERTO_API" "la API"
+
+# La web: el build lleva la URL de la API adentro (NEXT_PUBLIC_*), así que se reconstruye con la del tailnet.
+pid=$(pid_de "$PUERTO_WEB"); [ -z "$pid" ] || { kill "$pid"; while escucha "$PUERTO_WEB"; do sleep 0.2; done; }
+( cd "$WEB_DIR" && NEXT_PUBLIC_API_URL="$URL_API" "${PNPM[@]}" build > "$LOGS/web-build.log" 2>&1 )
+( cd "$WEB_DIR" && NEXT_PUBLIC_API_URL="$URL_API" nohup "${PNPM[@]}" start -p "$PUERTO_WEB" > "$LOGS/web.log" 2>&1 & )
+esperar "$PUERTO_WEB" "la web"
+
+tailscale serve --bg --https="$HTTPS_WEB" "http://127.0.0.1:$PUERTO_WEB" > /dev/null
+tailscale serve --bg --https="$HTTPS_API" "http://127.0.0.1:$PUERTO_API" > /dev/null
+
+# Que se pueda verificar, no solo afirmar: la API por HTTPS y el CORS para el origen del tailnet.
+curl -sf -o /dev/null "$URL_API/api/v1/health" || { echo "la API no responde en $URL_API" >&2; exit 1; }
+curl -sf -o /dev/null -H "Origin: $URL_WEB" -D - "$URL_API/api/v1/etapas" | grep -qi "access-control-allow-origin: $URL_WEB" ||
+  { echo "la API no acepta el origen $URL_WEB (CORS)" >&2; exit 1; }
+curl -sf -o /dev/null "$URL_WEB/manifest.webmanifest" || { echo "la web no responde en $URL_WEB" >&2; exit 1; }
+echo "PWA:  $URL_WEB   (en el teléfono o el Quest: abrir y «Agregar a pantalla de inicio» / «Instalar»)"
+echo "API:  $URL_API"
+echo "logs: $LOGS"

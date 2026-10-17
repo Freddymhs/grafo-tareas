@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# pendiente — UNA tarjeta nueva en el grafo, sin etapa (= entrada): lo que /flow:todo, /flow:observaciones,
+# /flow:propuesta y /vista:entrega anotan. Imprime `<id>\t<titulo>` tal como quedó guardado.
+#
+#   pendiente <tipo> <texto literal> [--vence <YYYY-MM-DD>] [--descripcion <texto>] [--persona <nombre>]
+#
+#   tipo          nodo   prioridad  etiqueta      quién lo manda
+#   bloqueo       DUDA   p1         bloqueo       /flow:todo — alguien tiene que actuar para que yo avance
+#   confirmacion  TAREA  p2         daily         /flow:todo — si asumo mal rehago trabajo
+#   informe       TAREA  p2         daily         /flow:todo — lo cuento en la daily y se cierra
+#   propuesta     TAREA  p2         propuesta     /flow:propuesta
+#   observacion   TAREA  p4         observacion   /flow:observaciones (el texto ya trae ✅ o 🔧)
+#   supuesto      TAREA  p2         supuesto      /vista:entrega (el texto ya trae ❓)
+#
+# El título es `<DD-mmm> · <texto>`: la fecha es el ÚNICO agregado (regla de /flow:todo §2: literal, con
+# sus typos). Una etiqueta, nunca dos. `--vence` es una fecha ISO (la API no parsea "monday").
+# `--persona` solo tiene sentido con `bloqueo`: la DUDA queda ESPERA_RESPUESTA_DE esa PERSONA (se crea si
+# falta) y "si X contesta, se liberan N" la cuenta. Es una extensión del contrato: ningún flow la pasa aún.
+set -euo pipefail
+source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
+
+TIPO="${1:?uso: pendiente <tipo> <texto> [--vence <fecha>] [--descripcion <texto>] [--persona <nombre>]}"
+TEXTO="${2:?falta el texto}"; shift 2
+VENCE=""; DESCRIPCION=""; PERSONA=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --vence) VENCE="${2:?--vence necesita una fecha}"; shift 2 ;;
+    --descripcion) DESCRIPCION="${2:?--descripcion necesita un texto}"; shift 2 ;;
+    --persona) PERSONA="${2:?--persona necesita un nombre}"; shift 2 ;;
+    *) echo "argumento desconocido: $1" >&2; exit 64 ;;
+  esac
+done
+
+case "$TIPO" in
+  bloqueo)      NODO=DUDA;  PRIORIDAD=p1; ETIQUETA=bloqueo ;;
+  confirmacion) NODO=TAREA; PRIORIDAD=p2; ETIQUETA=daily ;;
+  informe)      NODO=TAREA; PRIORIDAD=p2; ETIQUETA=daily ;;
+  propuesta)    NODO=TAREA; PRIORIDAD=p2; ETIQUETA=propuesta ;;
+  observacion)  NODO=TAREA; PRIORIDAD=p4; ETIQUETA=observacion ;;
+  supuesto)     NODO=TAREA; PRIORIDAD=p2; ETIQUETA=supuesto ;;
+  *) echo "tipo desconocido: $TIPO (bloqueo · confirmacion · informe · propuesta · observacion · supuesto)" >&2; exit 64 ;;
+esac
+[ -z "$PERSONA" ] || [ "$TIPO" = bloqueo ] || { echo "--persona solo va con bloqueo" >&2; exit 64; }
+
+CUERPO=$(jq -nc --arg t "$NODO" --arg ti "$(fecha_hoy) · $TEXTO" --argjson pr "$(prioridad_api "$PRIORIDAD")" \
+  --arg e "$ETIQUETA" --arg d "$DESCRIPCION" --arg v "$VENCE" \
+  '{tipo: $t, titulo: $ti, prioridad: $pr, etiquetas: [$e]}
+   + (if $d != "" then {descripcion: $d} else {} end)
+   + (if $v != "" then {vence: $v} else {} end)')
+NUEVO=$(gr_crear "$CUERPO")
+if [ -n "$PERSONA" ]; then
+  gr_conectar "$(printf '%s' "$NUEVO" | jq -r .id)" "$(nodo_id_o_crear PERSONA "$PERSONA")" ESPERA_RESPUESTA_DE > /dev/null
+fi
+printf '%s\n' "$NUEVO" | linea

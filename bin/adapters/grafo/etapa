@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# etapa — mueve la tarjeta de una task (`[<id>]`, TAREA por prefijo) o una FASE (`FASE <n>`, nodo FASE con
+# ese título exacto, como los deja el importador) a su etapa. Es la proyección del estado del PBI en el
+# tablero (/flow:todo §6): la mueven /flow:pbi:get, /flow:paircoding y el hook fase-tilde, nunca una mano.
+#
+#   etapa <id | "FASE <n>"> <etapa> [--titulo <título corto>]
+#
+#   etapa ∈ las claves de `secciones` en refs.yaml; el nombre tiene que existir en `GET /etapas` de la API.
+#   Sin nodo: con --titulo lo crea ahí (una FASE nace con título `FASE <n>` y el corto en la descripción;
+#   una task, como `[<id>] <título>`); sin él, sale 4 y lo dice — el que llama decide.
+#   Salida: `<nodo_id>\t<titulo>\t<movida a «etapa»|creada en «etapa»|ya estaba>`.
+set -euo pipefail
+source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
+ID="${1:?uso: etapa <id|FASE n> <etapa> [--titulo <título>]}"; ETAPA="${2:?falta la etapa}"; shift 2
+TITULO=""
+while [ $# -gt 0 ]; do
+  case "$1" in --titulo) TITULO="${2:?--titulo necesita un texto}"; shift 2 ;; *) echo "argumento desconocido: $1" >&2; exit 64 ;; esac
+done
+
+NOMBRE=$(cfg "secciones.$ETAPA") || { echo "etapa desconocida: $ETAPA (no está en tablero.secciones)" >&2; exit 64; }
+if [[ "$ID" == FASE\ * ]]; then
+  NODO=$(nodo_por_titulo "$ID" FASE)
+  NUEVO=$(jq -nc --arg ti "$ID" --arg d "$TITULO" --arg et "$NOMBRE" '{tipo: "FASE", titulo: $ti, descripcion: $d, etapa: $et}')
+else
+  NODO=$(nodo_por_prefijo "[$ID]" TAREA)
+  NUEVO=$(jq -nc --arg ti "[$ID] $TITULO" --arg et "$NOMBRE" --arg e "$(cfg label)" '{tipo: "TAREA", titulo: $ti, etapa: $et, etiquetas: [$e]}')
+fi
+
+if [ -z "$NODO" ]; then
+  if [ -z "$TITULO" ]; then
+    echo "no hay tarjeta [$ID] abierta en el grafo; con --titulo la creo en «$NOMBRE»" >&2
+    exit 4
+  fi
+  printf '%s\tcreada en «%s»\n' "$(gr_crear "$NUEVO" | linea)" "$NOMBRE"
+  exit 0
+fi
+
+if [ "$(printf '%s' "$NODO" | jq -r '.etapa // ""')" = "$NOMBRE" ]; then
+  printf '%s\tya estaba\n' "$(printf '%s' "$NODO" | linea)"
+  exit 0
+fi
+gr_editar "$(printf '%s' "$NODO" | jq -r .id)" "$(jq -nc --arg et "$NOMBRE" '{etapa: $et}')" > /dev/null
+printf '%s\tmovida a «%s»\n' "$(printf '%s' "$NODO" | linea)" "$NOMBRE"

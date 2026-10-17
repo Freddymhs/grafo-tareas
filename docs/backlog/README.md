@@ -1,6 +1,6 @@
 # Backlog — grafo-tareas
 
-**Última actualización:** 2026-10-16 · Fuente: [`../_CONCEPTO.md`](../_CONCEPTO.md) (generado con `/work:create-backlog`)
+**Última actualización:** 2026-10-17 · Fuente: [`../_CONCEPTO.md`](../_CONCEPTO.md) (generado con `/work:create-backlog`)
 
 Proyecto personal, sin tracker de empresa (`refs.yaml`: `tracker: none`, `tablero: none`). Cada FASE abre con **Destraba**
 y lleva `## Understand`, `## QA` y `## Cierre oficial en Azure` (esta última, *no aplica*: formato del método, `/work:resume:new-concept` §B).
@@ -12,10 +12,10 @@ y lleva `## Understand`, `## QA` y `## Cierre oficial en Azure` (esta última, *
 | [1 · Prueba en el visor](FASE_1_PRUEBA_VISOR.md) | F1.0 | la decisión del 3D, antes de escribir la API | `grafo-tareas.vr` | ✅ 72 FPS · DECISION_3D |
 | [2 · API del grafo](FASE_2_API_GRAFO.md) | F1.1 | una fuente de verdad para importador, VR y PWA | `grafo-tareas.api` | 🟡 código verde · falta desplegar (criterio 4) |
 | [3 · Importador Todoist](FASE_3_IMPORTADOR_TODOIST.md) | F1.2 | ver el trabajo real (pide N1, N2, C1-C4 confirmados) | `grafo-tareas.api` | ✅ importado (134 tareas → 158 nodos) · `04cbbd6` |
-| [4 · PWA tipo lista](FASE_4_PWA_LISTA.md) | F2 | trabajar el día sin Todoist | `grafo-tareas.web` | 🟡 1/4 · Orval + C9 (etapa, etiquetas, prioridad, vence, búsqueda) |
-| [5 · Adaptador `grafo` y corte](FASE_5_ADAPTADOR_GRAFO_Y_CORTE.md) | F2 | `tablero.kind: grafo`, Todoist apagado | método (`bin/adapters/grafo/`) | ⬜ |
-| [6 · VR solo lectura](FASE_6_VR_SOLO_LECTURA.md) | F1.3 | el mapa real en el visor: otra vista del mismo dato | `grafo-tareas.vr` | ⬜ |
-| [7 · Editar desde el visor](FASE_7_EDITAR_DESDE_VR.md) | F3 | conectar y cerrar dentro del 3D | `grafo-tareas.vr` | ⬜ |
+| [4 · PWA tipo lista](FASE_4_PWA_LISTA.md) | F2 | trabajar el día sin Todoist | `grafo-tareas.web` | ✅ 4/4 · offline, Markdown, servida por HTTPS del tailnet (`bin/servir-tailnet`) · falta que Freddy la abra en el teléfono/Quest y la use una semana (criterio 1) |
+| [5 · Adaptador `grafo` y corte](FASE_5_ADAPTADOR_GRAFO_Y_CORTE.md) | F2 | `tablero.kind: grafo`, Todoist apagado | método (`bin/adapters/grafo/`) | 🟡 2/3 · adaptador (27 casos) + importador de `FASE_*.md`/§ABIERTO · el corte (tarea 2) y C10 son de Freddy |
+| [6 · VR solo lectura](FASE_6_VR_SOLO_LECTURA.md) | F1.3 | el mapa real en el visor: otra vista del mismo dato | `grafo-tareas.vr` | ✅ 3/3 · API, posiciones guardadas, bloqueo de la API · falta medir FPS en el visor |
+| [7 · Editar desde el visor](FASE_7_EDITAR_DESDE_VR.md) | F3 | conectar y cerrar dentro del 3D | `grafo-tareas.vr` | ✅ 3/3 · conectar con el rayo, cerrar y ver qué libera, Zustand · falta medir FPS en el visor |
 
 **Orden (Freddy, 2026-10-16, con la FASE 1 verde):** backend → clon de Todoist → corte → VR. La VR es otra vista de lo que muestra la PWA; el riesgo del 3D ya lo descartó la FASE 1. F4 del concepto (Redis + cola, OAuth) no tiene FASE: solo si hace falta.
 **La FASE 1 corta:** si en el visor no rinde o no se lee, se para y se revisa la decisión del 3D antes de la FASE 2.

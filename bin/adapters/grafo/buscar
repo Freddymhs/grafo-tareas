@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# buscar — los nodos ABIERTOS cuyo título contiene todas las palabras (sin distinguir mayúsculas).
+# Lo pide /flow:todo §3 antes de crear: parecida no es igual, lo decide el humano, no esto.
+#
+#   buscar <palabra> [<palabra>…]        → `<id>\t<titulo>` por coincidencia; sin coincidencias no imprime
+#                                          nada y sale 0 (es un resultado, no un error)
+# La API busca UNA cadena (`q=`): se le pide la primera palabra y las demás se filtran acá.
+set -euo pipefail
+source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
+[ $# -ge 1 ] || { echo "uso: buscar <palabra> [<palabra>…]" >&2; exit 64; }
+
+PALABRAS=$(printf '%s\n' "$@" | jq -R . | jq -sc 'map(ascii_downcase)')
+gr_listar "$1" |
+  jq -c --argjson ps "$PALABRAS" '.[] | select((.titulo | ascii_downcase) as $c | $ps | all(. as $p | $c | contains($p)))' |
+  while IFS= read -r n; do printf '%s\n' "$n" | linea; done

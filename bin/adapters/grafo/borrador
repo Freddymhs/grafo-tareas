@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# borrador — una TAREA en el carril: en el grafo un carril es una RAMA con ese nombre (se crea si falta) y la
+# tarjeta le PERTENECE. Es lo que /flow:pbi:repartir deja por pieza con el sí del humano: título
+# `<ronda> <id> · N.M · <título> · <task|por crear>` y la especificación entera como descripción.
+#
+#   borrador <carril> <título> [--descripcion-archivo <ruta>]     → `<id>\t<titulo>`
+#
+# Sin `--descripcion-archivo` la tarjeta va sin descripción. Lleva la etiqueta `borrador` para distinguirla
+# de lo que ya está en curso.
+set -euo pipefail
+source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
+CARRIL="${1:?uso: borrador <carril> <título> [--descripcion-archivo <ruta>]}"; TITULO="${2:?falta el título}"; shift 2
+ARCHIVO=""
+while [ $# -gt 0 ]; do
+  case "$1" in --descripcion-archivo) ARCHIVO="${2:?--descripcion-archivo necesita una ruta}"; shift 2 ;; *) echo "argumento desconocido: $1" >&2; exit 64 ;; esac
+done
+[ -z "$ARCHIVO" ] || [ -f "$ARCHIVO" ] || { echo "no existe: $ARCHIVO" >&2; exit 1; }
+
+RAMA=$(nodo_id_o_crear RAMA "$CARRIL")
+CUERPO=$(jq -nc --arg ti "$TITULO" --arg e "$ETIQUETA_BORRADOR" --rawfile d "${ARCHIVO:-/dev/null}" \
+  '{tipo: "TAREA", titulo: $ti, etiquetas: [$e]} + (if $d != "" then {descripcion: $d} else {} end)')
+NUEVO=$(gr_crear "$CUERPO")
+gr_conectar "$(printf '%s' "$NUEVO" | jq -r .id)" "$RAMA" PERTENECE_A > /dev/null
+printf '%s\n' "$NUEVO" | linea

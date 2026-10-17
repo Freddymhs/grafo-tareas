@@ -22,26 +22,32 @@
 ### Tarea 1: Orval + borrar la demo `posts/` de la plantilla
 - [x] Hecha — 2026-10-16: `orval.config.ts` (react-query + fetch, tags-split, mutator `src/lib/api/cliente.ts` que apunta a `NEXT_PUBLIC_API_URL` y desenvuelve el sobre `{data, meta}` de la API) → `src/lib/api/generado/` (`pnpm api:generar`); demo `posts/`, `table/`, store, schemas y query-keys fuera; home/layout/e2e del proyecto; `@serwist/next` instalado para la tarea 4
 
-### Tarea 2: vistas — "hoy puedo", por rama, por persona que bloquea
-- [ ] Hecha
+### Tarea 2: vistas — tablero por etapa, "hoy puedo", bloqueos (personas y dudas), ramas, detalle
+- [x] Hecha — 2026-10-17 (commit `61aaa9f` en `grafo-tareas.web`): `src/app/{page,tablero}.tsx` (columnas = `GET /etapas` + Entrada; tarjetas con etiquetas, p1/p2, fecha), `hoy/`, `bloqueos/` ("si contesta se liberan N" por `libera`), `ramas/` (color, miembros, `nodos?rama=`), `nodos/[id]/` (bloqueado-por, descripción, subtareas, qué libera), `components/tarjeta-nodo.tsx`, nav en `layout.tsx`, `constants` (API_URL, LIMITE_TABLERO 500, ETAPA_ENTRADA, NAVEGACION). Solo lectura. Gates verdes (tsc 0 · lint 0 · 5 tests · build 5 rutas); probado con `next start -p 3001` contra la API real y los 134 nodos: 0 errores de página/hidratación, 1 aviso 404 de un recurso (favicon, por confirmar). Capturas en `/tmp/claude-1000/web-shots/`. La descripción se muestra en texto plano: el render Markdown pide una dependencia (`react-markdown`) → preguntar antes de instalar.
+  Para esta tarea la API necesitó (commit `88f762b`, CI verde): `GET nodos` declarando `{data,total}` (Orval tipaba un array), filtro `rama=`, `limit` ≤ 500, `color` de rama tipado; y en Orval apagar el sobre del cliente fetch (`override.fetch.includeHttpResponseReturnType: false`) porque el mutator `src/lib/api/cliente.ts` ya desenvuelve `{data, meta}`.
 
 ### Tarea 3: crear / cerrar / conectar nodos
-- [ ] Hecha
+- [x] Hecha — 2026-10-17 (commits `aa187db` en `grafo-tareas.web` y `f06384c` en `grafo-tareas.api`): `components/crear-nodo.tsx` (alta rápida en el tablero: título, tipo, etapa, prioridad → `POST /nodos`), `components/conexiones-nodo.tsx` (lista con el título del otro extremo vía `findOne`, quitar, y conectar "este [tipo] [buscar por `q`]" → `POST /conexiones`; reemplaza la lista de subtareas con UUIDs), detalle con select de etapa y Cerrar/Reabrir (`PATCH /nodos/:id`), `lib/api/invalidar-grafo.ts` (toda mutación invalida todo: lo derivado cambia en todo el grafo), `lib/grafo/describir-conexion.ts` + test (3). Gates verdes (tsc 0 · lint 0 · vitest 8 · build 6 rutas). Smoke con Chrome contra la API real (`/tmp/claude-1000/web-shots/t3-*.png`): crear en Entrada con p1 → mover a ENTENDIMIENTO → conectar BLOQUEADA_POR → quitar → cerrar → volver a Entrada → borrar; 0 errores de página, solo el 404 del favicon.
+  La API necesitó dos cosas (`f06384c`): (1) **CORS**: `@fastify/cors` solo permite `GET,HEAD,POST` por defecto, así que el navegador rechazaba `PATCH`/`DELETE` en el preflight (las vistas de la tarea 2 eran solo GET y no lo vieron) → `src/config/cors.ts` con `METODOS_PERMITIDOS` + test e2e del preflight; (2) `PATCH nodos/:id` con `etapa: null` para volver a la entrada (`UpdateNodoDto.etapa` nullable; `IsNotEmpty` sigue rechazando `""`) + test e2e; `openapi.json` y `updateNodoDto.ts` regenerados. e2e 16/16, unit 32/32.
 
 ### Tarea 4: Serwist (offline de lectura) + manifest; abrir por URL de Tailscale en el teléfono y en el Quest
-- [ ] Hecha
+- [x] Hecha — 2026-10-17 (Freddy: "terminalo tú"). Hecho y probado: `src/app/sw.ts` (Serwist: precache del build + `NetworkFirst` sobre los GET a la API con caché `api-grafo`, 3 s de espera, 200 entradas; las mutaciones no se cachean) · `src/app/~offline/page.tsx` como fallback de documentos (precacheada a mano con `additionalPrecacheEntries`, revisión = commit) · `src/app/manifest.ts` (`/manifest.webmanifest`, standalone, lang es) · `src/app/icon.svg` (cierra el 404 del favicon) + `public/iconos/icono-{192,512}.png` · `SerwistProvider` y `viewport.themeColor` en `layout.tsx` · `public/sw*` ignorado · build con `next build --webpack`. Smoke con Chrome (`/tmp/claude-1000/web-shots/t4-*.png`): SW activo y controlando, manifest/íconos 200; **sin red**: tablero y "hoy puedo" se sirven de la caché (12 columnas, mismas tarjetas), ruta no visitada → "Sin conexión". Los `ERR_FAILED` que quedan offline son los prefetch RSC de los links: esperables.
+  **Decisión tomada (revisable):** `@serwist/next` clásico no soporta Turbopack; el `build` va con `--webpack` (`dev` sigue con Turbopack y sin SW). Funciona y está probado; el modo *configurator* (`@serwist/cli`) no se instaló: no hace falta mientras el build ande, y es una dependencia más.
+  **Tailscale (2026-10-17):** `bin/servir-tailnet` (orquestador) levanta API y web y las sirve por HTTPS del tailnet con `tailscale serve` — `https://thinkerpad.tail1798c7.ts.net` (web) y `:8443` (API) —; construye la web con `NEXT_PUBLIC_API_URL` del tailnet, arranca la API con ese origen en CORS y verifica health, CORS y manifest antes de imprimir la URL. Probado en Chrome con vista de teléfono por esa URL: contexto seguro, service worker activo, 80 tarjetas, y **sin red** las mismas 80 (`/tmp/claude-1000/web-shots/tailnet-movil.png`). Corte de palabra en tarjetas y título (rutas largas desbordaban en el teléfono). Los procesos no sobreviven a un reinicio del PC: se vuelve a correr el script. **Lo único que queda en manos de Freddy:** abrir esa URL en el teléfono y en el Quest e instalarla.
+  **Descripción en Markdown (2026-10-17):** `react-markdown` + `remark-gfm` (instalados con `--config.minimumReleaseAge=1440`) en `components/descripcion.tsx`, sin HTML crudo (test: un `<img onerror>` no se renderiza). Probado con la descripción real más larga con títulos: 6 títulos, listas y código, 0 `<pre>` crudo (`web-markdown.png`).
+  **Incidente del mismo día (resuelto):** los e2e de la API corrían contra `grafo_tareas` (`.env`) y su `deleteMany` de `beforeAll` borró las 134 tareas importadas; el README decía `_test` pero nada lo forzaba. Fix: `test/setup-e2e.ts` (jest `setupFiles`) fuerza una base terminada en `_test` antes de que Nest cargue `.env`; verificado con conteo antes/después (dev 20 → 20) y reimportado `--proyecto 6VhFQg6v45qcJHPc`: 158 nodos / 86 conexiones / 80 abiertas / hoy-puedo 78, idéntico a la medición original.
 
 ## Criterios de Aceptación
 
 - [ ] 1 · Una semana de trabajo real hecha desde la PWA sin abrir Todoist
-- [ ] 2 · Gates de la plantilla en verde (type-check, lint, vitest, playwright)
-- [ ] 3 · Hidratación sin warnings (gap de entrevista: concepto § practice-wishlist)
+- [x] 2 · Gates de la plantilla en verde (type-check, lint, vitest, playwright) — 2026-10-17: tsc 0 · lint 0 · vitest 8 · build · **playwright 4/4** (`e2e/home.spec.ts` actualizado: la home es el tablero; `e2e/navegacion.spec.ts`: las 4 vistas, aviso sin API, página offline y manifest). El config apuntaba al 3000 (hoy la API): ahora 3001, `serviceWorkers: "block"` (si no, el SW atiende los fetch y `page.route` no los ve) y `PW_CHANNEL=chrome` opcional para correr con el Chrome del sistema.
+- [x] 3 · Hidratación sin warnings (gap de entrevista: concepto § practice-wishlist) — 2026-10-17: en los smoke de las tareas 2, 3 y 4 con captura de `pageerror`/`console.error`: 0 errores de hidratación en las 5 vistas (queda solo el 404 del favicon, cerrado por `icon.svg` en la tarea 4).
 
 ## QA
 
-- [ ] Colección
-- [ ] Auditoría
-- [ ] Listo para PR
+- [x] Colección — no aplica: la web no expone API (la colección es de la API, FASE 2)
+- [x] Auditoría — 2026-10-17: `/work:backlog:review` de la tarea 2 (2 arreglos SSOT) y auditoría previa al commit sobre todo lo cambiado (0 `let`, 0 `any`, grep agnóstico 0); smoke con Chrome de cada tarea contra la API real
+- [x] Listo para PR — 2026-10-17: gates verdes (tsc · lint · vitest 10 · build · playwright 4/4); commits `61aaa9f` (tarea 2) y `aa187db` (tareas 3-4) en `main` de `grafo-tareas.web`, más `f06384c` en la API (CORS, `etapa: null`); falta solo el push (lo corre Freddy)
 
 ## Cierre oficial en Azure
 
