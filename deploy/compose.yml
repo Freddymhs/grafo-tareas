@@ -1,0 +1,95 @@
+# grafo-tareas en el Mac Mini (FASE 12). Lo levanta `bin/desplegar`; a mano solo para mirar (`docker compose ps`).
+# Rutas relativas a esta carpeta: el orquestador en ~/apps/grafo-tareas y los repos adentro, como en el PC.
+# Nada se publica en la LAN: Postgres sin puerto, API y PWA en 127.0.0.1; afuera solo `tailscale serve` (HTTPS).
+# Las variables salen de deploy/.env (lo crea bin/desplegar la primera vez, chmod 600, fuera de git).
+name: grafo-tareas
+
+x-reinicio: &reinicio
+  # Convención del Mac Mini (~/CLAUDE.md, checklist punto 11): sin esto un reinicio deja el servicio muerto.
+  restart: unless-stopped
+
+services:
+  postgres:
+    <<: *reinicio
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: grafo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD en deploy/.env}
+      POSTGRES_DB: grafo_tareas
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U grafo -d grafo_tareas']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    <<: *reinicio
+    build: ../grafo-tareas.api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:${PUERTO_API:?falta PUERTO_API}:3000'
+    environment:
+      NODE_ENV: production
+      PORT: '3000'
+      DATABASE_URL: postgresql://grafo:${POSTGRES_PASSWORD}@postgres:5432/grafo_tareas?schema=public
+      # La PWA del tailnet y la VR del visor (adb reverse: su origen es localhost del Quest).
+      CORS_ORIGINS: ${URL_WEB:?falta URL_WEB},http://localhost:4173,http://localhost:5173
+      PINO_LOG_LEVEL: info
+      THROTTLE_TTL: '60'
+      THROTTLE_LIMIT: '100'
+      ROLES_ARCHIVO: /area/roles.yaml
+      REFS_ARCHIVO: /area/refs.yaml
+    volumes:
+      # Los mismos archivos del área que usa bin/dev en el PC; la API los lee al arrancar.
+      - ../docs/roles.yaml:/area/roles.yaml:ro
+      - ../refs.yaml:/area/refs.yaml:ro
+
+  web:
+    <<: *reinicio
+    build:
+      context: ../grafo-tareas.web
+      args:
+        NEXT_PUBLIC_API_URL: ${URL_API:?falta URL_API}
+    depends_on:
+      - api
+    ports:
+      - '127.0.0.1:${PUERTO_WEB:?falta PUERTO_WEB}:3000'
+
+  respaldo:
+    # pg_dump diario, 14 copias, en deploy/respaldos/ del Mac Mini (D5). Un contenedor y no launchd: en este Mini
+    # los LaunchAgents no siempre cargan (su ~/CLAUDE.md) y un LaunchDaemon pide sudo.
+    <<: *reinicio
+    image: postgres:16-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      DIAS_A_GUARDAR: '14'
+      SEGUNDOS_ENTRE_RESPALDOS: '86400'
+    volumes:
+      - ./respaldos:/respaldos
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -u
+        while true; do
+          archivo="/respaldos/grafo-$$(date +%Y-%m-%d_%H%M).dump"
+          if pg_dump -h postgres -U grafo -d grafo_tareas -Fc -f "$$archivo.parcial"; then
+            mv "$$archivo.parcial" "$$archivo"
+            echo "respaldo: $$archivo ($$(du -h "$$archivo" | cut -f1))"
+          else
+            rm -f "$$archivo.parcial"
+            echo "respaldo FALLÓ: $$archivo" >&2
+          fi
+          find /respaldos -name 'grafo-*.dump' -mtime +"$$DIAS_A_GUARDAR" -delete
+          sleep "$$SEGUNDOS_ENTRE_RESPALDOS"
+        done
+
+volumes:
+  pgdata:

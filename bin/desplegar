@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# desplegar — FASE 12: lleva el `main` PUBLICADO de grafo-tareas (orquestador, api, web) al Mac Mini y lo levanta con
+# deploy/compose.yml. Repetible: correrlo dos veces seguidas no cambia nada.
+#
+#   1. aquí: lo que no está en GitHub no se despliega → aborta si algún `main` local va adelante de origin
+#   2. allá (ssh): clona o trae los tres repos a ~/apps/grafo-tareas, crea deploy/.env la primera vez (contraseña de
+#      Postgres al azar, chmod 600), `docker compose up -d --build`, `tailscale serve` 8443 → API y 10000 → PWA
+#   3. aquí: verifica por el tailnet health, PWA, CORS de PATCH, puertos solo en 127.0.0.1 y restart unless-stopped
+#
+# El runner de GitHub del Mac Mini solo toma repos de fmarcos-labs (su ~/CLAUDE.md); éstos son de Freddymhs: por eso ssh.
+set -euo pipefail
+
+ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+HOST_SSH="${GRAFO_HOST_SSH:-mac-mini}"
+DIR_REMOTO="${GRAFO_DIR_REMOTO:-apps/grafo-tareas}"            # relativo al HOME del Mac Mini (su convención: ~/apps/<app>)
+HOST_TAILNET="${GRAFO_HOST_TAILNET:-mac-mini-server.tail1798c7.ts.net}"
+GITHUB="${GRAFO_GITHUB:-git@github.com:Freddymhs}"
+REPOS_INTERNOS=(grafo-tareas.api grafo-tareas.web)
+RAMA=main
+PUERTO_API=3007                                                  # apps generales del Mac Mini: 3001-3009
+PUERTO_WEB=3008
+HTTPS_API=8443                                                   # tailscale serve solo da HTTPS en 443, 8443 y 10000
+HTTPS_WEB=10000                                                  # (el 443 del Mac Mini es de otro servicio)
+URL_API="https://$HOST_TAILNET:$HTTPS_API"
+URL_WEB="https://$HOST_TAILNET:$HTTPS_WEB"
+SEGUNDOS_ESPERA=180
+
+falla() { echo "desplegar: $*" >&2; exit 1; }
+
+# 1. Lo publicado es lo que se despliega.
+for repo in "" "${REPOS_INTERNOS[@]}"; do
+  dir="$ORQ${repo:+/$repo}"; nombre="${repo:-grafo-tareas}"
+  git -C "$dir" fetch -q origin "$RAMA"
+  adelante=$(git -C "$dir" rev-list --count "origin/$RAMA..$RAMA")
+  [ "$adelante" = 0 ] || falla "$nombre tiene $adelante commit(s) sin pushear: lo que no está en GitHub no se despliega"
+  [ -z "$(git -C "$dir" status --porcelain)" ] || echo "aviso: $nombre tiene cambios sin commitear; no viajan (se despliega origin/$RAMA)"
+done
+
+# 2. En el Mac Mini.
+ssh "$HOST_SSH" bash -s -- "$DIR_REMOTO" "$GITHUB" "$RAMA" "$PUERTO_API" "$PUERTO_WEB" "$HTTPS_API" "$HTTPS_WEB" \
+  "$URL_API" "$URL_WEB" "${REPOS_INTERNOS[@]}" <<'REMOTO'
+set -euo pipefail
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"   # ssh no carga el .zshrc: sin esto no hay docker
+TAILSCALE=/Applications/Tailscale.app/Contents/MacOS/Tailscale
+DIR="$HOME/$1"; GITHUB=$2; RAMA=$3
+export PUERTO_API=$4 PUERTO_WEB=$5; HTTPS_API=$6; HTTPS_WEB=$7; export URL_API=$8 URL_WEB=$9
+shift 9
+
+traer() {   # traer <dir> <repo>: clona la primera vez; después solo avanza (nunca pisa: --ff-only)
+  if [ -d "$1/.git" ]; then git -C "$1" fetch -q origin "$RAMA" && git -C "$1" checkout -q "$RAMA" && git -C "$1" merge -q --ff-only "origin/$RAMA"
+  else git clone -q --branch "$RAMA" "$GITHUB/$2.git" "$1"; fi
+  echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
+}
+mkdir -p "$(dirname "$DIR")"
+traer "$DIR" grafo-tareas
+for repo in "$@"; do traer "$DIR/$repo" "$repo"; done
+
+ENV="$DIR/deploy/.env"
+if [ ! -f "$ENV" ]; then
+  umask 077
+  printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > "$ENV"
+  echo "deploy/.env creado (contraseña nueva de Postgres, 600)"
+fi
+mkdir -p "$DIR/deploy/respaldos"
+
+docker compose -f "$DIR/deploy/compose.yml" --env-file "$ENV" up -d --build --remove-orphans 2>&1 | grep -vE '^ *#|^$' | tail -12
+
+"$TAILSCALE" serve --bg --https="$HTTPS_API" "http://127.0.0.1:$PUERTO_API" >/dev/null
+"$TAILSCALE" serve --bg --https="$HTTPS_WEB" "http://127.0.0.1:$PUERTO_WEB" >/dev/null
+
+echo "--- contenedores (puerto publicado · reinicio)"
+CONTENEDORES=$(docker compose -f "$DIR/deploy/compose.yml" --env-file "$ENV" ps -q)
+[ "$(wc -w <<<"$CONTENEDORES")" = 4 ] || { echo "FALLA: se esperaban 4 contenedores corriendo" >&2; exit 1; }
+for c in $CONTENEDORES; do
+  docker inspect -f '{{.Name}} · {{range $p, $b := .HostConfig.PortBindings}}{{range $b}}{{.HostIp}}:{{.HostPort}} {{end}}{{end}}· {{.HostConfig.RestartPolicy.Name}}' "$c"
+  # D2 y la convención del Mac Mini: nada en la LAN, y todo vuelve solo tras un reinicio.
+  ips=$(docker inspect -f '{{range $p, $b := .HostConfig.PortBindings}}{{range $b}}{{.HostIp}} {{end}}{{end}}' "$c")
+  for ip in $ips; do [ "$ip" = 127.0.0.1 ] || { echo "FALLA: $c publica en $ip, no solo en 127.0.0.1" >&2; exit 1; }; done
+  [ "$(docker inspect -f '{{.HostConfig.RestartPolicy.Name}}' "$c")" = unless-stopped ] || { echo "FALLA: $c sin restart unless-stopped" >&2; exit 1; }
+done
+REMOTO
+
+# 3. Verificar desde afuera, por el tailnet: lo que ve el teléfono.
+echo "--- verificación por el tailnet"
+espera_200() {   # espera_200 <url>: reintenta hasta SEGUNDOS_ESPERA (la API aplica migraciones al arrancar)
+  local fin=$((SECONDS + SEGUNDOS_ESPERA)) codigo=000
+  while [ $SECONDS -lt $fin ]; do
+    codigo=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$1" || true)
+    [ "$codigo" = 200 ] && break
+    sleep 3
+  done
+  echo "$codigo"
+}
+health=$(espera_200 "$URL_API/api/v1/health"); echo "API health: $health"
+web=$(espera_200 "$URL_WEB/"); echo "PWA: $web"
+metodos=$(curl -s -D - -o /dev/null -m 10 -X OPTIONS -H "Origin: $URL_WEB" -H 'Access-Control-Request-Method: PATCH' \
+  "$URL_API/api/v1/nodos" | tr -d '\r' | grep -i '^access-control-allow-methods:' || true)
+echo "CORS: ${metodos:-sin cabecera}"
+
+[ "$health" = 200 ] || falla "la API no responde 200 por $URL_API"
+[ "$web" = 200 ] || falla "la PWA no responde 200 por $URL_WEB"
+grep -q PATCH <<<"$metodos" || falla "el preflight no permite PATCH desde $URL_WEB (trampa CORS de la FASE 4)"
+echo "listo: PWA $URL_WEB · API $URL_API"

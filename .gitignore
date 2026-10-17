@@ -4,3 +4,4 @@ _docs/
 .env
 .env.*
 .claude/settings.local.json
+deploy/respaldos/
