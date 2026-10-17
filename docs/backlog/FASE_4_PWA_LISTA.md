@@ -47,7 +47,7 @@
 
 - [x] Colección — no aplica: la web no expone API (la colección es de la API, FASE 2)
 - [x] Auditoría — 2026-10-17: `/work:backlog:review` de la tarea 2 (2 arreglos SSOT) y auditoría previa al commit sobre todo lo cambiado (0 `let`, 0 `any`, grep agnóstico 0); smoke con Chrome de cada tarea contra la API real
-- [x] Listo para PR — 2026-10-17: gates verdes (tsc · lint · vitest 10 · build · playwright 4/4); commits `61aaa9f` (tarea 2) y `aa187db` (tareas 3-4) en `main` de `grafo-tareas.web`, más `f06384c` en la API (CORS, `etapa: null`); falta solo el push (lo corre Freddy)
+- [x] Listo para PR — 2026-10-17: gates verdes (tsc · lint · vitest 10 · build · playwright 4/4); commits `61aaa9f` (tarea 2) y `aa187db` (tareas 3-4) en `main` de `grafo-tareas.web`, más `f06384c` en la API (CORS, `etapa: null`); pusheado el 2026-10-17 y CI de GitHub verde
 
 ## Cierre oficial en Azure
 

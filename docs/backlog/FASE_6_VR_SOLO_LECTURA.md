@@ -34,7 +34,7 @@
 
 - [x] Colección — no aplica: no expone API
 - [x] Auditoría — 2026-10-17: gates (tsc · lint · prettier · vitest 30 · build · playwright 3/3) y smoke con Chrome contra la API real
-- [x] Listo para PR — 2026-10-17: commit `954652d` en `main` de `grafo-tareas.vr` (junto con la FASE 7); falta solo el push (Freddy)
+- [x] Listo para PR — 2026-10-17: commit `954652d` en `main` de `grafo-tareas.vr` (junto con la FASE 7); pusheado el 2026-10-17 y CI de GitHub verde
 
 ## Cierre oficial en Azure
 

@@ -30,7 +30,7 @@
 
 - [x] Colección — no aplica: no expone API
 - [x] Auditoría — 2026-10-17: gates de la VR y smoke de punta a punta VR → API → PWA
-- [x] Listo para PR — 2026-10-17: commit `954652d` en `main` de `grafo-tareas.vr` (junto con la FASE 6); falta solo el push (Freddy)
+- [x] Listo para PR — 2026-10-17: commit `954652d` en `main` de `grafo-tareas.vr` (junto con la FASE 6); pusheado el 2026-10-17 y CI de GitHub verde
 
 ## Cierre oficial en Azure
 
