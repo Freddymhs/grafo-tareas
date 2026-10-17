@@ -31,9 +31,16 @@ const pestanasDeLaVr = async () =>
     ({ type, url }) => type === 'page' && url.startsWith(origen),
   )
 
+// Con el navegador cerrado o detrás de un juego, su depuración remota no existe y el fetch se corta: no es una falla de
+// la VR, es que no hay qué recargar. Se dice así, sin la traza.
+const antes = await pestanasDeLaVr().catch(() => null)
+if (antes === null) {
+  console.log('visor: el navegador del Quest no está abierto (¿un juego al frente?): no hay pestañas que recargar')
+  process.exit(0)
+}
+
 const SCRIPTS = "[...document.scripts].map((s) => s.src.split('/').pop()).join(',')"
 
-const antes = await pestanasDeLaVr()
 if (antes.length === 0) {
   console.log(`visor: no hay pestañas de ${origen} abiertas (--abrir la abre)`)
   process.exit(0)
