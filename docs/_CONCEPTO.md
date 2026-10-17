@@ -54,6 +54,8 @@ Leídos: proyecto `TRABAJO` (100 tareas de una lista mayor, el resto no se leyó
 
 ## Modelo de dominio
 
+> **Ampliado el 2026-10-17 (C9, Freddy):** `Nodo` lleva además `etapa` (columna del tablero, lista fija = las etapas del método), `etiquetas` (daily, propuesta, observación, retro, supuesto: los "tipos de tarjeta"), `prioridad` 1-4 y `vence`. Y lo que Freddy explicó con `fases.html`/`calidad.html`: **los `FASE_x.md` son el corazón**; sus casillas dan la etapa de cada FASE en dos tableros (flujo normal y calidad). Todoist aporta lo que esos archivos no muestran: las conexiones y las tarjetas sueltas que "no se pueden olvidar". El grafo junta las dos cosas y el 3D las hace visibles.
+
 ```
 Nodo
   ├── id, tipo (TAREA | HISTORIA | FASE | RAMA | DUDA | PERSONA | PR | DAILY_ITEM)   ← HISTORIA, no HU: vocabulario de cualquier empresa

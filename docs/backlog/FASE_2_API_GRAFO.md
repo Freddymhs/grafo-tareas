@@ -47,6 +47,10 @@
 - El JSON de Swagger se exporta a un archivo versionado (lo consume Orval en las FASE 4 y 6). Paso de CI con el grep agnóstico.
 - [x] Hecha — 2026-10-16: `pnpm openapi:export` (`src/openapi.ts` desde `dist`: ts-node no resuelve los alias `.js`) → `openapi.json` (10 rutas, determinista); el CI falla si quedó atrás (`git diff --exit-code`) y si `src/` nombra una herramienta fuera de `importadores/`
 
+### Tarea 6 (agregada por C9, 2026-10-17): tablero en el nodo y búsqueda
+- `etapa` (lista fija: `GET /etapas`, `ETAPAS_POR_DEFECTO` = las etapas del método con los nombres de Freddy, `ETAPAS` en el entorno la reemplaza), `etiquetas[]`, `prioridad` 1-4, `vence` (fecha) en `Nodo`; filtros `GET nodos?etapa=&etiqueta=&q=` (`q` busca en título y descripción). El importador los llena desde Todoist; la sección que no es etapa queda al pie de la descripción.
+- [x] Hecha — migración `tablero_etapa_etiquetas_prioridad_vence`; `EtapasService` valida la etapa al crear/editar (400 si no está en la lista); contrato a 11 rutas; tests 32 unit + 14 e2e
+
 ### Tarea 5: borrar `src/modules/example/` y su test
 - [x] Hecha — 2026-10-16, con la migración `init` de la plantilla
 

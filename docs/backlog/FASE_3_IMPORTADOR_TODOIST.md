@@ -1,7 +1,7 @@
 # FASE 3: IMPORTADOR TODOIST — UNA DIRECCIÓN, UNA VEZ, IDEMPOTENTE
 
 **Destraba**: ver el trabajo real en el grafo: la FASE 4 (PWA) y la FASE 6 (VR) muestran datos de verdad y no sintéticos
-**Listo para PR**: casi · 2026-10-16 (noche): tareas 1-3 y criterios 1-3 hechos; migración real a la base local hecha (134 tareas → 158 nodos, 86 conexiones; 2ª corrida 0 nuevos); `backlog:review` corrido y sus 3 errores corregidos. Falta: commit por `sellar` y la decisión de TestSprite (a/b/c) de Freddy
+**Listo para PR**: sí · commit `04cbbd6`, CI verde · 2026-10-16 (noche): tareas 1-3 y criterios 1-3 hechos; migración real a la base local hecha (134 tareas → 158 nodos, 86 conexiones; 2ª corrida 0 nuevos); `backlog:review` corrido y sus 3 errores corregidos. Falta: commit por `sellar` y la decisión de TestSprite (a/b/c) de Freddy
 **Prioridad**: Alta
 **Dependencias**: **FASE 2** (código verde 2026-10-16). N1, N2 y C1-C4 ya confirmados: **solo `TRABAJO`** (134 tareas), **nombres reales** de personas, base local en Docker
 **Fuente**: `docs/_CONCEPTO.md` § Lo que Todoist no deja ver, § Fases F1.2, § Cómo se conecta el grafo (Migración), § Riesgos (importador frágil)
@@ -52,7 +52,7 @@
 
 - [x] Colección — no aplica: el importador es un comando, no expone rutas; lo cubre `test/importador.e2e-spec.ts`
 - [x] Auditoría — `/work:backlog:review` 2026-10-16: ❌ `let cursor` en el cliente (→ paginación recursiva) · ❌ `let` en specs, también los 2 de la plantilla (→ `armar()` por test y holder `ctx` en e2e; 0 `let` en el repo) · ❌ los e2e se pisaban en la base de test (→ `maxWorkers: 1`) · ⚠️ `hoy-puedo` listaba nodos FASE: con datos reales 96 de 80 abiertas (→ solo TAREA, concepto § Modelo: 78 de 80, 2 padres bloqueados por subtareas). ⚠️ TestSprite no instalado: quality gate pendiente de decisión de Freddy
-- [ ] Listo para PR
+- [x] Listo para PR — commit `04cbbd6` en grafo-tareas.api, CI verde
 
 ## Cierre oficial en Azure
 

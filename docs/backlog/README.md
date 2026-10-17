@@ -11,8 +11,8 @@ y lleva `## Understand`, `## QA` y `## Cierre oficial en Azure` (esta última, *
 |---|---|---|---|---|
 | [1 · Prueba en el visor](FASE_1_PRUEBA_VISOR.md) | F1.0 | la decisión del 3D, antes de escribir la API | `grafo-tareas.vr` | ✅ 72 FPS · DECISION_3D |
 | [2 · API del grafo](FASE_2_API_GRAFO.md) | F1.1 | una fuente de verdad para importador, VR y PWA | `grafo-tareas.api` | 🟡 código verde · falta desplegar (criterio 4) |
-| [3 · Importador Todoist](FASE_3_IMPORTADOR_TODOIST.md) | F1.2 | ver el trabajo real (pide N1, N2, C1-C4 confirmados) | `grafo-tareas.api` | 🟡 código verde, migración local hecha (134 tareas) · falta `Listo para PR` |
-| [4 · PWA tipo lista](FASE_4_PWA_LISTA.md) | F2 | trabajar el día sin Todoist | `grafo-tareas.web` | ⬜ |
+| [3 · Importador Todoist](FASE_3_IMPORTADOR_TODOIST.md) | F1.2 | ver el trabajo real (pide N1, N2, C1-C4 confirmados) | `grafo-tareas.api` | ✅ importado (134 tareas → 158 nodos) · `04cbbd6` |
+| [4 · PWA tipo lista](FASE_4_PWA_LISTA.md) | F2 | trabajar el día sin Todoist | `grafo-tareas.web` | 🟡 1/4 · Orval + C9 (etapa, etiquetas, prioridad, vence, búsqueda) |
 | [5 · Adaptador `grafo` y corte](FASE_5_ADAPTADOR_GRAFO_Y_CORTE.md) | F2 | `tablero.kind: grafo`, Todoist apagado | método (`bin/adapters/grafo/`) | ⬜ |
 | [6 · VR solo lectura](FASE_6_VR_SOLO_LECTURA.md) | F1.3 | el mapa real en el visor: otra vista del mismo dato | `grafo-tareas.vr` | ⬜ |
 | [7 · Editar desde el visor](FASE_7_EDITAR_DESDE_VR.md) | F3 | conectar y cerrar dentro del 3D | `grafo-tareas.vr` | ⬜ |
