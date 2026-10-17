@@ -24,6 +24,7 @@
   **Para decidir en la tarea 2 (Freddy):** las `secciones` del Laboratorio tienen `codigo: EN CODIGO` y `coleccion: Collection Created`, que NO están en `ETAPAS` de la API (lista fija, C9): `etapa 99901 codigo` da 400 "Etapa desconocida". Al cortar: o se agregan a `ETAPAS` en el `.env` de la API, o se mapean a etapas que existan.
 
 ### Tarea 2: migración final y corte
+- **2026-10-17 (tarde) — hecho el paso 2, pausado antes del 3.** Respaldo forzado (`grafo-2026-10-17_1945.dump`); importación final contra producción: Todoist → 16 nuevos (1 tarea + 15 «FASE n») · 3 cambiados · 28 conexiones nuevas; FASE del Laboratorio → **15 adoptadas por fusión**, 0 «FASE n» de Todoist sueltas, 0 duplicadas por título; base 215 nodos · 137 conexiones. `[25311] FASE 19 · URL commit…` (borrada en Todoist) cerrada en el grafo con el OK de Freddy. **Los pasos 3-5 tocan el Laboratorio** (`refs.yaml` → `tablero`, `bin/adapters/grafo/`): Freddy preguntó si algo del Laboratorio se rompía y dijo estar aprobando sin leer → se pausó y se le explicó qué cambia (solo dónde caen las tarjetas; reversible con `git checkout refs.yaml`). Se retoma con su «corta» explícito. Hasta entonces el Laboratorio sigue en Todoist; el Laboratorio no fue modificado (verificado con `git status`).
 - Última corrida del importador (FASE 3) → `refs.yaml` `tablero: { kind: grafo, api, token_env }` en el Laboratorio y acá → Todoist solo para lo de N2.
 - [ ] Hecha (con el OK de Freddy en el momento)
 

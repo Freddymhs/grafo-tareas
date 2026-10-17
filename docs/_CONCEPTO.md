@@ -269,7 +269,33 @@ Copiar funciones de Todoist · multiusuario · móvil nativo · sincronización 
 - **Importador frágil:** traduce emojis y prosa; es heurístico. Cada regla con test y con el caso real de Todoist como fixture.
 - **PWA instalada en Quest:** Meta solo documenta el empaquetado para apps en su tienda; en v0 se abre por URL (Tailscale) y se guarda como favorito. No depender de la instalación.
 
+## Cómo trabaja Freddy — el árbol que el grafo tiene que mostrar (Freddy, 2026-10-17)
+
+> Fuente: lo que Freddy explicó el 2026-10-17 + su cheatsheet (`ah` → `~/Desktop/automatizandosag.md`) + `/flow:pbi:repartir`
+> + las 7 tarjetas reales del Draft. **Leer antes de tocar un importador o el modelo**: sin esto se inventa la estructura.
+
+1. **Azure:** los analistas refinan una **HU** y se la asignan. Una HU tiene varios PBI (niveles exactos: § Para confirmar C12).
+2. **«🚀 Draft trabajo» = la etapa previa.** `/flow:brechas` (qué ya existe en el código) y `/flow:pbi:repartir` (la HU →
+   **piezas `N.M`** ≤ 1 día, con «depende de»), en **carriles** (zona de código: A · Bandeja, B · Acceso y KPIs, C · Recepción)
+   y **rondas** (1️⃣ cimientos · 2️⃣ paralelo · 3️⃣ cruce). Formato fijo de la tarjeta: `<ronda> <HU> · <N.M> · <título> · <task|por crear>`;
+   la descripción empieza con `# N.M · título  HU <n> · task <id|sin task> · reparto <fecha>`; el encaje va en la descripción del proyecto.
+3. **El PBI se crea cuando la pieza está clara** (lo crea Freddy, salvo que un compañero ya lo haya hecho). Al tomarla, la tarjeta
+   pasa a **TRABAJO** como `[<id>] <título>` (etiqueta `board`) y la mueven los comandos y el hook `fase-tilde`.
+4. **La FASE** (`FASE_N.md`, `new-concept` tras `pbi:get` → `build` → `understand`) es el 80 % definido: cabecera con `**Azure**: task <id>
+   (padre HU <n>)`. No se crean todas de golpe: Todoist es la etapa previa.
+5. Después: código, colección, auditoría, PR, cierre (URL commit, evidencias, wiki).
+6. **TRABAJO = lo asignado, primero.** Cuando se vacía, se avanza el Draft.
+
+**El árbol:** HU → piezas / PBI → FASE → tarjeta de TRABAJO, con dudas, personas y notas colgando. **Medido el 2026-10-17 en
+producción:** el backend NO tiene las HU, ni el Draft, ni el enganche tarjeta `[id]` ↔ FASE (48 de 85 tareas abiertas sueltas; en la
+VR, puntos grises sin forma). Todo lo que falta está escrito en formatos fijos que los comandos de Freddy ya producen: se **lee**, no se inventa.
+
 ## Para confirmar
+
+- **C12 (2026-10-17, abierto — bloquea el modelo del árbol; respondido por las fuentes, falta el «sí» de Freddy):** (1) HU = PBI, un nivel; debajo Tasks; FASE = Task — `Laboratorio/docs/referencia/equipo-y-proceso.md` § Vocabulario (verificado en Azure el 2026-09-13). (2) Tarjeta y FASE = la misma task vista dos veces; la tarjeta `PERTENECE_A` su FASE (D10 las marca a las dos). (3) La pieza es la misma tarjeta que pasa a TRABAJO (`/flow:pbi:repartir` §5) → un nodo. Reglas en `docs/backlog/FASE_13_EL_ARBOL_HU_PIEZA_TASK.md`. Lo original: (1) ¿19565 es una HU o un PBI, y 24972 (la de la FASE 10) es un PBI o una
+  task? La FASE dice «task 24972 (padre HU 19565)» y el README del Laboratorio «tasks… del PBI 19565». (2) La tarjeta `[25476]` de TRABAJO
+  y la «FASE 32 · … · 25476» del `.md`: ¿un solo nodo o la tarjeta pertenece a la FASE? (3) La pieza «3.1» del Draft que pasa a TRABAJO
+  como `[263xx]`: ¿la misma cosa que avanza, o la del Draft queda como plan?
 
 - **C11 (2026-10-17, en conversación con Freddy) — roles y complementos.** Lo confirmado y lo abierto:
   - **Roles = tipo de trabajo, cada uno con sus columnas.** Confirmados: **Producto** (features/PBI), **Calidad** (Sonar, refactor, performance, tests rojo→verde; absorbe la "Confiabilidad": logs, alertas, CI), **Seguridad**, **DevEx** (solo código y herramientas del equipo), **Incidente** (bug en producción), **Negocio** (detectar, conversar con el analista o Fabián, redactar el PBI; el PBI aprobado pasa a Producto y queda conectado a su origen). Descartado: Investigación. Regla: todo rol que no sea Producto termina en «adoptado/mostrado», no en «hecho» (evidencia: en DOT el commit de tooling `85636aa` quedó fuera de `main`/`dev` y el `ARCHITECTURAL_REVIEW.md` quedó en una carpeta gitignoreada).

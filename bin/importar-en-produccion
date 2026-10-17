@@ -5,7 +5,8 @@
 #   importar-en-produccion fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco]
 #
 # todoist: el token viaja por stdin (sale de ~/.zsh_secrets; nunca en una línea de comandos ni en el Mac Mini).
-# fases:   copia al Mac Mini SOLO lo que el importador lee —`FASE_*.md` y `Tareas/<id>/entendimiento.md`—, lo monta en
+# fases:   copia al Mac Mini SOLO lo que el importador lee —`FASE_*.md`, `Tareas/<id>/entendimiento.md` y el mapa
+#          task → HU que lee del tracker del orquestador (`padres.json`, FASE 13)—, lo monta en
 #          un contenedor de un solo uso de la API (`docker compose run`) y lo borra al terminar. El proyecto es la clave
 #          `proyecto` del refs.yaml del orquestador (el origen `fases-md:<proyecto>`); los roles, los del despliegue.
 # Siempre conviene `--seco` primero: cuenta contra la base real sin escribir (corre lo mismo y deshace la transacción).
@@ -36,6 +37,33 @@ importar_todoist() {
     remoto "read -r TODOIST_API_KEY; [ -n \"\$TODOIST_API_KEY\" ] || { echo 'sin TODOIST_API_KEY en ~/.zsh_secrets del PC' >&2; exit 1; }; export TODOIST_API_KEY; docker compose exec -T -e TODOIST_API_KEY api node dist/importadores/todoist/cli.js --proyecto '$proyecto' $seco"
 }
 
+# FASE 13: el mapa task → HU (y el título de cada HU) sale del TRACKER del orquestador, con su propio adaptador y solo
+# GET: la cabecera de la FASE lo dice en prosa y no siempre (21 de 35 en el Laboratorio, medido 2026-10-17). Hoy sabe
+# leer Azure; otro tracker → las FASE quedan sin HU y se avisa. Sale por stdout el JSON { tareas, padres }.
+padres_del_tracker() {   # padres_del_tracker <orquestador> <carpeta del backlog>
+  local orq=$1 backlog=$2 kind adaptador tasks
+  kind=$(REF_DESDE="$orq" ref tracker.kind 2>/dev/null) || { echo "aviso: $orq no declara tracker.kind: las FASE quedan sin HU" >&2; return 1; }
+  [ "$kind" = azure ] || { echo "aviso: tracker «$kind»: el mapa de padres solo lee azure; las FASE quedan sin HU" >&2; return 1; }
+  adaptador=$(dirname "$(REF_DESDE="$orq" ref tracker.item)")
+  # La misma regla que leer-fase.ts: el primer número de la línea **Azure**.
+  tasks=$(grep -h -m1 -E '^\*\*Azure\*\*' "$backlog"/FASE_*.md | grep -oE '^\*\*Azure\*\*:?[^0-9]*[0-9]{5,6}' \
+    | grep -oE '[0-9]{5,6}$' | sort -u | paste -sd, -)
+  [ -n "$tasks" ] || { echo "aviso: ninguna FASE nombra su task" >&2; return 1; }
+  bash -s "$adaptador" "$tasks" <<'AZURE'
+set -euo pipefail
+source "$1/lib/azure.sh"
+campos="System.Id,System.Parent,System.Title"
+hijas=$(api "$ORG/wit/workitems?ids=$2&fields=$campos&api-version=7.0")
+padres=$(jq -r '[.value[].fields["System.Parent"] // empty | tostring] | unique | join(",")' <<<"$hijas")
+titulos='{"value":[]}'
+[ -z "$padres" ] || titulos=$(api "$ORG/wit/workitems?ids=$padres&fields=$campos&api-version=7.0")
+jq -n --argjson h "$hijas" --argjson p "$titulos" '{
+  tareas: ($h.value | map(select(.fields["System.Parent"]) | {(.id | tostring): (.fields["System.Parent"] | tostring)}) | add // {}),
+  padres: ($p.value | map({(.id | tostring): .fields["System.Title"]}) | add // {})
+}'
+AZURE
+}
+
 importar_fases() {
   local orquestador="${1:?$USO}"; shift
   local extra=() proyecto=""
@@ -60,6 +88,13 @@ importar_fases() {
   [ -d "$orquestador/Tareas" ] && rsync -a --prune-empty-dirs --include='*/' --include='entendimiento.md' --exclude='*' \
     "$orquestador/Tareas/" "$HOST_SSH:$DIR_REMOTO/deploy/$carpeta/Tareas/"
   echo "copiado: $(remoto "find '$carpeta/backlog' -name 'FASE_*.md' | wc -l | tr -d ' '") FASE · $(remoto "find '$carpeta/Tareas' -name entendimiento.md | wc -l | tr -d ' '") entendimiento.md"
+  local padres_local; padres_local=$(mktemp)
+  if padres_del_tracker "$orquestador" "$docs/backlog" > "$padres_local"; then
+    rsync -a "$padres_local" "$HOST_SSH:$DIR_REMOTO/deploy/$carpeta/padres.json"
+    extra+=(--padres /importar/padres.json)
+    echo "padres: $(jq '.tareas | length' "$padres_local") tasks → $(jq '.padres | length' "$padres_local") HU ($(jq -r '.padres | to_entries | map("\(.key) \(.value)") | join(" · ")' "$padres_local"))"
+  fi
+  rm -f "$padres_local"
 
   # Contenedor de un solo uso con la misma imagen y el mismo DATABASE_URL que la API; lo copiado, montado de solo lectura.
   remoto "docker compose run --rm -T -v \"\$PWD/$carpeta:/importar:ro\" api node dist/importadores/fases/cli.js \
