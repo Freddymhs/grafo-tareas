@@ -9,8 +9,8 @@
       "total": 5
     },
     "FASE_2": {
-      "status": "pending",
-      "tasks": 0,
+      "status": "in_progress",
+      "tasks": 5,
       "total": 5
     },
     "FASE_3": {

@@ -206,6 +206,8 @@ repos:
 - **Orquestador creado:** `nuevo-workspace` → `DEVELOPMENT/grafo-tareas/`; `refs.yaml` con `tracker: none`, `tablero: none` (Freddy: apagado hasta F2), `qa: none`, `rama_base: main`.
 - **GitHub:** 4 repos privados creados (`Freddymhs/grafo-tareas`, `.api`, `.web`, `.vr`) con `origin` puesto.
 - **create-backlog:** `docs/backlog/FASE_1..7` (F1 protegida = FASE 1-4), `docs/diagrams/DIAGRAMAS_COMPONENTES.md`, `docs/flows.md`, `.claude/backlog-progress.json`. **Siguiente: FASE 1 (prueba en el visor).**
+- **FASE 1 ✅ (2026-10-16, noche):** 72 FPS con 500 nodos en el Quest 3S, `DECISION_3D.md`: sigue R3F. Freddy reordenó: **backend → PWA → corte → VR**.
+- **FASE 2, código verde (2026-10-16, noche):** API con nodos, conexiones, ramas y derivado (`bloqueado`, `hoy-puedo`, `libera` con SQL recursivo); C1-C3 confirmados; `openapi.json` versionado; 17 unit + 11 e2e. Base local en Docker (`127.0.0.1:5433`); Neon y el Mac Mini quedan para cuando haya datos reales (criterio 4). **Siguiente: FASE 3, el importador de Todoist** — antes, N1 y N2 (§ Para confirmar).
 - **new-project:** `grafo-tareas.api` ← `template-nest`, `grafo-tareas.web` ← `template-nextjs-tanstack`, `grafo-tareas.vr` ← `template-react-vite` (git propio cada uno, rama `main`); `docs/_CONCEPTO.md` plantado; draft en `resume.json`.
 
 **Sin probar en real:** `pendiente`, `tarjeta`, `etapa`, `borrador` contra Todoist (solo `buscar` corrió real). Se verá en el primer `/flow:todo` o tilde de FASE.
@@ -249,13 +251,13 @@ Copiar funciones de Todoist · multiusuario · móvil nativo · sincronización 
 
 ## Para confirmar
 
-- **C1 (código):** decidí que "bloqueado / libera" se calcula en la API (`WITH RECURSIVE` sobre `Conexion`) y los fronts solo lo reciben, porque con tres repos una regla duplicada se desincroniza · ¿confirmás?
-- **C2 (código):** decidí guardar `posicion {x,y,z}` en `Nodo` para que el mapa 3D sea estable entre sesiones · ¿confirmás?
-- **C3 (código):** decidí que todo importador sea idempotente por `externo { origen, id }`, no por título · ¿confirmás?
+- **C1 (código) — ✅ CONFIRMADO por Freddy 2026-10-16:** decidí que "bloqueado / libera" se calcula en la API (`WITH RECURSIVE` sobre `Conexion`) y los fronts solo lo reciben, porque con tres repos una regla duplicada se desincroniza · ¿confirmás?
+- **C2 (código) — ✅ CONFIRMADO por Freddy 2026-10-16:** decidí guardar `posicion {x,y,z}` en `Nodo` para que el mapa 3D sea estable entre sesiones · ¿confirmás?
+- **C3 (código) — ✅ CONFIRMADO por Freddy 2026-10-16:** decidí que todo importador sea idempotente por `externo { origen, id }`, no por título · ¿confirmás?
 
-- **C4 (código):** orden `nuevo-workspace` → `new-project` sobre el mismo padre, ver § Cómo se crea el proyecto · ¿confirmás?
+- **C4 (código) — ✅ HECHO 2026-10-16 (nuevo-workspace → new-project sobre el mismo padre):** orden `nuevo-workspace` → `new-project` sobre el mismo padre, ver § Cómo se crea el proyecto · ¿confirmás?
 - **N2 (negocio, Freddy):** alcance del reemplazo. El grafo cubre trabajo y proyectos (laborales, freelance, personales, de aprendizaje). Decidí dejar fuera `RUTINA` (hábitos), `Regalos`, `social` y lo que vive en Reminders (vida diaria): siguen donde están. Confirmar si `🎯 Crecimiento Profesional` (empleo, estudio) entra en F2 o después.
-- **N1 (negocio, Freddy):** HU, dudas y nombres de personas del cliente (SIIGSA/SAG) quedarán en Neon, un tercero. Decidí seguir porque es Postgres cifrado en tránsito y uso personal; confirmar contra las reglas de confidencialidad del cliente antes de importar datos reales. Default si no: anonimizar nombres de personas en el importador.
+- **N1 (negocio, Freddy)** — base local en Docker mientras se construye (Freddy 2026-10-16); Neon recién con datos reales, y N1 se confirma antes: HU, dudas y nombres de personas del cliente (SIIGSA/SAG) quedarán en Neon, un tercero. Decidí seguir porque es Postgres cifrado en tránsito y uso personal; confirmar contra las reglas de confidencialidad del cliente antes de importar datos reales. Default si no: anonimizar nombres de personas en el importador.
 
 ## Prompt para retomar (pegarlo tal cual en una sesión nueva o después de /compact)
 
@@ -264,7 +266,7 @@ Retomamos grafo-tareas. Antes de hacer nada, lee entero ~/Volumes/Extended/githu
 
 Reglas para esta sesión:
 - No re-decidas nada de § Stack ni de § Pareto. Si algo choca con el concepto, lo marcas y me preguntas.
-- Pasos 0-4 hechos (F-1, orquestador, refs.yaml, new-project, create-backlog). Ahora: FASE 1 → recién con FASE 1 verde (DECISION_3D.md), la FASE 2 (API).
+- Hechas: F-1, orquestador, backlog, FASE 1 (72 FPS, DECISION_3D) y el código de la FASE 2 (API, docs/backlog/FASE_2_API_GRAFO.md). Orden vigente: backend → PWA (FASE 4) → corte (FASE 5) → VR (FASE 6). Ahora: FASE 3 (importador Todoist), que pide N1 y N2 confirmados antes de tocar datos reales.
 - Instalar dependencias (npm i) es instalador: me confirmas antes.
 - Crear repos o pushear es publicar: me preguntas en ese momento.
 - Commits: por /work:sellar:run, y los corro yo salvo que te pida que los corras tú.
@@ -272,5 +274,5 @@ Reglas para esta sesión:
 - Para trabajar por adb con el visor, siempre ~/bin/quest-despierto -- <cmd> (memoria quest-3s-setup).
 - Lo abierto (N1, N2, C1-C4 en § Para confirmar) se confirma antes de importar datos reales de Todoist (FASE 3).
 
-Primer paso: FASE 1, Tarea 1. Parado en grafo-tareas.vr/.
+Primer paso: FASE 3, Understand — medir TRABAJO y Draft de nuevo (solo lectura) y confirmar N1/N2 conmigo antes de escribir el importador. Parado en grafo-tareas.api/. Base local: `docker start grafo-tareas-postgres`.
 ```
