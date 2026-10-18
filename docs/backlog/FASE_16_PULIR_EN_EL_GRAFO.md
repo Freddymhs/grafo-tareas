@@ -42,7 +42,10 @@ nada valioso»
   llama a la API con el motivo
 
 ### Tarea 4: el reporte Todoist ↔ grafo
-- [ ] `bin/…`: cada tarjeta de Todoist con su estado en el grafo; el denominador impreso
+- [x] 2026-10-18, desplegado con Freddy presente: `GET /contraste` (`calcularContraste`, puro) —
+  de todo lo que vino de una fuente: `total` (el denominador), iguales, editados (qué campos, último motivo) y descartados (motivo);
+  lo creado en el grafo no entra. Lo que falte en el grafo y siga en Todoist lo dicen los «nuevos» del importador en seco. Unit 3 +
+  e2e; API 101 unit · 50 e2e. Primer descarte real: «preguntas» (sin contenido), a pedido de Freddy
 
 ## Preguntas para Freddy (abiertas)
 
