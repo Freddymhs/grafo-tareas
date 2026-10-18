@@ -1,7 +1,7 @@
 # FASE 5: ADAPTADOR `grafo` DEL TABLERO Y CORTE DE TODOIST
 
 **Destraba**: que el método escriba en el grafo en vez de Todoist — `tablero.kind: grafo` y Todoist apagado para trabajo y proyectos
-**Listo para PR**: no · FASE escrita el 2026-10-16
+**Listo para PR**: no · FASE escrita el 2026-10-16; **corte hecho el 2026-10-18**: el Laboratorio escribe en el grafo
 **Prioridad**: Media
 **Dependencias**: **FASE 4** (la PWA reemplaza el uso diario) · FASE 3 (la migración)
 **Fuente**: `docs/_CONCEPTO.md` § Cómo se conecta el grafo · `~/dotfiles/claude/PORTAR.md` §El contrato del tablero (5 operaciones)
@@ -26,7 +26,24 @@
 ### Tarea 2: migración final y corte
 - **2026-10-17 (tarde) — hecho el paso 2, pausado antes del 3.** Respaldo forzado (`grafo-2026-10-17_1945.dump`); importación final contra producción: Todoist → 16 nuevos (1 tarea + 15 «FASE n») · 3 cambiados · 28 conexiones nuevas; FASE del Laboratorio → **15 adoptadas por fusión**, 0 «FASE n» de Todoist sueltas, 0 duplicadas por título; base 215 nodos · 137 conexiones. `[25311] FASE 19 · URL commit…` (borrada en Todoist) cerrada en el grafo con el OK de Freddy. **Los pasos 3-5 tocan el Laboratorio** (`refs.yaml` → `tablero`, `bin/adapters/grafo/`): Freddy preguntó si algo del Laboratorio se rompía y dijo estar aprobando sin leer → se pausó y se le explicó qué cambia (solo dónde caen las tarjetas; reversible con `git checkout refs.yaml`). Se retoma con su «corta» explícito. Hasta entonces el Laboratorio sigue en Todoist; el Laboratorio no fue modificado (verificado con `git status`).
 - Última corrida del importador (FASE 3) → `refs.yaml` `tablero: { kind: grafo, api, token_env }` en el Laboratorio y acá → Todoist solo para lo de N2.
-- [ ] Hecha (con el OK de Freddy en el momento)
+- [x] Hecha — **2026-10-18, con el «sí, vamos» de Freddy:**
+  - **Antes:** respaldo `grafo-2026-10-18_2037.dump`, y el reporte final Todoist ↔ grafo en la FASE 16 (223 contrastadas: 186
+    iguales, 19 editadas y 18 descartadas, cada una con su motivo).
+  - **Última importación:** en seco dio 0 nuevas y 0 por actualizar en TRABAJO (135), en el Draft (10) y en las fases, así que
+    no hizo falta la real: el grafo ya tenía todo.
+  - **El corte, en el Laboratorio:** `bin/adapters/grafo/` copiado, `proyecto: laboratorio`, y el bloque `tablero:` pasa a
+    `kind: grafo`, con `api` y `entrada: { proyecto: laboratorio, seccion: Entrada }`. `/sigsa:sonarqube:entregar` creaba su
+    tarjeta directo en Todoist (con la clave vieja `todoist.project_id`); pasó al contrato (`etapa`) más un `PATCH` de la
+    descripción.
+  - **La prueba con las operaciones reales del Laboratorio contra producción:**
+    - `pendiente` (como `/flow:todo`) creó la tarjeta, y `buscar` la encontró;
+    - `tarjeta 99905` la creó en ENTENDIMIENTO, y `etapa` la llevó a Collection Created;
+    - `borrador` dejó la pieza en la columna «20379 · C · Recepción» del plan;
+    - el hook real `fase-tilde` le habló al grafo (FASE 37: «ya estaba»);
+    - todo lo creado se borró: 225 nodos antes y después.
+  - **Desde ahí:** TRABAJO y el Draft de Todoist quedan congelados, y sus importadores ya no se corren. `importar fases` sigue
+    haciendo falta, porque el estado de cada FASE todavía sale de sus casillas.
+  - **Volver atrás:** `git show d8281c7:refs.yaml`, el bloque `tablero:` de antes, en el Laboratorio.
 
 **Decisión D10 (Freddy, 2026-10-17): el hook marca en los dos lados.** `fase-tilde` sigue tildando la casilla en la `FASE_x.md` (la fuente) y, por `tablero.etapa`, mueve el nodo en el backend. Dos marcas a propósito: si no coinciden, alguien se saltó un paso, y `importar:fases` lo corrige desde el `.md`. Las vistas conviven: `fases.html`/`calidad.html` (clásicas) y la PWA/VR. La PWA y la VR **muestran** las FASE pero no las editan; editan las conexiones.
 Para que las dos marcas caigan en el mismo nodo, el adaptador busca la FASE por el externo del importador (`fases-md:<proyecto>` / `fase:n`, abierta o cerrada) y no por el título, que se repite entre proyectos (C10); si no existe la crea con ese externo. `refs.yaml` necesita `proyecto:`. `bin/tests/test_tablero.sh` 31/31 (4 casos nuevos: externo al crear, mueve la del importador aunque esté cerrada, no toca la «FASE n» de Todoist, no duplica). Probado contra la API real sobre «FASE 6»: movió el nodo `fases-md:grafo-tareas` y dejó intacto el de Todoist; como la prueba cambió su etapa, `importar:fases` la devolvió a la del `.md`.
@@ -47,8 +64,9 @@ Para que las dos marcas caigan en el mismo nodo, el adaptador busca la FASE por 
 
 ## Criterios de Aceptación
 
-- [ ] 1 · `/flow:todo` y el hook `fase-tilde` escriben en el grafo sin cambiar una línea de los flows
-- [ ] 2 · Segundo adaptador del contrato funcionando: cierra PORTAR §Huecos 4
+- [x] 1 · `/flow:todo` y el hook `fase-tilde` escriben en el grafo sin cambiar una línea de los flows — 2026-10-18, prueba del
+  corte (Tarea 2). Excepción: `/sigsa:sonarqube:entregar` escribía directo en Todoist y pasó al contrato
+- [x] 2 · Segundo adaptador del contrato funcionando: cierra PORTAR §Huecos 4 — el `grafo`, activo en el Laboratorio desde el corte
 
 ## QA
 

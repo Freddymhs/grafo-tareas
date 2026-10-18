@@ -133,6 +133,15 @@ después se borraron (222 nodos antes y después). Ni Todoist ni el `refs.yaml` 
   - Queda una deuda: la regla de columnas de calidad vive en dos lugares, `roles.yaml` y el Python del hook. Hoy coinciden
     en APROBADO, pero el hook no lee `roles.yaml`.
 
+### Lo que dejó el corte (2026-10-18)
+
+- ⏳ **Las 10 tarjetas `[FASE n]` quedan congeladas.** Con el tablero en el grafo, el hook mueve el nodo FASE (`etapa "FASE n"`
+  busca la FASE por su externo, D10), y la tarjeta de Todoist ya no la mueve nadie. Hoy están en la columna de su FASE (0 de 10
+  fuera), pero se van a ir quedando atrás. Propuesta: descartarlas con su motivo, porque la tarjeta de una FASE de calidad es el
+  nodo FASE (C12). Espera el «sí» de Freddy.
+- ⏳ **Al contrato le falta «crear con descripción».** `/sigsa:sonarqube:entregar` necesita la tarjeta en ENTENDIMIENTO con su
+  texto: hoy usa `etapa` y después `PATCH` de la descripción. Si otro comando lo pide, se agrega como operación del contrato.
+
 ## El arreglo (para aprobar)
 
 - **`fase-tildar`**, después de tildar, llama al mismo `fase-tilde.sh` con el JSON de un `Edit` sobre esa FASE. Así la regla
