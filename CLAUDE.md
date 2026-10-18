@@ -51,6 +51,11 @@
 - **Lo descartado no está en `nodos`: está archivado en `descartes`** (FASE 16). Descartar mueve el nodo y sus conexiones; ninguna
   lectura tiene que filtrarlo. Un borrado de verdad (`DELETE /nodos/:id`) no deja rastro ni lo respeta el importador: para pulir se
   descarta, con motivo. Y un campo editado por `PATCH` queda en la bitácora y el importador ya no lo pisa.
+- **El importador de Todoist lee solo las tarjetas ACTIVAS (`GET /tasks`): una tarjeta tildada en Todoist no vuelve a pasar y queda
+  ABIERTA en el grafo.** Hoy no muerde porque Freddy cierra moviendo a la sección CERRADO (D2), que sí se lee; medido 2026-10-18:
+  0 colgadas de 72 tras cerrar la 4.1b del Draft a mano (`PATCH` con motivo). Arreglo cuando haga falta: por cada nodo `todoist` de
+  la cara importada que esté ABIERTO y no venga, `GET /tasks/{id}` y cerrarlo si `checked`. Cómo medirlo: activos de los dos
+  proyectos contra los TAREA abiertos de origen `todoist`.
 - **Prisma 7 sacó `migrate diff --from-url`:** el comando falla con salida 1, que se confunde con «hay diferencias». Se compara con
   `--from-config-datasource --to-schema prisma/schema.prisma --exit-code` (0 = idénticos, 2 = difieren). *(Real 2026-10-18.)*
 - **`ref` vuelve ruta absoluta del PC todo valor con `/` y toda clave `dir`** (salvo las URL con `://`): una ruta del Mac Mini en `refs.yaml` sale apuntando al PC. Por eso `despliegue` guarda `app: grafo-tareas` y no la carpeta.

@@ -382,10 +382,12 @@ Fable u Opus, NUNCA Sonnet (memoria feedback-evitar-subagentes-costosos).
 Sellado HECHO (2026-10-18 tarde): los 7 repos (grafo-tareas, grafo-tareas.vr, ~/bin, ~/.claude/commands, Laboratorio, Brechas,
 ~/dotfiles) con todo stageado y su mensaje en `/tmp/commit-<repo>.txt`; los commits los corre Freddy. Re-auditoría de los 20 descartes
 hecha: 9 restaurados (perdían información), quedan 11 (FASE_16). Sin subagentes de acá en adelante (memoria).
-Commits de los 7 hechos por Freddy. Dudas de la 19565 cerradas (4) y reimportadas; quedan Q4 y Q10, reales (FASE_17).
-Pendiente de Freddy: crear en Azure las 4 tasks del README del reparto; pasar task-26311.md a Thomas; decidir si pega
-task-25325.md en su tarjeta; preguntar la Q10 a Carabantes; y si arregla `~/bin/claude-bifurcar:46` (fallback que no corre con
-pipefail; arreglo: `|| true` dentro del `$(...)`).
+Commits de los 7 hechos por Freddy. Las 6 dudas de la 19565 cerradas con evidencia (Q4 era una propuesta a Fabián; Q10, del front):
+0 dudas de FASE abiertas. «Mover a» en la web desplegado (api `ff8bac1`, web `a20670e`: Trabajo | Plan + clic derecho). Para la daily:
+«para decir» colgado de la FASE 30 (husky = Sonar real, los 6 que quedaron). `claude-bifurcar:46` arreglado (rojo probado).
+Cómo trabaja Freddy con lo del reparto (2026-10-18): las 4 tasks nuevas viven SOLO en el Draft / cara plan; él decide cómo partir
+la recepción (¿solo «con observación» primero?) antes de pegar nada en Azure o en la tarjeta de la 25325. Con los compañeros solo se
+comparte Azure: no se les pasan archivos propios (task-26311.md es referencia suya, no para Thomas).
 
 Siguiente, en orden:
 1. Freddy prueba los gestos con ?depurar y se calibran (umbrales en lib/conteo-dedos.ts, pose-mano.ts, gesto-voltear.ts).

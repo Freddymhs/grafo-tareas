@@ -174,6 +174,11 @@ el «sí» de Freddy. Veredictos con cita (Azure solo GET, reuniones, FASE):
   el tmp de la sesión) y la 5 partida (Q9 cerrada · Q10 abierta). `importar:fases` en seco y real: 2 abiertos leídos, **4 dudas
   cerradas** en producción, 1 actualizada. Quedan abiertas solo **Q4** (tipo de muestra: falta que Fabián cree la task) y **Q10**
   (microorganismos en mezclas: nunca se preguntó a Carabantes)
+- [x] 2026-10-18 tarde, Freddy: Q4 «me suena al sprint anterior» y Q10 «supuestamente está resuelto». Cerradas las dos: **Q4 no es
+  duda sino una propuesta a Fabián** (el negocio ya dijo que el tipo de muestra no va; borrarlo es una task que Fabián decide si entra;
+  `propuestas.md:21` y la tarjeta del 29-sep, que sigue viva); **Q10 se resolvió por alcance**: filtrar la cascada de microorganismos
+  al grupo es del front (`FASE_10` §Fuera de alcance), y si el front lo hace distinto lo ve QA. Reimportado: 2 cerradas; **ninguna
+  duda de FASE queda abierta**
 
 ### Revisión: tarjetas de cierre que duplican el trámite (2026-10-18, tick sin humano, solo lectura; para decidir con Freddy)
 
@@ -192,7 +197,17 @@ se cierra solo al tildar su cierre. Nada se descarta sin el «sí» de Freddy, u
   descartes respetados. La VR **abre en la última HU y cara vistas** (`lib/ultima-vista.ts`, VR 119 tests, rojo probado)
 
 ### Tarea 5: Freddy lo ve en el visor
-- [ ] Abre la HU 20379, ve lo real; da vuelta la hoja y ve las 7 piezas del Draft; vuelve
+- [x] 2026-10-18, Freddy en el visor: abrió la 20379, vio lo real, deslizó la mano hacia arriba y vio el Draft («ese es el mismo que
+  está del otro lado… la versión que yo creé hace tiempo»); volvió. Después de reconciliar, la cara plan son 9 piezas por ronda
+
+### Tarea 8: «Mover a» en la web (era «fuera de alcance»; Freddy contaba con él, 2026-10-18)
+- [x] 2026-10-18, api `ff8bac1` + web `a20670e` desplegadas: `GET /nodos?cara=` (e2e: listar por cara, mover y volver, cara
+  inválida → 400; rojo probado sacando el filtro del where). La web suma **Trabajo | Plan** arriba del tablero (el Plan ordenado por
+  ronda) y **clic derecho → «Mover a Trabajo» / «Mover al Plan»** en cada tarjeta, más el mismo botón en el detalle (el teléfono no
+  tiene clic derecho); las FASE no se mueven. `PATCH` de la cara con motivo «Movida desde la web: Plan → Trabajo» (bitácora; el
+  importador lo respeta). Web: tsc 0 · lint 0 · 22 tests (4 de `mover-cara`, rojo probado). Probado en Chrome headless contra
+  producción: Trabajo 100 tarjetas, Plan 10, el menú aparece (sin hacer clic: datos reales). La prueba destapó la 4.1b colgada
+  (cerrada en Todoist, abierta en el grafo): cerrada con `PATCH` y motivo; el hueco del importador quedó como trampa en `CLAUDE.md`
 
 ## Decisiones del agente (para revisar al leer)
 
@@ -208,7 +223,7 @@ Freddy pidió no preguntar: estas las tomó el agente. Cada una se cambia sin re
 
 ## Fuera de alcance
 
-- **Mover del plan a lo real desde la PWA** («Mover a», como en Todoist): siguiente FASE. La API ya lo permite desde la tarea 1
+- ~~**Mover del plan a lo real desde la PWA**~~: hecho en la tarea 8
 - **Mover desde la VR**: cuando Freddy decida cómo (hoy no está definido y hacerlo mal obliga a rehacer)
 - **Resincronizar plan ↔ real** (qué del plan ya se hizo, también lo que hizo un compañero, y las brechas nuevas): necesita las dos
   caras primero. Freddy: «sería horriblemente complejo» sin una herramienta para eso
