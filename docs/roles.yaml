@@ -39,7 +39,7 @@ roles:
       - { clave: coleccion, columna: Collection Created, si: { qa: Colección }, curso: true, que: "construir/actualizar la colección Postman" }
       - { clave: auditoria, columna: TESTEADO, si: { qa: Auditoría }, curso: true, que: "correr newman y armar la historia" }
       - { clave: listo, columna: LISTO PARA PR, si: { qa: Listo para PR }, curso: true, que: "cerrar con el auditor la guía de pruebas" }
-      - { clave: aprobado, columna: APROBADO, si: cierre_real, que: "mergeado: URL commit, evidencias, Wiki" }
+      - { clave: aprobado, columna: APROBADO, si: { qa: Mergeado }, que: "mergeado: el PR entró a la base (la casilla Mergeado; el cierre en Azure va en TRÁMITES DE CIERRE)" }
       - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
   calidad:
@@ -55,7 +55,7 @@ roles:
       - { clave: cambiar, columna: "CAMBIAR 🧰", si: { grupo: cambiar }, curso: true, que: "el arreglo" }
       - { clave: red, columna: "RED 🧰", si: { grupo: red }, curso: true, que: "roturas, tsc, suite, alcance" }
       - { clave: pr, columna: Pull Request, si: { qa: Listo para PR }, que: "PR abierto" }
-      - { clave: aprobado, columna: APROBADO, si: cierre_real, que: "mergeado: URL commit, evidencias, Wiki" }
+      - { clave: aprobado, columna: APROBADO, si: { qa: Mergeado }, que: "mergeado: el PR entró a la base (la casilla Mergeado; el cierre en Azure va en TRÁMITES DE CIERRE)" }
       - { clave: cerrado, columna: CERRADO, si: terminada, que: "todo tildado" }
 
   seguridad:
