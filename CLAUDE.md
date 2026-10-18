@@ -51,6 +51,12 @@
 - **Lo descartado no está en `nodos`: está archivado en `descartes`** (FASE 16). Descartar mueve el nodo y sus conexiones; ninguna
   lectura tiene que filtrarlo. Un borrado de verdad (`DELETE /nodos/:id`) no deja rastro ni lo respeta el importador: para pulir se
   descarta, con motivo. Y un campo editado por `PATCH` queda en la bitácora y el importador ya no lo pisa.
+- **«FASE 22» en una tarjeta de Todoist creaba su propia FASE pelada** (origen `todoist`, sin etapa) al lado de la del `.md`;
+  `--adoptar todoist` la fusionaba y la siguiente importación del tablero la volvía a crear. En producción llegaron a ser 15
+  duplicadas (columna «Sin etapa» llena de «FASE n»). Desde api `d091edd`, `bin/importar-en-produccion todoist` pasa
+  `--fases-de <refs todoist.fases_de>` y la tarjeta cuelga de la FASE del orquestador por externo (`fases-md:laboratorio`,
+  `fase:n`), creándola solo si falta. Medir: `GET /nodos?tipo=FASE` → todas de `fases-md:*`; reimportar en seco → 0 nuevos.
+  *(Real 2026-10-18: fusionadas las 15 con respaldo `grafo-2026-10-18_1721.dump`.)*
 - **El importador de Todoist lee solo las tarjetas ACTIVAS (`GET /tasks`): una tarjeta tildada en Todoist no vuelve a pasar y queda
   ABIERTA en el grafo.** Hoy no muerde porque Freddy cierra moviendo a la sección CERRADO (D2), que sí se lee; medido 2026-10-18:
   0 colgadas de 72 tras cerrar la 4.1b del Draft a mano (`PATCH` con motivo). Arreglo cuando haga falta: por cada nodo `todoist` de

@@ -19,6 +19,7 @@ despliegue:                            # FASE 12: dónde corre el grafo. La leen
 todoist:                               # los proyectos que se importan (FASE 17). La lee bin/importar-en-produccion
   trabajo: 6VhFQg6v45qcJHPc            # TRABAJO: lo real
   plan: 6P4h8Wp2pW59Fq2x               # 🚀 Draft trabajo: el plan de cada HU (/flow:brechas + /flow:pbi:repartir) → --cara PLAN
+  fases_de: laboratorio                # «FASE 22» en una tarjeta es la FASE 22 del Laboratorio (fases-md:laboratorio): no se duplica (C10)
 docs: { dir: docs }
 repos: {}                              # los gates (typecheck/lint/test) por repo se llenan tras inspeccionar cada plantilla en new-project
 

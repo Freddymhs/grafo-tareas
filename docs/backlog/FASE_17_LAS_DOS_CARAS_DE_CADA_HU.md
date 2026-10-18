@@ -232,6 +232,13 @@ se cierra solo al tildar su cierre. Nada se descarta sin el «sí» de Freddy, u
   nombre y apellido por separado, dónde corre el nocturno, **con qué id se guarda una persona**: D5 eligió el de Keycloak y el
   solicitante usa el de identidad), 2 supuestos y 1 dolor de código (comentario viejo en la migración de `laboratorio_analisis`).
   Cada una cuelga de su pieza o task y dice qué bloquea. Páginas: HU 20379 real 45 → 50 nodos, plan 12 → 25
+- [x] 2026-10-18, Freddy en la web: «una columna que simplemente tiene nombre de fases: FASE 1, 2, 3, 22, 23… no entiendo la
+  lógica». Eran **15 FASE duplicadas**: el importador del tablero sintetizaba «FASE n» pelada (sin etapa) cada vez que una tarjeta
+  la nombraba, y volvía a crearla aunque se fusionara. api `d091edd` (`--fases-de`, la FASE se busca por externo en el
+  orquestador y solo se crea si falta; unit con rojo probado) + `refs.yaml` `todoist.fases_de: laboratorio` + respaldo
+  `grafo-2026-10-18_1721.dump` + `importar:fases --adoptar todoist` (15 adoptadas). Resultado: 35 FASE, todas del `.md` y con
+  etapa; reimportar TRABAJO y el Draft en seco → 0 nuevos; «Sin etapa» 50 → 35 (0 FASE), «Sin HU» 72 → 57. Las 35 que quedan son
+  notas de TRABAJO sin sección: las clasifica la FASE 18
 
 ## Decisiones del agente (para revisar al leer)
 

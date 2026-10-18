@@ -36,9 +36,13 @@ importar_todoist() {
   # FASE 17: el proyecto del plan («🚀 Draft trabajo») lo dice el refs.yaml, para no depender de acordarse de un flag.
   local cara=REAL
   if [ "$proyecto" = "$(REF_DESDE="$ORQ" ref todoist.plan 2>/dev/null || true)" ]; then cara=PLAN; fi
-  echo "importar-en-produccion: proyecto $proyecto → cara $cara" >&2
+  # C10: «FASE 22» en una tarjeta es la FASE 22 del orquestador que dice el refs.yaml; sin esto, el tablero la duplica.
+  local fases_de="" con_fases=""
+  fases_de=$(REF_DESDE="$ORQ" ref todoist.fases_de 2>/dev/null || true)
+  [ -z "$fases_de" ] || con_fases="--fases-de $fases_de"
+  echo "importar-en-produccion: proyecto $proyecto → cara $cara${fases_de:+ · FASE de $fases_de}" >&2
   bash -c 'set +u; source ~/.zsh_secrets >/dev/null 2>&1; printf "%s\n" "${TODOIST_API_KEY:-}"' |
-    remoto "read -r TODOIST_API_KEY; [ -n \"\$TODOIST_API_KEY\" ] || { echo 'sin TODOIST_API_KEY en ~/.zsh_secrets del PC' >&2; exit 1; }; export TODOIST_API_KEY; docker compose exec -T -e TODOIST_API_KEY api node dist/importadores/todoist/cli.js --proyecto '$proyecto' --cara $cara $seco"
+    remoto "read -r TODOIST_API_KEY; [ -n \"\$TODOIST_API_KEY\" ] || { echo 'sin TODOIST_API_KEY en ~/.zsh_secrets del PC' >&2; exit 1; }; export TODOIST_API_KEY; docker compose exec -T -e TODOIST_API_KEY api node dist/importadores/todoist/cli.js --proyecto '$proyecto' --cara $cara $con_fases $seco"
 }
 
 # FASE 13: el mapa task → HU (y el título de cada HU) sale del TRACKER del orquestador, con su propio adaptador y solo
