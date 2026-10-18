@@ -2,8 +2,8 @@
 
 **Destraba**: que Freddy compruebe, trabajando su próxima task real, que cada paso del Laboratorio llega a la web y a la VR
 como debería, y arreglar lo que esa mirada ya encontró
-**Listo para PR**: no · el guion se usa con la próxima task; el arreglo de `fase-tildar` (Tarea 2) está hecho; la pasada de
-las 10 tarjetas en Todoist (Tarea 3) espera el «sí» de Freddy
+**Listo para PR**: no · el guion se usa con la próxima task; el arreglo de `fase-tildar` (Tarea 2) está hecho; de la pasada
+(Tarea 3) se movió la FASE 37, y las 9 mergeadas esperan que Freddy elija la salida (§ La pasada de las 10 tarjetas)
 **Prioridad**: Alta para el arreglo (es lo que más confunde hoy en el tablero); el guion, cuando toque
 **Dependencias**: FASE 13 (árbol HU → FASE → tarjeta), FASE 17 (dos caras)
 **Fuente**: Freddy, 2026-10-18: «verificar de una prueba end-to-end de que las cosas funcionan bien»; y después: «la prueba
@@ -98,9 +98,26 @@ después se borraron (222 nodos antes y después). Ni Todoist ni el `refs.yaml` 
 - ✅ **Arreglado: `fase-tildar` no movía la tarjeta.** Ahora, después de tildar, llama al mismo hook con el aviso de un `Edit`.
   Prueba: `~/bin/tests/test_fase_tildar.sh`, 4 casos, vistos en rojo.
 - ✅ **Arreglado: el importador tomaba «Thomas» por Carabantes** (`ALIAS_PERSONAS`). Ahora es Tomás Soto, con su prueba.
-- ⏳ **No es agnóstico, y queda propuesto:** las personas del cliente (Carabantes, Soto, Fabián) están escritas en el código
-  del importador. Deberían vivir en el `refs.yaml` del área, como las escaleras de dudas (C11: «las personas son del
-  cliente»).
+- ✅ **Agnóstico: las personas salieron del código** (Freddy: «dale»). Viven en `personas:` del `refs.yaml` del área, como
+  las escaleras de dudas (C11: «las personas son del cliente»). `leerArea` las valida y `AreaService` las entrega, y el
+  importador las recibe: sin esa clave no crea ninguna. En `src` no queda ningún nombre del cliente, tampoco en los ejemplos de
+  Swagger. Pruebas: `leer-area.spec.ts` y `traducir.spec.ts` (sin área no inventa personas), y la e2e del importador con su
+  `refs.yaml` de fixture.
+
+### La pasada de las 10 tarjetas (2026-10-18, con el «sí» de Freddy)
+
+- ✅ **FASE 37: movida en Todoist de AMARRAR a RED** con el hook real; reimportar dio 1 actualizada y 0 nuevas, en seco y en real.
+- ✅ **Las 10 llevan `calidad` en el grafo** (PATCH con motivo): salen de Producto, que es lo que confundía.
+- ⛔ **Las otras 9 NO se movieron, porque habría sido llevarlas hacia atrás.** Están mergeadas, pero su FASE no lo refleja:
+  - la FASE 22 tiene tildado «Listo para PR», y le faltan las casillas del cierre en Azure;
+  - las FASE 23 a 30 no tienen tildados «Listo para PR» ni todas sus tareas.
+
+  La regla de calidad (`docs/roles.yaml`, igual a la plantilla) deriva APROBADO del cierre en Azure, no de la casilla
+  `Mergeado`, que se agregó después. Por eso las deja en RED o en Pull Request, cuando en Todoist ya están más adelante
+  (TESTEADO, LISTO PARA PR, Pull Request, APROBADO). Las dos salidas son de Freddy:
+  - **en la fuente:** tildar con `/flow:tildar` lo que ya pasó en esas FASE (`listo` y las tareas hechas);
+  - **en la regla:** que `Mergeado` lleve a APROBADO en `roles.yaml`, para producto y calidad. Cambia la plantilla del
+    método, el importador y el hook a la vez, y sus pruebas de paridad.
 
 ## El arreglo (para aprobar)
 

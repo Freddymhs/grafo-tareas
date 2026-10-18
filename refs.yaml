@@ -30,3 +30,13 @@ repos: {}                              # los gates (typecheck/lint/test) por rep
 #     negocio: { antes: contrastar con el código, personas: [Tomás Carabantes, Tomás Soto] }
 #     codigo:  { personas: [Tomás Soto, Tomás Carabantes] }
 rituales: { daily: Daily, retro: Retro }
+
+# Cómo se escribe cada persona en las tarjetas (D6, FASE 19): el importador del tablero cuelga un «BLOQUEO… esperando a
+# X» de UNA persona. Son del cliente, no del código: van acá (la API las lee por REFS_ARCHIVO). Se toma la primera con un
+# alias en el texto, así que va primero la que contiene a otra («Tomás Soto» contiene «Tomás»). «Tomás» a secas =
+# Carabantes (C8, a confirmar). Hoy son las del SAG porque el grafo de producción es solo el SAG; al cortar, al
+# refs.yaml del Laboratorio.
+personas:
+  Tomás Soto: [Tomás Soto, Tomas Soto, Thomas, Soto]
+  Tomás Carabantes: [Tomás Carabantes, Tomas Carabantes, Tomás, Tomas, Carabantes]
+  Fabián: [Fabián, Fabian]
