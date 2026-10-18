@@ -382,9 +382,10 @@ Fable u Opus, NUNCA Sonnet (memoria feedback-evitar-subagentes-costosos).
 Sellado HECHO (2026-10-18 tarde): los 7 repos (grafo-tareas, grafo-tareas.vr, ~/bin, ~/.claude/commands, Laboratorio, Brechas,
 ~/dotfiles) con todo stageado y su mensaje en `/tmp/commit-<repo>.txt`; los commits los corre Freddy. Re-auditoría de los 20 descartes
 hecha: 9 restaurados (perdían información), quedan 11 (FASE_16). Sin subagentes de acá en adelante (memoria).
-Pendiente de Freddy: commitear los 7; crear en Azure las 4 tasks del README del reparto; pasar task-26311.md a Thomas; decidir si
-pega task-25325.md en su tarjeta; el «sí» para cerrar las dudas 1, 2, 4 y 6 de la 19565 (FASE_17 §Revisión de las 6 dudas); y si
-arregla `~/bin/claude-bifurcar:46` (fallback que no corre con pipefail; arreglo: `|| true` dentro del `$(...)`).
+Commits de los 7 hechos por Freddy. Dudas de la 19565 cerradas (4) y reimportadas; quedan Q4 y Q10, reales (FASE_17).
+Pendiente de Freddy: crear en Azure las 4 tasks del README del reparto; pasar task-26311.md a Thomas; decidir si pega
+task-25325.md en su tarjeta; preguntar la Q10 a Carabantes; y si arregla `~/bin/claude-bifurcar:46` (fallback que no corre con
+pipefail; arreglo: `|| true` dentro del `$(...)`).
 
 Siguiente, en orden:
 1. Freddy prueba los gestos con ?depurar y se calibran (umbrales en lib/conteo-dedos.ts, pose-mano.ts, gesto-voltear.ts).

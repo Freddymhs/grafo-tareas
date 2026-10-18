@@ -169,8 +169,11 @@ el «sí» de Freddy. Veredictos con cita (Azure solo GET, reuniones, FASE):
    25094); Q10 (microorganismos en mezclas) nunca se preguntó: dueño Carabantes.
 6. **24973 · para qué lo quiere el front** → CONTESTADA: gbaeza, Azure 24551 (28-09): `numero` es el id estable de la categoría.
 
-- [ ] Con el «sí» de Freddy: cerrar 1, 2, 4 y 6 en sus `entendimiento.md` y partir la 5 (Q9 cerrada · Q10 abierta); reimportar
-  las FASE del Laboratorio para que las dudas se cierren en el grafo
+- [x] 2026-10-18 tarde (Freddy: «valídalas tú y si te parecen obvias, toma las respuestas»; evidencia recomprobada por el
+  orquestador contra Azure y los docs): 1, 2, 4 y 6 cerradas en sus `entendimiento.md` (sin viñeta, con su cita; respaldo previo en
+  el tmp de la sesión) y la 5 partida (Q9 cerrada · Q10 abierta). `importar:fases` en seco y real: 2 abiertos leídos, **4 dudas
+  cerradas** en producción, 1 actualizada. Quedan abiertas solo **Q4** (tipo de muestra: falta que Fabián cree la task) y **Q10**
+  (microorganismos en mezclas: nunca se preguntó a Carabantes)
 
 ### Revisión: tarjetas de cierre que duplican el trámite (2026-10-18, tick sin humano, solo lectura; para decidir con Freddy)
 
