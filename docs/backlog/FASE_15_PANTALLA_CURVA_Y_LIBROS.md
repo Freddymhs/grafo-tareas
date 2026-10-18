@@ -1,8 +1,8 @@
-# FASE 15: LA PANTALLA CURVA Y LOS LIBROS (UNA HU A LA VEZ)
+# FASE 15: LA PANTALLA CURVA Y LAS PÁGINAS (UNA HU A LA VEZ)
 
 **Destraba**: que Freddy lea su trabajo en el visor sin que se vea «apilado» ni «desordenado» (2026-10-17, en el visor: «me recuerda
 a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja una HU a la vez: esa es la que tiene que ver
-**Listo para PR**: no · tarea 1 en vr `e8776fb` (commiteado, sin pushear); tareas 2-4 esperan las respuestas de abajo
+**Listo para PR**: no · api `47d3a99` (pusheada y desplegada) · vr `e8776fb` `d0eb364` `65a6fde` `876356b` (los tres primeros pusheados; `876356b`, las páginas, sin pushear) · el gesto, en Changes
 **Prioridad**: Alta — la VR es lo que Freddy quiere ver
 **Dependencias**: FASE 13 (el árbol), FASE 14 (moverse y leer)
 **Fuente**: Freddy en el visor, 2026-10-17 · regla suya: **«la lógica no se construye en la VR, solamente se muestra»**
@@ -32,31 +32,58 @@ a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja un
   (±1 m), sin profundidad; las sueltas en una grilla detrás ordenada por título; `ubicarFaltantes` sobre la misma pantalla; `?radio=`
   calibra al recalcular. VR 38/38 tests. Producción recalculada con `?reordenar` (las posiciones de la esfera quedan en el respaldo
   `grafo-2026-10-17_2236.dump`)
+- [x] 2026-10-17, vr `d0eb364` + `65a6fde`: todas las etiquetas a la vista (`?etiquetas=`) y **cada nodo reserva la celda de su texto**:
+  el acomodo corre en metros de la pantalla desenrollada con choque entre celdas (test: 172 textos pisados sin choque, ≤ 2 % con
+  choque); la pertenencia a una rama tira poco (el color ya la dice). Freddy en el visor: «quedó increíblemente mejor»
 
-### Tarea 2: los libros en la API
-- [ ] `GET /libros` (uno por HU) y `GET /libros/:id` (su contenido), con filtros `rol=` (la regla del tablero) y ocultar trámites.
-  **Espera las preguntas 1 y 3**
+### Tarea 2: las páginas en la API
+- [x] Hecha — 2026-10-17, api `47d3a99`: `GET /derivado/paginas` (`calcularPaginas`, puro): una página por HU con su árbol por
+  PERTENECE_A más lo que bloquea a lo suyo (un salto; y a quién espera una duda); las ramas no entran (son el color); «Sin HU» al final.
+  Unit 7 + e2e. Desplegada: HU 19565 · 98 nodos (30 abiertas) · HU 20379 · 57 (21) · Sin HU · 53 (41). Filtros por rol y trámites:
+  todavía no
 
 ### Tarea 3: qué es trámite (importador)
 - [ ] Marcar como trámite las tarjetas de cierre («falta URL commit / Evidencias / wiki»). **Espera la pregunta 2**
 
-### Tarea 4: la VR muestra un libro
-- [ ] El libro abierto al frente, plano; repisa de libros en la mano izquierda (gatillo o pellizco; deslizar, después); panel con
-  leyenda, roles, ocultar trámites y volver al centro
+### Tarea 4: la VR muestra una página
+- [x] 2026-10-17, vr `876356b`: la página al frente (`aberturaPara`: 180°, más si no cabe, hasta 270°); cada página guarda su acomodo
+  (C2), un nodo de dos páginas es de la primera (`hogares`); fila de arriba con pestañas (tareas abiertas, la activa en azul) y la
+  leyenda de colores; X / Y del control izquierdo. Los colores se calculan sobre el grafo entero. Producción re-acomodada por página
+- [ ] Freddy lo ve en el visor (estaba jugando: queda para cuando abra el navegador)
+
+### Tarea 5: girar la pelota (gesto de Freddy)
+- [ ] 2026-10-17, **en Changes** (vr, sin commitear, tick sin humano): `lib/gesto-pelota.ts` (puro: pose de sostener + giro ≥ 50° en
+  ≤ 0,5 s, pausa de 0,6 s; tests 8, rojo probado quitando ventana y pausa) y `escena/GestoPelota.tsx` (mano izquierda por
+  articulaciones, arco de progreso abajo al centro). **Falta calibrar con Freddy en el visor:** los umbrales son una primera estimación
+- [x] Calibración 1 — 2026-10-17, con Freddy («me costó mucho cambiar una página»): 91 s grabados con `?depurar` (búfer
+  `window.__gestoPelota` leído por CDP). Medido: sus giros son de 100° a 160° en < 0,5 s; la pose estaba activa solo el 38 % del tiempo
+  (su mano curvada mide 0,16–0,18 m puntas→muñeca, el tope era 0,16; el pulgar roza el índice al girar = «pellizco»); la mano **vuelve**
+  sola (+114° y −110° al segundo), así que con la regla vieja cada cambio se deshacía (10 cambios simulados, alternados). Y la causa de
+  fondo: la sostiene **vertical**, y el ángulo muñeca→nudillos proyectado al plano es ruido. Cambios: giro real alrededor del eje vertical
+  por la orientación de la muñeca (`lib/giro-vertical.ts`, con test de signo y de pose vertical), sin filtro de pose, umbral 70° en 0,4 s,
+  el regreso bloqueado 1,2 s. VR 60/60
+- [ ] Calibración 2 — en curso: los primeros 16 s de la segunda grabación dan 7 cambios (`+ + − − + + +`); falta que Freddy diga cuáles
+  quiso hacer
+
+### Tarea 6: marcar lo mergeado
+- [ ] Pedido de Freddy 2026-10-17: un botón en la fila de arriba que distinga lo ya mergeado (y ver qué le falta: URL commit, avisar a
+  Thomas, compartir con el front). Qué es «mergeado» lo decide la API — **a confirmar con Freddy** (¿columna «Pull Request» / APROBADO?
+  ¿«mergeado» en el título?)
 
 ## Preguntas para Freddy (abiertas)
 
-1. **Qué entra en un libro:** la HU + sus FASE + las tarjetas de esas FASE + las piezas del Draft + las dudas que las bloquean. ¿Falta
-   o sobra algo?
-2. **Trámites:** ¿el importador marca como trámite las tarjetas «falta URL commit / Evidencias / wiki», y el libro las oculta de
+1. **Trámites:** ¿el importador marca como trámite las tarjetas «falta URL commit / Evidencias / wiki», y la página las oculta de
    entrada con un botón para verlas?
-3. **Lo que no es de ninguna HU** (notas, retros, onboarding 22204): ¿un libro «Sin HU», o no se muestra?
+2. **Mergeado (tarea 6):** ¿qué cuenta como mergeado?
+
+Cerradas 2026-10-17: el contenido de una página (HU + FASE + tarjetas + piezas + lo que las bloquea) y la página «Sin HU» («me agrada
+todo eso»).
 
 ## Criterios de Aceptación
 
 - [x] 1 · Sin profundidad: todo nodo a la misma distancia del usuario y en la banda de los ojos (test `grafo.test.ts`)
 - [ ] 2 · Freddy abre un libro y lo lee sin que se vea apilado
-- [ ] 3 · Lo que decide el contenido y los filtros tiene e2e en la API; la VR no lo recalcula
+- [x] 3 · Lo que decide el contenido de una página tiene e2e en la API (`paginas.e2e-spec.ts`); la VR no lo recalcula
 
 ## QA
 
