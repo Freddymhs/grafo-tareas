@@ -441,6 +441,8 @@ Abiertas:
 - CORTE HECHO (2026-10-18, FASE 5): el Laboratorio escribe en el grafo (`tablero.kind: grafo`); Todoist TRABAJO y el
   Draft quedan congelados y sus importadores no se corren más; `importar fases` sigue (el estado de cada FASE sale de sus
   casillas). Volver: `git show d8281c7:refs.yaml` en el Laboratorio. Reporte previo: FASE 16 § Reporte final.
+  Después del corte: 10 tarjetas [FASE n] descartadas, un trámite por FASE (con el texto para pegar de Todoist), la prosa
+  de los comandos dice «el tablero» y el `ah` está al día (lo que ya no existe, marcado).
 - FASE 19 (2/3, desplegada: api d47e4f7 · orquestador 05e8821): ensayo del corte y sus arreglos (fase-tildar llama
   al hook, adaptador con la API caída, borrador → POST /piezas, tarjeta adopta la pieza), personas fuera del código
   (`personas:` del refs.yaml) y APROBADO = la casilla Mergeado (roles.yaml + hook): 0 de 10 tarjetas [FASE n] fuera de

@@ -135,10 +135,15 @@ después se borraron (222 nodos antes y después). Ni Todoist ni el `refs.yaml` 
 
 ### Lo que dejó el corte (2026-10-18)
 
-- ⏳ **Las 10 tarjetas `[FASE n]` quedan congeladas.** Con el tablero en el grafo, el hook mueve el nodo FASE (`etapa "FASE n"`
-  busca la FASE por su externo, D10), y la tarjeta de Todoist ya no la mueve nadie. Hoy están en la columna de su FASE (0 de 10
-  fuera), pero se van a ir quedando atrás. Propuesta: descartarlas con su motivo, porque la tarjeta de una FASE de calidad es el
-  nodo FASE (C12). Espera el «sí» de Freddy.
+- ✅ **Las 10 tarjetas `[FASE n]` congeladas, descartadas** (con el «sí» de Freddy), cada una con su motivo: la tarjeta de una
+  FASE de calidad es su nodo FASE. Antes de descartar se leyeron enteras: su título estilo commit ya está en git (los merges de
+  `develop` del BFF) para las FASE 22 a 30; el de la FASE 37, que todavía no tiene commit, pasó a su Tarea 16.
+- ✅ **Trámites normalizados, un solo nodo por FASE** (con el «sí» de Freddy). «Listo para PR» tildado en las FASE 23 a 30
+  (mergeadas: el PR existió); la URL commit de la FASE 23, tildada después de verla en Azure (GET de la 26307). Importar fases
+  generó sus trámites. Las 8 tarjetas de Todoist por FASE no se descartaron sin más: llevaban los links y el texto de Evidencias
+  listo para pegar, que se copió a la descripción del trámite de su FASE (`PATCH` con motivo; el importador lo respeta, medido en
+  seco: 0 por actualizar). Recién después se descartaron. Las agrupadoras («🟣 Cierres pendientes» y «Agregar URL commit… 12») y
+  «editar la wiki por los cambios de 23697» se quedan: no las cubre ningún trámite de FASE.
 - ⏳ **Al contrato le falta «crear con descripción».** `/sigsa:sonarqube:entregar` necesita la tarjeta en ENTENDIMIENTO con su
   texto: hoy usa `etapa` y después `PATCH` de la descripción. Si otro comando lo pide, se agrega como operación del contrato.
 
