@@ -2,8 +2,8 @@
 
 **Destraba**: que Freddy compruebe, trabajando su próxima task real, que cada paso del Laboratorio llega a la web y a la VR
 como debería, y arreglar lo que esa mirada ya encontró
-**Listo para PR**: no · el guion se usa con la próxima task; el arreglo de `fase-tildar` (Tarea 2) está hecho; de la pasada
-(Tarea 3) se movió la FASE 37, y las 9 mergeadas esperan que Freddy elija la salida (§ La pasada de las 10 tarjetas)
+**Listo para PR**: no · el guion se usa con la próxima task (Tarea 1); el arreglo de `fase-tildar` (Tarea 2) y la pasada de
+las 10 tarjetas (Tarea 3) están hechos
 **Prioridad**: Alta para el arreglo (es lo que más confunde hoy en el tablero); el guion, cuando toque
 **Dependencias**: FASE 13 (árbol HU → FASE → tarjeta), FASE 17 (dos caras)
 **Fuente**: Freddy, 2026-10-18: «verificar de una prueba end-to-end de que las cosas funcionan bien»; y después: «la prueba
@@ -114,10 +114,24 @@ después se borraron (222 nodos antes y después). Ni Todoist ni el `refs.yaml` 
 
   La regla de calidad (`docs/roles.yaml`, igual a la plantilla) deriva APROBADO del cierre en Azure, no de la casilla
   `Mergeado`, que se agregó después. Por eso las deja en RED o en Pull Request, cuando en Todoist ya están más adelante
-  (TESTEADO, LISTO PARA PR, Pull Request, APROBADO). Las dos salidas son de Freddy:
-  - **en la fuente:** tildar con `/flow:tildar` lo que ya pasó en esas FASE (`listo` y las tareas hechas);
-  - **en la regla:** que `Mergeado` lleve a APROBADO en `roles.yaml`, para producto y calidad. Cambia la plantilla del
-    método, el importador y el hook a la vez, y sus pruebas de paridad.
+  (TESTEADO, LISTO PARA PR, Pull Request, APROBADO).
+- ✅ **Resuelto en la regla** (Freddy delegó la decisión: «haz esto»). Se descartó tildar en la fuente, porque habría
+  afirmado tareas sin tildar que no se pueden verificar (a la FASE 30 le faltaban 13 casillas). Se eligió la regla, porque
+  `Mergeado` se creó para ser esa señal (FASE 17).
+  - `roles.yaml` (área y plantilla): `aprobado` de producto y calidad pasa a `si: { qa: Mergeado }`. Medido antes con
+    `test_roles.py` sobre las 35 FASE: cambian esas 9, todas hacia APROBADO, y las otras 26 quedan iguales.
+  - El hook `fase-tilde` (su copia de la regla de calidad): si `Mergeado` está tildada, la columna es APROBADO.
+    `test_fase_tildar.sh`, 5 casos, vistos en rojo. Con el cambio de `fase-tildar`, una tilde de cierre habría devuelto
+    la FASE 22 a Pull Request.
+  - `tablero.secciones` del Laboratorio y del bloque `grafo`: la sección `aprobado: APROBADO`.
+  - En producción, desplegado el 2026-10-18 (api `d47e4f7`, orquestador `05e8821`, respaldo previo
+    `grafo-2026-10-18_2010.dump`):
+    - importar las fases: 9 actualizadas y 0 nuevas (lo mismo en seco);
+    - el hook movió 8 tarjetas a APROBADO en Todoist; la 22 ya estaba;
+    - reimportar TRABAJO: 8 actualizadas y 0 nuevas;
+    - resultado: **0 de 10** tarjetas `[FASE n]` en otra columna que la de su FASE.
+  - Queda una deuda: la regla de columnas de calidad vive en dos lugares, `roles.yaml` y el Python del hook. Hoy coinciden
+    en APROBADO, pero el hook no lee `roles.yaml`.
 
 ## El arreglo (para aprobar)
 
@@ -151,13 +165,13 @@ después se borraron (222 nodos antes y después). Ni Todoist ni el `refs.yaml` 
   `~/bin/tests/test_fase_tildar.sh` 4/4, en rojo antes del arreglo (la tarjeta no se movía)
 
 ### Tarea 3: las 10 tarjetas (con su «sí»: escribe en Todoist)
-- [ ] La pasada del hook por las FASE de calidad, y reimportar TRABAJO en seco: 0 tarjetas `[FASE n]` en otra columna que la de
-  su FASE
+- [x] La pasada del hook por las FASE de calidad, y reimportar TRABAJO en seco: 0 tarjetas `[FASE n]` en otra columna que la de
+  su FASE — 2026-10-18: 0 de 10, con la regla de `Mergeado` (§ La pasada de las 10 tarjetas)
 
 ## Criterios de Aceptación
 
 - [ ] 1 · Freddy recorrió el guion con una task real, y lo que no se vio quedó anotado acá
-- [ ] 2 · Ninguna tarjeta `[FASE n]` en una columna distinta de la de su FASE, en producción
+- [x] 2 · Ninguna tarjeta `[FASE n]` en una columna distinta de la de su FASE, en producción — 0 de 10, medido el 2026-10-18
 - [ ] 3 · La única prueba nueva es la del caso que falló
 
 ## QA

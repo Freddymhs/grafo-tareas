@@ -438,11 +438,11 @@ Abiertas:
 - FASE 17: calibrar los gestos con ?depurar (lib/conteo-dedos.ts, pose-mano.ts, gesto-voltear.ts).
 - FASE 16: el reporte final Todoist ↔ grafo.
 - FASE 18: normalizar las tarjetas; espera el «sí».
-- FASE 19: probar el ciclo a mano + el ensayo del corte (2026-10-18). Arreglados y probados en rojo: fase-tildar llama
-  al hook, el adaptador grafo con la API caída, borrador (POST /piezas, la regla de pieza.ts) y tarjeta (adopta la
-  pieza); las personas del cliente salieron del código a `personas:` del refs.yaml (agnóstico). Falta: desplegar la API
-  (POST /piezas, personas). De las 10 tarjetas [FASE n] se movió la 37; las 9 mergeadas esperan que Freddy elija: tildar
-  su Listo para PR/tareas, o que Mergeado lleve a APROBADO en roles.yaml (FASE 19 § La pasada).
+- FASE 19 (2/3, desplegada: api d47e4f7 · orquestador 05e8821): ensayo del corte y sus arreglos (fase-tildar llama
+  al hook, adaptador con la API caída, borrador → POST /piezas, tarjeta adopta la pieza), personas fuera del código
+  (`personas:` del refs.yaml) y APROBADO = la casilla Mergeado (roles.yaml + hook): 0 de 10 tarjetas [FASE n] fuera de
+  su columna. Falta: Freddy recorre el guion con una task real. Deuda: la regla de calidad vive en roles.yaml y en el
+  Python del hook.
 HU 20379 en el grafo: la propuesta del esquema para Thomas es un nodo; la cadena propuesta → duda → 0.5 → 0.4/3.1 →
   [25325] → 3.3/3.4/26309 y a quién espera cada duda (Carabantes · Tomás Soto) están como vínculos.
 HU 20379: las 4 tasks nuevas viven solo en la cara PLAN hasta que Freddy decida cómo partir la recepción.
