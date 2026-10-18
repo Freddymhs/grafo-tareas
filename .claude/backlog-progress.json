@@ -87,6 +87,11 @@
       "status": "in_progress",
       "tasks": 6,
       "total": 8
+    },
+    "FASE_18": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 3
     }
   },
   "updated_at": "2026-10-18"

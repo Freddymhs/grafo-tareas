@@ -208,6 +208,30 @@ se cierra solo al tildar su cierre. Nada se descarta sin el «sí» de Freddy, u
   importador lo respeta). Web: tsc 0 · lint 0 · 22 tests (4 de `mover-cara`, rojo probado). Probado en Chrome headless contra
   producción: Trabajo 100 tarjetas, Plan 10, el menú aparece (sin hacer clic: datos reales). La prueba destapó la 4.1b colgada
   (cerrada en Todoist, abierta en el grafo): cerrada con `PATCH` y motivo; el hueco del importador quedó como trampa en `CLAUDE.md`
+- [x] 2026-10-18, Freddy en la web: el Plan salía todo en «Sin etapa» («¿no debería tener columnas como el Draft?») y el Trabajo
+  sin filtro por HU («como las pestañas de la VR»), todo con la lógica en el back. api `b310b61` + web `fb8f1ab` desplegadas:
+  `GET /derivado/plan?libro=` (una columna por carril —la RAMA con la etiqueta `carril`, que ahora pone el importador— con sus
+  piezas abiertas en orden de ronda; `calcularTableroPlan`, puro) y `GET /nodos?libro=` (la misma regla de las páginas de la VR;
+  la cara elige la página). La web: fila de HU (Todas · HU 19565 · HU 20379 · Sin HU) y el Plan por carriles con el borde de su
+  color. API unit 116 · e2e 54; web 24 tests; rojos probados. Draft reimportado (2 carriles etiquetados). Probado en producción:
+  HU 19565 → 38 tarjetas, Sin HU 59, Todas 100; Plan → A · Bandeja (3) y C · Recepción (6), igual que el Draft de Todoist.
+  «Sin etapa» no es información chueca: 30 tarjetas de TRABAJO sin sección en Todoist (las notas sueltas de arriba) + 5 trámites
+- [x] 2026-10-18, Q4 (tipo de muestra): Freddy no la quiere pedir todavía; es una corrección sin prioridad que no rompe nada.
+  Rama **🧹 Normalización** creada en el grafo con la tarjeta del 29-sep colgada: el lugar de esas correcciones, visible en la
+  web (Ramas) y en la VR (color), para cuando decida llevarlas a Fabián. La propuesta de etiquetas siguió en la FASE 18
+- [x] 2026-10-18, Freddy: «revalidá en Azure y en develop si esas dudas se contestan; si no, son preguntas nuevas y van a la
+  base». Revisadas las ~25 preguntas abiertas del reparto de la 20379 contra los 40 comentarios de Azure (la HU, sus 23 tasks,
+  la 24433, la 20378 y la wiki 6738) y el develop de los 9 repos (sin cambios desde la foto de brechas). **Contestadas, no se
+  cargan:** el laboratorio no filtra (Carabantes 15-10: «un usuario no puede pertenecer a más de un laboratorio»); Rechazar es de
+  la 25015; los análisis sí tienen área (script `09_areas_funcionales.sql` de Thomas, `d785567`); los códigos OBSERVADA y
+  EN_VERIFICACION_SECCION existen en la rama de la 25325; el solicitante entra al buscador (la HU lo pide en tres lugares); en el
+  catálogo manda la planilla (FASE_18 D7). **Abiertas, cargadas en el grafo (16):** 8 dudas de negocio para Carabantes (Observar,
+  «Volver» del modal, texto del aviso a analistas, «con Observaciones» ¿requiere acción?, 5 días hábiles o corridos y ¿cada noche?,
+  quién confirma una recepción ajena, En Validación ¿de qué?, nombre y primer apellido ¿columna aparte?), 5 de código para Thomas
+  (aprobar el esquema + orquestación + ¿`recepcion_muestra` sobra?, analistas de un área sin endpoint y catálogos que no calzan,
+  nombre y apellido por separado, dónde corre el nocturno, **con qué id se guarda una persona**: D5 eligió el de Keycloak y el
+  solicitante usa el de identidad), 2 supuestos y 1 dolor de código (comentario viejo en la migración de `laboratorio_analisis`).
+  Cada una cuelga de su pieza o task y dice qué bloquea. Páginas: HU 20379 real 45 → 50 nodos, plan 12 → 25
 
 ## Decisiones del agente (para revisar al leer)
 

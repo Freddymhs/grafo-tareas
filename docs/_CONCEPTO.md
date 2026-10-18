@@ -385,6 +385,8 @@ hecha: 9 restaurados (perdían información), quedan 11 (FASE_16). Sin subagente
 Commits de los 7 hechos por Freddy. Las 6 dudas de la 19565 cerradas con evidencia (Q4 era una propuesta a Fabián; Q10, del front):
 0 dudas de FASE abiertas. «Mover a» en la web desplegado (api `ff8bac1`, web `a20670e`: Trabajo | Plan + clic derecho). Para la daily:
 «para decir» colgado de la FASE 30 (husky = Sonar real, los 6 que quedaron). `claude-bifurcar:46` arreglado (rojo probado).
+Web (2026-10-18, api `b310b61`, web `fb8f1ab`): fila de HU en el tablero y el Plan en columnas por carril, todo calculado en la API.
+Rama «🧹 Normalización» para correcciones sin prioridad. FASE 18 (normalizar las tarjetas) escrita: espera el «sí» de Freddy.
 Cómo trabaja Freddy con lo del reparto (2026-10-18): las 4 tasks nuevas viven SOLO en el Draft / cara plan; él decide cómo partir
 la recepción (¿solo «con observación» primero?) antes de pegar nada en Azure o en la tarjeta de la 25325. Con los compañeros solo se
 comparte Azure: no se les pasan archivos propios (task-26311.md es referencia suya, no para Thomas).
