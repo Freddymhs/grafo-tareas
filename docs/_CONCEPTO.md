@@ -453,4 +453,7 @@ HU 20379 en el grafo: la propuesta del esquema para Thomas es un nodo; la cadena
 HU 20379: las 4 tasks nuevas viven solo en la cara PLAN hasta que Freddy decida cómo partir la recepción.
 Próximo producto, ya decidido: ver el sprint en la VR (Azure GET), filtros por personas (FASE 18), la tarjeta madre de las
 tareas repetitivas y un comando que reconcilie el Draft con lo hecho.
+Más adelante, sin fecha (Freddy, 2026-10-18: «no nos compliquemos, avancemos»): el estado de cada FASE sale de sus casillas
+y pasa al backend; la plantilla que crea las FASE (`new-concept` / `create-backlog`) crea también sus nodos y vínculos en
+el tablero, y la FASE queda como intención y decisiones. Hasta entonces, lo que nace de una FASE se cambia en la FASE.
 ```

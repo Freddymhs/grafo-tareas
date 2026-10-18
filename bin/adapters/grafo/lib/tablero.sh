@@ -71,6 +71,11 @@ if [ -n "${TABLERO_FAKE:-}" ]; then
   gr_conectar() { _fake_append "$FAKE_CONEXIONES" c "$(jq -nc --arg o "$1" --arg d "$2" --arg t "$3" '{origenId: $o, destinoId: $d, tipo: $t}')"; }
   # Guarda lo pedido sin aplicar la regla de la pieza: ésa vive en la API y la prueban sus e2e (piezas.e2e-spec.ts).
   gr_pieza() { gr_crear "$(jq -c '{tipo: "TAREA", cara: "PLAN", titulo, descripcion, carril}' <<<"$1")"; }
+  # El área de `GET /area`: area.json si el test la escribe; si no, la que tiene la daily (la de todos los días).
+  gr_area() {
+    if [ -f "$TABLERO_FAKE/area.json" ]; then jq -c . "$TABLERO_FAKE/area.json"
+    else echo '{"rituales":[{"clave":"daily","nombre":"Daily"}]}'; fi
+  }
 else
   # ── la API real ────────────────────────────────────────────────────────────────────────────────
   API=$(cfg api)
@@ -96,12 +101,14 @@ else
   gr_listar() {
     local q estado; q=$(jq -rn --arg q "$1" '$q | @uri'); estado="${3:-ABIERTO}"
     [ "$estado" = TODOS ] && estado=""
-    _gr_curl GET "/nodos?limit=$LIMITE_LISTA&q=$q${2:+&tipo=$2}${estado:+&estado=$estado}" | jq -c '.data'
+    # Un `q=` vacío da 400 (Validation failed): sin texto, no se manda.
+    _gr_curl GET "/nodos?limit=$LIMITE_LISTA${q:+&q=$q}${2:+&tipo=$2}${estado:+&estado=$estado}" | jq -c '.data'
   }
   gr_crear()    { _gr_curl POST "/nodos" "$1"; }
   gr_editar()   { _gr_curl PATCH "/nodos/$1" "$2"; }
   gr_conectar() { _gr_curl POST "/conexiones" "$(jq -nc --arg o "$1" --arg d "$2" --arg t "$3" '{origenId: $o, destinoId: $d, tipo: $t}')"; }
   gr_pieza()    { _gr_curl POST "/piezas" "$1"; }
+  gr_area()     { _gr_curl GET "/area"; }
 fi
 
 # El nodo abierto cuyo título empieza con `<prefijo>` (`[25699]`): objeto JSON, o nada.
@@ -138,5 +145,24 @@ nodo_id_o_crear() {   # $1 tipo · $2 título
   if [ -n "$existente" ]; then printf '%s' "$existente" | jq -r .id; return; fi
   id=$(gr_crear "$(jq -nc --arg t "$1" --arg ti "$2" '{tipo: $t, titulo: $ti}')" | jq -r .id)
   [ -n "$id" ] && [ "$id" != null ] || { echo "no pude crear el nodo $1 «$2»" >&2; return 1; }
+  printf '%s\n' "$id"
+}
+
+# El externo con que la API escribe el nodo de un ritual (`ORIGEN_RITUAL`, grafo-tareas.api complementos.repository.ts):
+# si cambia allá, cambia acá. Así lo «para decir» de este adaptador y lo de `POST /nodos/:id/complementos` cuelgan del mismo.
+readonly ORIGEN_RITUAL=ritual
+
+# Id del nodo del ritual `<clave>` de GET /area (la daily, la retro: los del área, no del método); si falta, lo crea
+# como la API. Sin ese ritual en el área sale 1 antes de que el que llama escriba nada.
+nodo_de_ritual() {   # $1 clave
+  local nombre existente id
+  nombre=$(gr_area | jq -r --arg c "$1" '.rituales[] | select(.clave == $c) | .nombre') || return 1
+  [ -n "$nombre" ] || { echo "el área no declara el ritual «$1» (\`rituales:\` del refs.yaml que lee la API, GET /area)" >&2; return 1; }
+  existente=$(gr_listar "" DAILY_ITEM TODOS |
+    jq -r --arg o "$ORIGEN_RITUAL" --arg c "$1" '[.[] | select(.externoOrigen == $o and .externoId == $c)] | first | .id // empty')
+  if [ -n "$existente" ]; then printf '%s\n' "$existente"; return; fi
+  id=$(gr_crear "$(jq -nc --arg ti "$nombre" --arg o "$ORIGEN_RITUAL" --arg c "$1" \
+    '{tipo: "DAILY_ITEM", titulo: $ti, externoOrigen: $o, externoId: $c}')" | jq -r .id)
+  [ -n "$id" ] && [ "$id" != null ] || { echo "no pude crear el nodo del ritual «$1»" >&2; return 1; }
   printf '%s\n' "$id"
 }

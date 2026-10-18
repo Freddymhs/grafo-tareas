@@ -147,6 +147,64 @@ después se borraron (222 nodos antes y después). Ni Todoist ni el `refs.yaml` 
 - ⏳ **Al contrato le falta «crear con descripción».** `/sigsa:sonarqube:entregar` necesita la tarjeta en ENTENDIMIENTO con su
   texto: hoy usa `etapa` y después `PATCH` de la descripción. Si otro comando lo pide, se agrega como operación del contrato.
 
+### Freddy en el visor (2026-10-18, HU 19565, build `index-XwwoaPKg`)
+
+Lo que vio, y la causa medida en el código y en producción (las citas `archivo:línea` son de la VR en `19aa13c`, antes
+del arreglo: `git -C grafo-tareas.vr show 19aa13c:src/<archivo>`). Lo arreglado, con su «dale, aplica las mejoras», va en
+§ Arreglos del visor; el orden de lo suelto (lista B) espera su «sí» por número.
+- **Con el filtro 1 «no hay hilos» HU → FASE; con el 2 sí.** No se pierden: con el 1 el árbol se dibuja con opacidad 0.4
+  (`OPACIDAD_ESTRUCTURA`) y la pertenencia a una rama con 0.08; con el 2, lo encendido va con 0.9 (`escena/Grafo.tsx:120-142`).
+- **[26750] gris y lejos «aunque es un PBI».** Es la tarjeta `[id]` de un PBI sin FASE todavía (`Tareas/26750` bajado, sin
+  `FASE_*.md`): un TAREA sin carril se pinta `COLOR_SIN_RAMA` (`lib/colores.ts:27`), y su único hilo va a la HU. La VR no distingue
+  la tarjeta de un PBI de una nota.
+- **[26317] Husky esencial «¿es FASE?».** No: es la tarjeta `[26317]`, cuelga de la FASE 30, y está **vieja**: la FASE 30 está
+  mergeada (APROBADO) y la tarjeta sigue en ENTENDIMIENTO, abierta. Vino así de Todoist.
+- **«Para la daily: el husky…» sin color propio.** Es un DAILY_ITEM (`complemento:para-decir`, `EN_DAILY_DE` → «Daily»): el
+  modelo lo tiene; la VR lo pinta como cualquier tarea. Además, 5 TAREA traen la etiqueta `daily` y 6 la `retro` en vez de ser
+  «para decir» de su ritual (`GET /area`: daily y retro): el mismo concepto, dos formas.
+- **«[correcciones viejas]…» y las 6 «01-oct · retro: …» «no sé qué son».** Las correcciones son un trámite real de Azure
+  (vincular/desvincular PR), hija de «🟣 Cierres pendientes». Las retro son propuestas de proceso: cuelgan de FASE 1, 6, 7, 8 y 13
+  porque **citan** sus números como ejemplo (PERTENECE_A por mención), y por eso caen en la página de la HU 19565.
+- **Tomás Carabantes: «Libre: nada lo frena».** Es su nodo PERSONA (le esperan 8 dudas abiertas). El texto de la selección
+  pregunta qué frena al nodo (`lib/seleccion.ts:7`): para una persona la pregunta es al revés, quién la espera.
+- **El rayo cuesta.** Es el de `@react-three/xr` por defecto (`createXRStore({ emulate: false })`, `App.tsx:31`), que se desvanece.
+- **Gestos que estorban.** La pose de apuntar cuenta como 1 dedo (y el 1 es «ver todo»); el pellizco del pulgar con el índice y
+  el gesto del menú de Meta no se descartan (`lib/conteo-dedos.ts:46`). Es la calibración pendiente de la FASE 17.
+- **De fondo, palabras de Freddy:** *«siento que tengo basura que nunca supe ordenar… ahora que la tengo no sé cómo mostrar la
+  información»*. En producción hay 21 TAREA abiertas sin etiqueta: notas sin «qué es».
+- **Lo que se mide al venir:** R3 del importador de fases (`engancharTarjetas`) cuelga de una FASE **toda TAREA que cite su
+  task en el título**, en cada importación: por eso las retro caen en la HU 19565, y borrar ese hilo a mano no sirve (vuelve).
+  R3 solo mira TAREA: lo que pase a «para decir» (DAILY_ITEM) deja de engancharse. El tipo de un nodo no se edita (`update-nodo.dto.ts`):
+  convertir = crear el nuevo y descartar el viejo (se restaura).
+
+### Arreglos del visor (2026-10-18, build `index-kLK2-wiS`, cargado y verificado en el visor)
+
+- ✅ **Hilos sin filtro**: árbol 0.4 → 0.75 y relaciones 0.6 → 0.85 (`lib/constants/grafo.ts`). El 1 era y sigue siendo el filtro
+  apagado (FASE 17 tarea 7: «1 = todo (por defecto)… sin filtro no se apaga nada»); lo raro era que se viera más tenue que el 2.
+- ✅ **Morado = PBI** (`lib/pbi.ts`, del título: `[<id>]` de la tarjeta, ` · <task>` al final de la FASE). La tarjeta y la FASE que
+  se encuentran, lavanda; la que no —**tarjeta sin FASE** (en producción: 25682, 26469, 26750) o **FASE sin task** (la 36)— en
+  fucsia y más grande que una FASE, y al seleccionarla dice «PBI a medias: sin FASE / FASE sin task». Lo cerrado no está a medias.
+- ✅ **«Para decir»** (DAILY_ITEM) con color propio, cian, en la leyenda. Y en la **entrada**: `pendiente informe|confirmacion`
+  del adaptador ya no crea una TAREA con `daily`, crea un DAILY_ITEM `complemento:para-decir` EN_DAILY_DE el ritual `daily` de
+  `GET /area` (el mismo nodo «Daily» que usa la API, por su externo `ritual/daily`); sin ese ritual en el área, sale 1 sin escribir.
+  Es el gancho que pidió Freddy: `/flow:todo` ya obliga a elegir el tipo; el adaptador lo guarda como lo que es.
+- ✅ **Persona seleccionada**: «La esperan N — se iluminan alrededor» (lo abierto con ESPERA_RESPUESTA_DE hacia ella, en la página).
+- ✅ **Rayo sólido** de la mano y del control: `MeshBasicMaterial`, opacidad 1, hasta la pantalla curva (`RADIO_PANORAMA`).
+- ✅ **Gestos**: el índice solo ya no es un número (es apuntar); ver todo = el número del filtro puesto otra vez (o B); el menú de
+  Meta —palma hacia la cara y pellizco— no es ningún número (`esGestoDeMeta`). El 3 («OK») junta pulgar e índice: por eso no se
+  ignora todo pellizco, solo el de la palma hacia la cara. **SUPUESTO**: el signo de la normal de la palma (test rojo probado
+  invirtiéndola, pero la orientación real de las articulaciones del Quest se confirma con `?depurar`, campo `meta`).
+- Gates: VR unit 133 · e2e 3 · tsc 0 · lint 0; `bin/tests/test_tablero.sh` 42/42 (5 nuevos, rojos probados volviendo `informe` a
+  TAREA). Contra producción, sin escribir: `nodo_de_ritual daily` encontró el «Daily» existente; destapó que `q=` vacío da 400 en
+  la API real y el backend falso lo aceptaba (arreglado: sin texto, no se manda).
+- ⏳ **`vence` daba 500 al crear y al editar** (encontrado aplicando la lista B, punto 23): el DTO documenta `YYYY-MM-DD` y el
+  servicio se lo pasaba tal cual a Prisma, que pide fecha con hora. Así `/flow:todo … --vence` fallaba en producción (avisando,
+  sin escribir) y el backend falso no lo veía. Arreglo en `nodos.service.ts` (`conVenceComoFecha`, crear y editar) + e2e en
+  `pulido.e2e-spec.ts`, rojo visto (`Expected 201, Received 500`). API unit 120 · e2e 58 · tsc 0 · lint 0. **Falta desplegar**:
+  commit, push y `bin/desplegar` (de Freddy). Mientras, la fecha completa (`…T00:00:00.000Z`) funciona.
+- ✅ **Lista B, puntos 21-25** (con sus respuestas): 21 propuesta con su explicación · 22 cerrada (ya la revisó) · 23 p1, vence
+  19-10 · 24 propuesta, para Fabián · 25 observación con su idea. Cada edición con motivo en la bitácora.
+
 ## El arreglo (para aprobar)
 
 - **`fase-tildar`**, después de tildar, llama al mismo `fase-tilde.sh` con el JSON de un `Edit` sobre esa FASE. Así la regla

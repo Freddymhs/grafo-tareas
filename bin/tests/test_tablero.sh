@@ -36,6 +36,18 @@ caso pendiente_tipo_malo    "tipo desconocido"      64 "$OP/pendiente" urgente "
 caso pendiente_guardo_p1    '"prioridad":1'         0 jq -c '.[0]' "$NODOS"
 caso pendiente_una_etiqueta '"etiquetas":["bloqueo"]' 0 jq -c '.[0]' "$NODOS"
 caso pendiente_vence        '"vence":"2026-10-20"'  0 bash -c "'$OP/pendiente' confirmacion 'x' --vence 2026-10-20 >/dev/null && jq -c '.[-1]' '$NODOS'"
+# Lo que se dice en la daily es «para decir», no una tarea (Freddy, 2026-10-18): DAILY_ITEM EN_DAILY_DE el ritual de la API.
+caso pendiente_para_decir   '{"tipo":"DAILY_ITEM","etiquetas":["complemento:para-decir"]}' 0 \
+  jq -c '[.[] | select(.titulo | endswith("queera, sinonigmia"))][0] | {tipo, etiquetas}' "$NODOS"
+caso pendiente_en_la_daily  "EN_DAILY_DE Daily"     0 bash -c "jq -r --slurpfile n '$NODOS' '
+  (\$n[0][] | select(.titulo | endswith(\"queera, sinonigmia\")) | .id) as \$item
+  | (\$n[0][] | select(.externoOrigen == \"ritual\" and .externoId == \"daily\")) as \$ritual
+  | .[] | select(.origenId == \$item and .destinoId == \$ritual.id) | \"\(.tipo) \(\$ritual.titulo)\"' '$CONEXIONES'"
+caso pendiente_un_ritual    "1"                     0 jq -r '[.[] | select(.externoOrigen == "ritual")] | length' "$NODOS"
+caso pendiente_sin_ritual   "no declara el ritual «daily»" 1 bash -c "mkdir -p '$T/sin-daily' &&
+  echo '{\"rituales\":[{\"clave\":\"retro\",\"nombre\":\"Retro\"}]}' > '$T/sin-daily/area.json' &&
+  TABLERO_FAKE='$T/sin-daily' '$OP/pendiente' informe x"
+caso pendiente_sin_ritual_no_escribe "true"         0 jq -r 'length == 0' "$T/sin-daily/nodos.json"
 caso buscar_encuentra       "esquema"               0 "$OP/buscar" tomás esquema
 caso buscar_vacio_es_0      ""                      0 "$OP/buscar" nadaquever
 caso buscar_no_cruza        ""                      0 bash -c "'$OP/buscar' queera esquema | grep -c . ; true"

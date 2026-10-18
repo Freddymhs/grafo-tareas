@@ -72,6 +72,10 @@
 - **Una entidad que entra por dos caminos se desincroniza si cada camino tiene su regla:** `borrador` (FASE 5) se quedó sin la cara
   PLAN, la ronda, el carril y la HU que el importador ganó en la FASE 17, y la vista Plan no veía sus piezas. La regla de la pieza
   vive en `grafo-tareas.api/src/importadores/pieza.ts` y la usan los dos (el importador y `POST /piezas`). *(Real 2026-10-18.)*
+- **El backend falso del adaptador (`TABLERO_FAKE`) acepta lo que la API real rechaza:** `q=` vacío (la API da 400) y `vence`
+  `YYYY-MM-DD` (daba 500 hasta el arreglo de `nodos.service.ts`) pasaban verdes en `test_tablero.sh`. Un parámetro nuevo de una
+  operación se prueba una vez contra la API real —de lectura, o sobre un nodo que se crea y se descarta—: el verde del falso no lo
+  prueba. *(Real 2026-10-18: `nodo_de_ritual` y la tarea de las horas extras.)*
 
 ## Lo que vive en este orquestador (además de los tres repos)
 

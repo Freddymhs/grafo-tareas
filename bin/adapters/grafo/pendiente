@@ -4,20 +4,28 @@
 #
 #   pendiente <tipo> <texto literal> [--vence <YYYY-MM-DD>] [--descripcion <texto>] [--persona <nombre>]
 #
-#   tipo          nodo   prioridad  etiqueta      quién lo manda
-#   bloqueo       DUDA   p1         bloqueo       /flow:todo — alguien tiene que actuar para que yo avance
-#   confirmacion  TAREA  p2         daily         /flow:todo — si asumo mal rehago trabajo
-#   informe       TAREA  p2         daily         /flow:todo — lo cuento en la daily y se cierra
-#   propuesta     TAREA  p2         propuesta     /flow:propuesta
-#   observacion   TAREA  p4         observacion   /flow:observaciones (el texto ya trae ✅ o 🔧)
-#   supuesto      TAREA  p2         supuesto      /vista:entrega (el texto ya trae ❓)
+#   tipo          nodo        prioridad  etiqueta                quién lo manda
+#   bloqueo       DUDA        p1         bloqueo                 /flow:todo — alguien tiene que actuar para que yo avance
+#   confirmacion  DAILY_ITEM  p2         complemento:para-decir  /flow:todo — si asumo mal rehago trabajo: se pregunta en la daily
+#   informe       DAILY_ITEM  p2         complemento:para-decir  /flow:todo — lo cuento en la daily y se cierra
+#   propuesta     TAREA       p2         propuesta               /flow:propuesta
+#   observacion   TAREA       p4         observacion             /flow:observaciones (el texto ya trae ✅ o 🔧)
+#   supuesto      TAREA       p2         supuesto                /vista:entrega (el texto ya trae ❓)
 #
+# Lo que se dice en la daily no es una tarea: es «para decir» (el complemento `para-decir` de roles.yaml), un
+# DAILY_ITEM que queda EN_DAILY_DE el ritual `daily` de GET /area —el mismo nodo que usa la API—. Así lo distinguen el
+# grafo, la web y la VR (Freddy, 2026-10-18: «tiene que quedar guardado con ciertas propiedades… para que de verdad sea
+# útil»). Antes era una TAREA con la etiqueta `daily`, la de Todoist, y nada la separaba de una tarea.
 # El título es `<DD-mmm> · <texto>`: la fecha es el ÚNICO agregado (regla de /flow:todo §2: literal, con
 # sus typos). Una etiqueta, nunca dos. `--vence` es una fecha ISO (la API no parsea "monday").
 # `--persona` solo tiene sentido con `bloqueo`: la DUDA queda ESPERA_RESPUESTA_DE esa PERSONA (se crea si
 # falta) y "si X contesta, se liberan N" la cuenta. Es una extensión del contrato: ningún flow la pasa aún.
 set -euo pipefail
 source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
+
+# La etiqueta que la API pone a un complemento (`complemento:<clave>`) y el ritual donde se dice, para /flow:todo.
+readonly PARA_DECIR=complemento:para-decir
+readonly RITUAL_DE_LA_DAILY=daily
 
 TIPO="${1:?uso: pendiente <tipo> <texto> [--vence <fecha>] [--descripcion <texto>] [--persona <nombre>]}"
 TEXTO="${2:?falta el texto}"; shift 2
@@ -31,16 +39,20 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+RITUAL=""
 case "$TIPO" in
-  bloqueo)      NODO=DUDA;  PRIORIDAD=p1; ETIQUETA=bloqueo ;;
-  confirmacion) NODO=TAREA; PRIORIDAD=p2; ETIQUETA=daily ;;
-  informe)      NODO=TAREA; PRIORIDAD=p2; ETIQUETA=daily ;;
-  propuesta)    NODO=TAREA; PRIORIDAD=p2; ETIQUETA=propuesta ;;
-  observacion)  NODO=TAREA; PRIORIDAD=p4; ETIQUETA=observacion ;;
-  supuesto)     NODO=TAREA; PRIORIDAD=p2; ETIQUETA=supuesto ;;
+  bloqueo)      NODO=DUDA;       PRIORIDAD=p1; ETIQUETA=bloqueo ;;
+  confirmacion) NODO=DAILY_ITEM; PRIORIDAD=p2; ETIQUETA=$PARA_DECIR; RITUAL=$RITUAL_DE_LA_DAILY ;;
+  informe)      NODO=DAILY_ITEM; PRIORIDAD=p2; ETIQUETA=$PARA_DECIR; RITUAL=$RITUAL_DE_LA_DAILY ;;
+  propuesta)    NODO=TAREA;      PRIORIDAD=p2; ETIQUETA=propuesta ;;
+  observacion)  NODO=TAREA;      PRIORIDAD=p4; ETIQUETA=observacion ;;
+  supuesto)     NODO=TAREA;      PRIORIDAD=p2; ETIQUETA=supuesto ;;
   *) echo "tipo desconocido: $TIPO (bloqueo · confirmacion · informe · propuesta · observacion · supuesto)" >&2; exit 64 ;;
 esac
 [ -z "$PERSONA" ] || [ "$TIPO" = bloqueo ] || { echo "--persona solo va con bloqueo" >&2; exit 64; }
+# El ritual se resuelve antes de crear: si el área no lo declara, no queda un «para decir» suelto.
+RITUAL_ID=""
+[ -z "$RITUAL" ] || RITUAL_ID=$(nodo_de_ritual "$RITUAL")
 
 CUERPO=$(jq -nc --arg t "$NODO" --arg ti "$(fecha_hoy) · $TEXTO" --argjson pr "$(prioridad_api "$PRIORIDAD")" \
   --arg e "$ETIQUETA" --arg d "$DESCRIPCION" --arg v "$VENCE" \
@@ -48,7 +60,11 @@ CUERPO=$(jq -nc --arg t "$NODO" --arg ti "$(fecha_hoy) · $TEXTO" --argjson pr "
    + (if $d != "" then {descripcion: $d} else {} end)
    + (if $v != "" then {vence: $v} else {} end)')
 NUEVO=$(gr_crear "$CUERPO")
+NUEVO_ID=$(printf '%s' "$NUEVO" | jq -r .id)
 if [ -n "$PERSONA" ]; then
-  gr_conectar "$(printf '%s' "$NUEVO" | jq -r .id)" "$(nodo_id_o_crear PERSONA "$PERSONA")" ESPERA_RESPUESTA_DE > /dev/null
+  gr_conectar "$NUEVO_ID" "$(nodo_id_o_crear PERSONA "$PERSONA")" ESPERA_RESPUESTA_DE > /dev/null
+fi
+if [ -n "$RITUAL_ID" ]; then
+  gr_conectar "$NUEVO_ID" "$RITUAL_ID" EN_DAILY_DE > /dev/null
 fi
 printf '%s\n' "$NUEVO" | linea

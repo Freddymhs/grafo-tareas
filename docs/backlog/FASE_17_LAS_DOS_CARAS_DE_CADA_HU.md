@@ -151,7 +151,9 @@ voy a hacer en la aplicación web» (en Todoist era clic derecho → «Mover a»
   `siguienteFiltro`: el botón B recorre 1 → 2 → 3). API unit 23 (importador) · tsc 0; VR 122 tests · tsc 0 · lint 0. Build
   `index-XwwoaPKg.js` servido; **falta cargarlo en el visor** (dormido) y desplegar la API + reimportar TRABAJO para que las 10
   manuales lleven la etiqueta (los 5 trámites automáticos ya la tienen en producción)
-- [ ] Freddy lo prueba y se calibran los umbrales (`CURVATURA_ESTIRADO_MAXIMA`, el del pulgar, `SOSTENER_S`, el del hombro)
+- [ ] Freddy lo prueba y se calibran los umbrales (`CURVATURA_ESTIRADO_MAXIMA`, el del pulgar, `SOSTENER_S`, el del hombro;
+  desde el 2026-10-18 también `PELLIZCO_MAXIMO_M` y `PALMA_HACIA_LA_CARA_COSENO_MINIMO` del gesto de Meta, y el signo de la
+  normal de la palma: FASE 19 § Arreglos del visor). El 1 ya no es un número (es apuntar); ver todo = el número puesto otra vez
 
 ### Revisión: las 6 dudas abiertas de la HU 19565 (2026-10-18, agente Fable de solo lectura; pedido de Freddy: «sí, revísalo»)
 
