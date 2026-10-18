@@ -65,10 +65,17 @@
 - **Prisma 7 sacó `migrate diff --from-url`:** el comando falla con salida 1, que se confunde con «hay diferencias». Se compara con
   `--from-config-datasource --to-schema prisma/schema.prisma --exit-code` (0 = idénticos, 2 = difieren). *(Real 2026-10-18.)*
 - **`ref` vuelve ruta absoluta del PC todo valor con `/` y toda clave `dir`** (salvo las URL con `://`): una ruta del Mac Mini en `refs.yaml` sale apuntando al PC. Por eso `despliegue` guarda `app: grafo-tareas` y no la carpeta.
+- **Sin conexión, `curl -w '%{http_code}'` escribe `000`, y `printf '%s' "$(falla)"` sale 0 aunque haya `set -e`:** el adaptador
+  `grafo` solo tomaba como error un `≥ 400` e imprimía con `printf "$(gr_crear …)"`, así que con el Mac Mini apagado `pendiente` y
+  `tarjeta` respondían «creada» sin guardar nada. Éxito = `2??`, y el resultado se asigna a una variable antes de imprimirlo: dentro
+  de `$(…)` no aplica `set -e`, en la asignación sí. *(Real 2026-10-18, ensayo del corte; caso `api_caida_*` en `test_tablero.sh`.)*
+- **Una entidad que entra por dos caminos se desincroniza si cada camino tiene su regla:** `borrador` (FASE 5) se quedó sin la cara
+  PLAN, la ronda, el carril y la HU que el importador ganó en la FASE 17, y la vista Plan no veía sus piezas. La regla de la pieza
+  vive en `grafo-tareas.api/src/importadores/pieza.ts` y la usan los dos (el importador y `POST /piezas`). *(Real 2026-10-18.)*
 
 ## Lo que vive en este orquestador (además de los tres repos)
 
-- `bin/adapters/grafo/` — el adaptador `grafo` del contrato del tablero (PORTAR §El contrato del tablero), contra la API REST. Se prueba sin red: `bash bin/tests/test_tablero.sh` (31 casos con `TABLERO_FAKE`). Se enciende cambiando `tablero:` en `refs.yaml` (bloque comentado ahí); mientras diga `none`, exit 3.
+- `bin/adapters/grafo/` — el adaptador `grafo` del contrato del tablero (PORTAR §El contrato del tablero), contra la API REST. Se prueba sin red: `bash bin/tests/test_tablero.sh` (37 casos: 35 con `TABLERO_FAKE` y 2 de API caída contra un puerto cerrado). `borrador` llama a `POST /piezas`, así que necesita la API con esa ruta desplegada. Se enciende cambiando `tablero:` en `refs.yaml` (bloque comentado ahí); mientras diga `none`, exit 3.
 - `bin/probar-en-visor [--api]` — sirve la VR y la abre en el Quest por `adb reverse` (siempre vía `quest-despierto`). `--api` = el grafo real, contra la API desplegada (`despliegue.api`; `GRAFO_API_URL=http://localhost:3000` para la del PC); sin él, la prueba sintética de la FASE 1.
 - `docs/roles.yaml` + `docs/backlog/plantillas/` — los roles del área (C11, FASE 8), copia de `~/dotfiles/workspace-template/docs/` (lo que `nuevo-workspace` le da a un área nueva). Los leen `importar:fases` (`--roles`, por defecto éste) y la API (`ROLES_ARCHIVO`). Se validan con `python3 ~/dotfiles/tests/test_roles.py docs`.
 - **`bin/desplegar` + `deploy/compose.yml` (FASE 12) — producción en el Mac Mini:** API, Postgres, PWA y respaldo diario (`deploy/respaldos/`, 14 copias) en Docker, solo en `127.0.0.1`; afuera `tailscale serve` (API `:8443`, PWA `:10000`). Despliega el `main` **publicado** (aborta si algo va sin pushear), es idempotente y verifica health, CORS de `PATCH`, puertos y `restart`. Dónde corre lo dice `refs.yaml` → `despliegue` (ssh, app, api, web). **Ésa es la base de verdad**; la del PC es de desarrollo.

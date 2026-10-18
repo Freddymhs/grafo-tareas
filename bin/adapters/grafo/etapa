@@ -33,7 +33,8 @@ if [ -z "$NODO" ]; then
     echo "no hay tarjeta [$ID] abierta en el grafo; con --titulo la creo en «$NOMBRE»" >&2
     exit 4
   fi
-  printf '%s\tcreada en «%s»\n' "$(gr_crear "$NUEVO" | linea)" "$NOMBRE"
+  CREADA=$(gr_crear "$NUEVO" | linea)
+  printf '%s\tcreada en «%s»\n' "$CREADA" "$NOMBRE"
   exit 0
 fi
 

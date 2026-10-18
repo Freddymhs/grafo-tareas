@@ -10,9 +10,10 @@
 # Cómo se traduce cada tarjeta al grafo:
 #   pendiente  → nodo TAREA (DUDA si es `bloqueo`) con prioridad, UNA etiqueta y `vence`; con --persona,
 #                DUDA --ESPERA_RESPUESTA_DE--> PERSONA (se crea si falta)
-#   tarjeta    → TAREA `[<id>] <título>` en la primera etapa · etapa → PATCH etapa del nodo (`[<id>]` = TAREA
-#                por prefijo; `FASE n` = nodo FASE con ese título exacto, como los deja el importador)
-#   borrador   → TAREA en una RAMA llamada como el carril (PERTENECE_A), etiqueta `borrador`
+#   tarjeta    → TAREA `[<id>] <título>` en la primera etapa; si el plan ya tiene la pieza con ese id, ésa pasa a
+#                trabajo (C12: una tarjeta, no dos) · etapa → PATCH etapa del nodo (`[<id>]` = TAREA por prefijo;
+#                `FASE n` = el nodo FASE del importador)
+#   borrador   → `POST /piezas`: la API le aplica la regla de la pieza (cara PLAN, ronda, su HU y la RAMA del carril)
 #
 # Salida de toda operación: `<id>\t<titulo>` por línea. Error → exit ≠ 0 con el motivo por stderr.
 # TABLERO_FAKE=<dir> reemplaza la API por archivos JSON (nodos.json, conexiones.json): los tests corren sin red.
@@ -20,7 +21,6 @@ set -euo pipefail
 
 ORQ="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/../../../.." && pwd)"
 readonly ORQ
-readonly ETIQUETA_BORRADOR=borrador
 readonly LIMITE_LISTA=500
 
 # exit 1 falta la clave · 3 `tablero: none` (apagado a propósito: se dice por stderr y se sale con el mismo 3)
@@ -69,6 +69,8 @@ if [ -n "${TABLERO_FAKE:-}" ]; then
     jq -c --arg id "$1" '.[] | select(.id == $id)' "$FAKE_NODOS"
   }
   gr_conectar() { _fake_append "$FAKE_CONEXIONES" c "$(jq -nc --arg o "$1" --arg d "$2" --arg t "$3" '{origenId: $o, destinoId: $d, tipo: $t}')"; }
+  # Guarda lo pedido sin aplicar la regla de la pieza: ésa vive en la API y la prueban sus e2e (piezas.e2e-spec.ts).
+  gr_pieza() { gr_crear "$(jq -c '{tipo: "TAREA", cara: "PLAN", titulo, descripcion, carril}' <<<"$1")"; }
 else
   # ── la API real ────────────────────────────────────────────────────────────────────────────────
   API=$(cfg api)
@@ -79,10 +81,16 @@ else
     respuesta=$(curl -sS -w '\n%{http_code}' -X "$1" "$API$2" -H 'Content-Type: application/json' \
       ${TOKEN:+-H "Authorization: Bearer $TOKEN"} ${3:+--data "$3"})
     codigo=${respuesta##*$'\n'}; cuerpo=${respuesta%$'\n'*}
-    if [ "$codigo" -ge 400 ] 2>/dev/null || [ -z "$codigo" ]; then
-      echo "API $1 $2 → $codigo: $(printf '%s' "$cuerpo" | jq -r '.message // .' 2>/dev/null || printf '%s' "$cuerpo")" >&2
-      exit 1
-    fi
+    # Sin conexión curl igual escribe un código: 000. Solo un 2xx es éxito (con «≥ 400» el 000 pasaba y no se guardaba nada).
+    case "$codigo" in
+      2??) ;;
+      000 | '')
+        echo "API $1 $2 → sin conexión con $API" >&2
+        exit 1 ;;
+      *)
+        echo "API $1 $2 → $codigo: $(printf '%s' "$cuerpo" | jq -r '.message // .' 2>/dev/null || printf '%s' "$cuerpo")" >&2
+        exit 1 ;;
+    esac
     printf '%s\n' "$cuerpo" | jq -c '.data'
   }
   gr_listar() {
@@ -93,6 +101,7 @@ else
   gr_crear()    { _gr_curl POST "/nodos" "$1"; }
   gr_editar()   { _gr_curl PATCH "/nodos/$1" "$2"; }
   gr_conectar() { _gr_curl POST "/conexiones" "$(jq -nc --arg o "$1" --arg d "$2" --arg t "$3" '{origenId: $o, destinoId: $d, tipo: $t}')"; }
+  gr_pieza()    { _gr_curl POST "/piezas" "$1"; }
 fi
 
 # El nodo abierto cuyo título empieza con `<prefijo>` (`[25699]`): objeto JSON, o nada.

@@ -2,17 +2,31 @@
 # tarjeta — la TAREA `[<id>] <título>` de una task en el grafo, con la etiqueta del contrato, en la primera
 # etapa (`secciones.entendimiento`). Idempotente: si ya hay una `[<id>]` abierta no crea otra (nunca dos
 # por id). Lo pide /flow:pbi:get paso 7 y repartir al tomar una pieza.
+# Si el plan ya tiene la pieza con ese id en el título (`5️⃣ 🟢 [26309] …`), ésa ES la tarjeta (C12): pasa a trabajo
+# —cara REAL, primera etapa, la etiqueta del contrato y el título del contrato—, con el motivo en la bitácora.
 #
-#   tarjeta <id> <título corto>      → `<nodo_id>\t<titulo>\t<creada|existía>`
+#   tarjeta <id> <título corto>      → `<nodo_id>\t<titulo>\t<creada|existía|tomada>`
 set -euo pipefail
 source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
 ID="${1:?uso: tarjeta <id> <título>}"; TITULO="${2:?falta el título}"
+readonly MOTIVO_TOMADA="se toma la pieza: pasa a trabajo como la tarjeta de su task (C12)"
 
-EXISTENTE=$(nodo_por_prefijo "[$ID]" TAREA)
+CANDIDATAS=$(gr_listar "[$ID]" TAREA)
+EXISTENTE=$(jq -c --arg p "[$ID]" '[.[] | select(.cara != "PLAN" and (.titulo | startswith($p)))] | first // empty' <<<"$CANDIDATAS")
 if [ -n "$EXISTENTE" ]; then
   printf '%s\texistía\n' "$(printf '%s' "$EXISTENTE" | linea)"
   exit 0
 fi
-CUERPO=$(jq -nc --arg ti "[$ID] $TITULO" --arg et "$(cfg secciones.entendimiento)" --arg e "$(cfg label)" \
+ENTENDIMIENTO=$(cfg secciones.entendimiento); ETIQUETA=$(cfg label)
+PIEZA=$(jq -c --arg p "[$ID]" '[.[] | select(.cara == "PLAN" and (.titulo | contains($p)))] | first // empty' <<<"$CANDIDATAS")
+if [ -n "$PIEZA" ]; then
+  CAMBIOS=$(jq -c --arg ti "[$ID] $TITULO" --arg et "$ENTENDIMIENTO" --arg e "$ETIQUETA" --arg m "$MOTIVO_TOMADA" \
+    '{titulo: $ti, cara: "REAL", etapa: $et, etiquetas: ((.etiquetas // []) + [$e] | unique), motivo: $m}' <<<"$PIEZA")
+  TOMADA=$(gr_editar "$(jq -r .id <<<"$PIEZA")" "$CAMBIOS" | linea)
+  printf '%s\ttomada\n' "$TOMADA"
+  exit 0
+fi
+CUERPO=$(jq -nc --arg ti "[$ID] $TITULO" --arg et "$ENTENDIMIENTO" --arg e "$ETIQUETA" \
   '{tipo: "TAREA", titulo: $ti, etapa: $et, etiquetas: [$e]}')
-printf '%s\tcreada\n' "$(gr_crear "$CUERPO" | linea)"
+CREADA=$(gr_crear "$CUERPO" | linea)
+printf '%s\tcreada\n' "$CREADA"

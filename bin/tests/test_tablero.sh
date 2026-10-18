@@ -44,6 +44,12 @@ caso tarjeta_crea           "creada"                0 "$OP/tarjeta" 25699 "Feria
 caso tarjeta_en_entendimiento '"etapa":"ENTENDIMIENTO"' 0 bash -c "jq -c '.[] | select(.titulo | startswith(\"[25699]\"))' '$NODOS'"
 caso tarjeta_idempotente    "existía"               0 "$OP/tarjeta" 25699 "otro título"
 caso tarjeta_una_sola       "1"                     0 bash -c "jq '[.[] | select(.titulo | startswith(\"[25699]\"))] | length' '$NODOS'"
+# C12: la pieza del plan que ya lleva el id de su task es la misma tarjeta: al tomarla pasa a trabajo, no se crea otra.
+jq '. + [{id:"pz1", tipo:"TAREA", titulo:"5️⃣ 🟢 [26310] Avisos · por la cola", estado:"ABIERTO", cara:"PLAN", etapa:null, etiquetas:["pieza","ronda:5"]}]' "$NODOS" > "$NODOS.tmp" && mv "$NODOS.tmp" "$NODOS"
+caso tarjeta_toma_la_pieza  "tomada"                0 "$OP/tarjeta" 26310 "Avisos"
+caso tarjeta_pieza_a_trabajo '{"cara":"REAL","etapa":"ENTENDIMIENTO","titulo":"[26310] Avisos"}' 0 jq -c '.[] | select(.id == "pz1") | {cara, etapa, titulo}' "$NODOS"
+caso tarjeta_pieza_sin_otra '1'                     0 bash -c "jq '[.[] | select(.titulo | contains(\"[26310]\"))] | length' '$NODOS'"
+caso tarjeta_pieza_tomada_existe "existía"          0 "$OP/tarjeta" 26310 "Avisos"
 
 caso etapa_mueve            "movida a «EN CODIGO»"  0 "$OP/etapa" 25699 codigo
 caso etapa_ya_estaba        "ya estaba"             0 "$OP/etapa" 25699 codigo
@@ -61,10 +67,18 @@ caso etapa_fase_sin_duplicar   "2"                   0 bash -c "jq '[.[] | selec
 
 printf 'especificación\nde la pieza\n' > "$T/spec.md"
 caso borrador_crea          "2️⃣ 20379 · 3.1"       0 "$OP/borrador" "C · Recepción" "2️⃣ 20379 · 3.1 · Iniciar" --descripcion-archivo "$T/spec.md"
-caso borrador_en_rama       '"tipo":"RAMA","titulo":"C · Recepción"' 0 bash -c "jq -c '.[] | select(.tipo == \"RAMA\") | {tipo, titulo}' '$NODOS'"
-caso borrador_pertenece     'PERTENECE_A'           0 jq -c '.[-1]' "$CONEXIONES"
+# La regla de la pieza (cara PLAN, ronda, HU y carril) la aplica la API en POST /piezas, la misma del importador: el
+# adaptador le pasa el carril, el título y la especificación, y no la repite (el backend falso solo guarda lo pedido).
+caso borrador_pide_pieza    '{"cara":"PLAN","carril":"C · Recepción"}' 0 jq -c '.[-1] | {cara, carril}' "$NODOS"
 caso borrador_descripcion   'de la pieza'           0 jq -r '.[-1].descripcion' "$NODOS"
+caso borrador_sin_spec      "falta --descripcion-archivo" 64 "$OP/borrador" "C · Recepción" "x"
 caso borrador_archivo_malo  "no existe"             1 "$OP/borrador" "A" "x" --descripcion-archivo "$T/nada.md"
+
+# Sin conexión con la API (el Mac Mini apagado), contra la API de verdad y no la falsa: curl escribe el código 000, y
+# eso no puede pasar por éxito. Real 2026-10-18, ensayo del corte: pendiente y tarjeta salían 0 sin haber guardado nada.
+sed -i 's#^  api: .*#  api: http://127.0.0.1:9/api/v1#' "$T/orq/refs.yaml"
+caso api_caida_pendiente    "sin conexión"          1 env -u TABLERO_FAKE "$OP/pendiente" informe "x"
+caso api_caida_tarjeta      "sin conexión"          1 env -u TABLERO_FAKE "$OP/tarjeta" 99903 "x"
 
 # `tablero: none` apaga todo el adaptador: ref sale 3 y el script no llega a la API.
 printf 'tablero: none\n' > "$T/orq/refs.yaml"
