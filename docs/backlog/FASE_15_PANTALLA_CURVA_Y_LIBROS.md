@@ -77,6 +77,21 @@ a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja un
   fondo. Unit 4 (rojo probado) + e2e. En producción: la familia de la HU 19565 son 90 nodos
 - [ ] Freddy lo prueba en el visor
 
+### Tarea 9: «Sin HU» con la misma regla que las HU
+- [x] 2026-10-17, api `d53bd25` (desplegada): toda página trae lo suyo y lo que eso necesita, a un salto. Antes, la tarjeta de cierres
+  pendientes en Azure llegaba a «Sin HU» con 3 de sus 18 hijas (las otras viven en su HU) y Freddy no entendía la relación. Ahora
+  «Sin HU» tiene 69 nodos (53 + las hijas invitadas). Unit + e2e 44/44
+- [x] vr (commit de `separarNuevas`): lo que llega a una página guardada (nuevo o invitado) se separa con el choque de celdas sin mover
+  lo guardado; las 15 hijas ya no caen encima de la madre. Test
+- [ ] Freddy lo ve en el visor (desconectado al desplegar: `offline`)
+
+### Tarea 10: todo nodo tiene fecha, y lo suelto se ordena por ella
+- [x] 2026-10-18, api `2cf86e7` (migración `fecha_origen` NOT NULL, aprobada por Freddy) + vr `d1afdad`: la fecha de origen de cada
+  nodo es la de creación de su tarjeta en Todoist (`added_at`) o, si no la trae, la de creación acá; reimportado (fechas reales del
+  13-09 al 17-10). La grilla de sueltas va de la más antigua a la más reciente; solo las **tareas sin padre** muestran «14-oct · …»
+  (Freddy: «la fecha en todo sería ruido»), sin repetirla si el título ya la trae
+- [ ] Freddy lo ve en el visor
+
 ### Tarea 6: marcar lo mergeado
 - [ ] Pedido de Freddy 2026-10-17: un botón en la fila de arriba que distinga lo ya mergeado (y ver qué le falta: URL commit, avisar a
   Thomas, compartir con el front). Qué es «mergeado» lo decide la API — **a confirmar con Freddy** (¿columna «Pull Request» / APROBADO?
