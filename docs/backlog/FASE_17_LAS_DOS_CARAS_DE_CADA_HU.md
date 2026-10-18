@@ -239,6 +239,16 @@ se cierra solo al tildar su cierre. Nada se descarta sin el «sí» de Freddy, u
   `grafo-2026-10-18_1721.dump` + `importar:fases --adoptar todoist` (15 adoptadas). Resultado: 35 FASE, todas del `.md` y con
   etapa; reimportar TRABAJO y el Draft en seco → 0 nuevos; «Sin etapa» 50 → 35 (0 FASE), «Sin HU» 72 → 57. Las 35 que quedan son
   notas de TRABAJO sin sección: las clasifica la FASE 18
+- [x] 2026-10-18, Freddy revisando la HU 19565 («¿por qué tantas en Sin etapa y en ENTENDIMIENTO?»). Medido: su trabajo de
+  producto está cerrado; lo abierto es Sonar (calidad) y papeleo. ENTENDIMIENTO tenía 10, de las que **8 eran trámites** («falta
+  URL commit y Evidencias») puestos ahí solo por su sección de Todoist. Idea de Freddy: una columna **a la derecha de CERRADO**
+  para lo que falta después de cerrar → api `9facc07`: etapa `TRÁMITES DE CIERRE` (después de CERRADO); un trámite va ahí sea
+  cual sea su sección (importador de Todoist y trámites de las FASE; rojo probado en los dos). web `66c804c`: «Sin etapa» pasa a
+  «Sin columna» y dice qué son. Reimportado: HU 19565 → TRÁMITES DE CIERRE 10 · ENTENDIMIENTO 2 · Sin columna 5. La 26750
+  (Sonar api.solicitudes, hija de la 19565 en Azure, todavía sin FASE) estaba suelta: colgada de su HU y con la etiqueta
+  `calidad` (PATCH con motivo); aparece en Calidad → ENTENDIMIENTO. Propuesto, sin hacer: (a) que el importador cuelgue toda
+  tarjeta `[id]` de su HU por el padre en Azure, aunque no tenga FASE todavía; (b) que la tarjeta de una FASE mergeada no se
+  muestre antes de APROBADO (hoy hay 7 en TESTEADO / LISTO PARA PR / Pull Request con su FASE ya mergeada: Todoist no se movió)
 
 ## Decisiones del agente (para revisar al leer)
 
