@@ -75,14 +75,19 @@
     },
     "FASE_15": {
       "status": "in_progress",
-      "tasks": 7,
+      "tasks": 9,
       "total": 10
     },
     "FASE_16": {
       "status": "in_progress",
       "tasks": 3,
       "total": 4
+    },
+    "FASE_17": {
+      "status": "in_progress",
+      "tasks": 4,
+      "total": 7
     }
   },
-  "updated_at": "2026-10-17"
+  "updated_at": "2026-10-18"
 }

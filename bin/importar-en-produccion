@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # importar-en-produccion — corre los importadores de la API contra la base DESPLEGADA (FASE 12), no la del PC.
 #
-#   importar-en-produccion todoist --proyecto <id-de-todoist> [--seco]
+#   importar-en-produccion todoist --proyecto <id-de-todoist> [--seco]   (el `todoist.plan` del refs.yaml entra como plan)
 #   importar-en-produccion fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco]
 #
 # todoist: el token viaja por stdin (sale de ~/.zsh_secrets; nunca en una línea de comandos ni en el Mac Mini).
@@ -33,8 +33,12 @@ importar_todoist() {
     shift
   done
   [ -n "$proyecto" ] || falla "$USO"
+  # FASE 17: el proyecto del plan («🚀 Draft trabajo») lo dice el refs.yaml, para no depender de acordarse de un flag.
+  local cara=REAL
+  if [ "$proyecto" = "$(REF_DESDE="$ORQ" ref todoist.plan 2>/dev/null || true)" ]; then cara=PLAN; fi
+  echo "importar-en-produccion: proyecto $proyecto → cara $cara" >&2
   bash -c 'set +u; source ~/.zsh_secrets >/dev/null 2>&1; printf "%s\n" "${TODOIST_API_KEY:-}"' |
-    remoto "read -r TODOIST_API_KEY; [ -n \"\$TODOIST_API_KEY\" ] || { echo 'sin TODOIST_API_KEY en ~/.zsh_secrets del PC' >&2; exit 1; }; export TODOIST_API_KEY; docker compose exec -T -e TODOIST_API_KEY api node dist/importadores/todoist/cli.js --proyecto '$proyecto' $seco"
+    remoto "read -r TODOIST_API_KEY; [ -n \"\$TODOIST_API_KEY\" ] || { echo 'sin TODOIST_API_KEY en ~/.zsh_secrets del PC' >&2; exit 1; }; export TODOIST_API_KEY; docker compose exec -T -e TODOIST_API_KEY api node dist/importadores/todoist/cli.js --proyecto '$proyecto' --cara $cara $seco"
 }
 
 # FASE 13: el mapa task → HU (y el título de cada HU) sale del TRACKER del orquestador, con su propio adaptador y solo

@@ -47,6 +47,7 @@ origen (negocio o código) y su escalera de personas (refs.yaml). Al contestarse
 ## QA
 
 - [ ] Listo para PR
+- [ ] Mergeado
 - [ ] Desplegado
 - [ ] Explicado
 

@@ -43,6 +43,7 @@ origen (negocio o código) y su escalera de personas (refs.yaml). Al contestarse
 - [ ] Colección
 - [ ] Auditoría
 - [ ] Listo para PR
+- [ ] Mergeado
 
 ## Cierre oficial en Azure
 

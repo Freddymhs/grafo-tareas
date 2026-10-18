@@ -43,7 +43,12 @@ a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja un
   todavía no
 
 ### Tarea 3: qué es trámite (importador)
-- [ ] Marcar como trámite las tarjetas de cierre («falta URL commit / Evidencias / wiki»). **Espera la pregunta 2**
+- [x] 2026-10-18, en Changes (api): el importador de Todoist marca con `complemento:tramite` las tarjetas que hablan del cierre
+  oficial (`PATRON_TRAMITE`: «URL commit», «Evidencias», «editar/actualizar la wiki»; medido en producción 12 de 144, 0 falsos),
+  solo si el catálogo del área tiene el complemento. La VR no las oculta de entrada: las apaga el **dedo 3** («pendiente sin
+  trámites», FASE 17 tarea 7), porque Freddy prefirió un lente a un botón. Falta desplegar y reimportar TRABAJO
+- [x] Marcar como trámite las tarjetas de cierre («falta URL commit / Evidencias / wiki»). Pregunta 1 contestada por Freddy el
+  2026-10-18: son «más un estorbo y carga cognitiva que datos valiosos» → se marcan y se apagan con un filtro
 
 ### Tarea 4: la VR muestra una página
 - [x] 2026-10-17, vr `876356b`: la página al frente (`aberturaPara`: 180°, más si no cabe, hasta 270°); cada página guarda su acomodo
@@ -93,14 +98,15 @@ a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja un
 - [ ] Freddy lo ve en el visor
 
 ### Tarea 6: marcar lo mergeado
-- [ ] Pedido de Freddy 2026-10-17: un botón en la fila de arriba que distinga lo ya mergeado (y ver qué le falta: URL commit, avisar a
+- [x] Resuelta 2026-10-18 en la FASE 17 (tarea 6): mergeado = la casilla `Mergeado` de la FASE, que tilda Freddy; la VR la muestra
+  con un anillo. Lo de «qué le falta» (URL commit, avisar, compartir) sigue en sus casillas y en los trámites
+- [x] Pedido de Freddy 2026-10-17: un botón en la fila de arriba que distinga lo ya mergeado (y ver qué le falta: URL commit, avisar a
   Thomas, compartir con el front). Qué es «mergeado» lo decide la API — **a confirmar con Freddy** (¿columna «Pull Request» / APROBADO?
   ¿«mergeado» en el título?)
 
 ## Preguntas para Freddy (abiertas)
 
-1. **Trámites:** ¿el importador marca como trámite las tarjetas «falta URL commit / Evidencias / wiki», y la página las oculta de
-   entrada con un botón para verlas?
+1. **Trámites:** ✅ cerrada 2026-10-18 (tarea 3): se marcan como trámite y el dedo 3 las apaga; sin botón.
 2. **Mergeado (tarea 6):** ¿qué cuenta como mergeado? Freddy: «no hay un hook que lo detecte». Pista (2026-10-17): las subtareas de la tarjeta «🟣 Azure · lo hacés vos…» son justo lo mergeado sin cierre, y sus títulos lo dicen. Sin decidir
 
 Cerradas 2026-10-17: el contenido de una página (HU + FASE + tarjetas + piezas + lo que las bloquea) y la página «Sin HU» («me agrada

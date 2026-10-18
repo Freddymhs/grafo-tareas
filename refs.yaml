@@ -16,6 +16,9 @@ despliegue:                            # FASE 12: dónde corre el grafo. La leen
   app: grafo-tareas                    # vive en ~/apps/<app> del Mac Mini (convención de su ~/CLAUDE.md)
   api: https://mac-mini-server.tail1798c7.ts.net:8443    # tailscale serve → 127.0.0.1:3007
   web: https://mac-mini-server.tail1798c7.ts.net:10000   # tailscale serve → 127.0.0.1:3008
+todoist:                               # los proyectos que se importan (FASE 17). La lee bin/importar-en-produccion
+  trabajo: 6VhFQg6v45qcJHPc            # TRABAJO: lo real
+  plan: 6P4h8Wp2pW59Fq2x               # 🚀 Draft trabajo: el plan de cada HU (/flow:brechas + /flow:pbi:repartir) → --cara PLAN
 docs: { dir: docs }
 repos: {}                              # los gates (typecheck/lint/test) por repo se llenan tras inspeccionar cada plantilla en new-project
 

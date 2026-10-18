@@ -290,6 +290,29 @@ Copiar funciones de Todoist · multiusuario · móvil nativo · sincronización 
 producción:** el backend NO tiene las HU, ni el Draft, ni el enganche tarjeta `[id]` ↔ FASE (48 de 85 tareas abiertas sueltas; en la
 VR, puntos grises sin forma). Todo lo que falta está escrito en formatos fijos que los comandos de Freddy ya producen: se **lee**, no se inventa.
 
+## Preguntas del producto desde el visor (2026-10-18)
+
+**Cerradas por Freddy el 2026-10-18, con lo que decidió:**
+
+- **Tarjetas «resueltas» que seguían abiertas:** se cierran solo con evidencia. Verificadas las 3 (`docs/backlog/FASE_16_PULIR_EN_EL_GRAFO.md`
+  §Verificación) y cerradas en el grafo con la evidencia en el motivo. El alcance del SAG es **solo Agrícola** por ahora.
+
+- **El estado vivirá en la base, no en el `.md`:** cuando se mueva desde la interfaz (o algún día la VR), se actualiza la base; la FASE
+  guarda la intención, el cómo y el porqué. Hoy APROBADO (Todoist) y la casilla `Mergeado` conviven.
+- **Lo que falta para cerrar se lee de la FASE:** los 5 duplicados «falta URL commit» (FASE 22, 32, 33, 34, 35) quedaron descartados
+  en el grafo. Le gusta la tarjeta madre que agrupa las tareas repetitivas (no ligada a una FASE) más que meterlas en la HU.
+- **Ver el sprint en la VR** (la iteración del PBI y sus fechas, leídas de Azure solo con GET): para ordenarse y proponer en la daily.
+  El grafo es extensión de memoria; no reemplaza decisiones. → próxima FASE.
+- **Reconciliar el Draft con lo que hizo otro es a mano y responsabilidad de Freddy:** el flujo quedó escrito en su `ah -e`
+  (`~/Desktop/automatizandosag.md`, sección «reconciliar el draft…»). Pendiente: un comando que haga los pasos 2 y 3 de una vez.
+- **Los colores agrupan, no son dependencias:** 🔵 Unidades organizacionales, 🟢 Recepción, 🟠 Feriados y 🟣 Sonar quedaron nombrados
+  en el grafo; el 🟡 se descartó como rama (era la marca de estado «en curso» de los docs del Laboratorio).
+- **Filtros 3 y 4 por personas:** «lo que espero de otros» y «lo que otros esperan de mí». → próxima FASE.
+- **El visor solo mira, por ahora:** se opera desde el clon de Todoist (la PWA, que edita el backend), no desde Todoist; la VR es para
+  comprender, aprender y presentar en la daily. Salir de Todoist va al final, por riesgo (dirección de largo plazo, sin fecha): lo
+  repetitivo (URL commit, evidencias) como nodos del backend; mover tarjetas en la web podría reemplazar algunos comandos.
+- **La VR abre donde se dejó** (la última HU y su cara, en el navegador del visor; `?pagina=` manda si se pide). Hecho.
+
 ## Para confirmar
 
 - **C12 — ✅ CONFIRMADO por Freddy 2026-10-17 («sí, constrúyelo»), construido en la FASE 13:** (1) HU = PBI, un nivel; debajo Tasks; FASE = Task — `Laboratorio/docs/referencia/equipo-y-proceso.md` § Vocabulario (verificado en Azure el 2026-09-13). (2) Tarjeta y FASE = la misma task vista dos veces; la tarjeta `PERTENECE_A` su FASE (D10 las marca a las dos). (3) La pieza es la misma tarjeta que pasa a TRABAJO (`/flow:pbi:repartir` §5) → un nodo. Reglas en `docs/backlog/FASE_13_EL_ARBOL_HU_PIEZA_TASK.md`. Lo original: (1) ¿19565 es una HU o un PBI, y 24972 (la de la FASE 10) es un PBI o una
@@ -322,31 +345,54 @@ VR, puntos grises sin forma). Todo lo que falta está escrito en formatos fijos 
 ## Prompt para retomar (pegarlo tal cual en una sesión nueva o después de /compact)
 
 ```text
-Retomamos grafo-tareas y el método portable (ignorar lo de juegos del Quest). Antes de hacer nada, leé entero
-~/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/docs/_CONCEPTO.md (§ Pareto, § Estado — lo del 2026-10-17 —
-y § Para confirmar: C10 y C11), después docs/backlog/README.md, FASE_5_ADAPTADOR_GRAFO_Y_CORTE.md (D10 y el plan
-del corte) y el CLAUDE.md del orquestador (§ Lo que vive en este orquestador y § Trampas). Esa es la única fuente.
+Retomamos grafo-tareas (ignorar lo de juegos del Quest). Antes de hacer nada, leé entero
+~/Volumes/Extended/github/DEVELOPMENT/grafo-tareas/docs/_CONCEPTO.md (§ Preguntas del producto desde el visor, § Estado,
+§ Para confirmar), docs/backlog/README.md, docs/backlog/FASE_17_LAS_DOS_CARAS_DE_CADA_HU.md (la última, 4/7),
+FASE_16_PULIR_EN_EL_GRAFO.md y el CLAUDE.md del orquestador (§ Trampas y § Lo que vive en este orquestador). Esa es la
+fuente; la memoria (project-plataforma-tareas-3d, feedback-vr-interfaz-lecciones, feedback-cerrar-solo-con-evidencia,
+feedback-mergeado-se-tilda, feedback-decidir-y-declarar-no-preguntar) solo apunta.
 
-Reglas: no re-decidir nada ya decidido (Stack, C1-C11, D1-D10); si algo choca, lo marco y pregunto. Método:
-/work:backlog:next → /work:backlog:review → /work:sellar:run; commits los corre Freddy salvo «hazlo»; pushear es
-publicar → preguntar. Instaladores → confirmar. Reglas globales (~/.claude/CLAUDE.md): sin let, sin any, SSOT,
-read-before-write, todo chequeo tiene que poder fallar. pnpm = npx -y pnpm@10.34.7. Bash para scripts (zsh no
-parte variables). Nunca pkill -f.
+Reglas de Freddy: en diseño/UX no preguntar, decidir y anotar «Decisiones del agente»; preguntar solo hechos de sus datos y
+el «sí» de migraciones/descartes. La VR es un VISOR (la API decide qué es cada cosa). Se pule SOLO en el grafo (descartar o
+PATCH con motivo ≤ 500 car., quedan en la bitácora); Todoist no se toca. Azure solo GET. «Mergeado» lo tilda Freddy
+(fase-tildar <n> mergeado); no proponer detectores. Una tarjeta «resuelta» se cierra solo con evidencia citada. Todo
+gesto con la mano a la altura del hombro. Cada cambio de la VR se le muestra en el visor (no solo tests). Si se reparte
+trabajo, agentes Fable con brief cerrado y revisión del orquestador. Commits: los corre Freddy salvo que lo pida; desplegar
+= commit + push + bin/desplegar (aplica migraciones: pedir el «sí»). Globales: sin let, sin any, SSOT, todo chequeo tiene
+que poder fallar (probar el rojo). pnpm = npx -y pnpm@10.34.7; bash para scripts; nunca pkill -f.
 
-Estado (2026-10-17, tarde-noche): FASE 1-4, 6-11 ✅, FASE 12 (despliegue) 4/5, FASE 5 2/3. Todo pusheado.
-**Producción en el Mac Mini (FASE 12):** PWA https://mac-mini-server.tail1798c7.ts.net:10000 · API :8443, Postgres en
-Docker (no Neon: Freddy 2026-10-17), datos del PC migrados (214 · 137), respaldo diario en ~/apps/grafo-tareas/deploy/
-respaldos. ESA es la base de verdad; la del PC (bin/dev, bin/servir-tailnet) es de desarrollo. Desplegar = pushear +
-bin/desplegar (idempotente; dónde corre = refs.yaml → despliegue). ~/bin/claude-bifurcar sin commitear (Freddy:
-«olvídate de bifurcar»); dotfiles claude/metodo.md y claude/settings.json NO son míos.
+Estado (2026-10-18): API en producción `473897e` (FASE 17: Nodo.cara REAL|PLAN, páginas real+plan, etiqueta `mergeada`
+desde la casilla de la FASE). Producción: 215 nodos · contraste 216 (203 iguales · 6 editados · 7 descartados). La VR
+NO se despliega: la sirve el PC al Quest (bin/probar-en-visor --api; recargar: node bin/lib/recargar-visor.mjs 9333
+http://localhost:4173 <index-*.js>; entrar: node bin/lib/entrar-vr.mjs <url>; ver: ~/bin/quest-despierto -- ~/bin/quest-ver
+<jpg>; tras reconectar adb: adb reverse tcp:4173 tcp:4173). Hecho en la VR: dos caras (mano izquierda abierta que sube /
+pestaña / stick), pestaña con esquina ámbar, leyenda por página, filtro con los dedos de la mano derecha (1 índice = todo,
+2 índice+medio = pendiente; un hilo brilla si lleva a algo pendiente), abre en la última HU/cara, fix de <Instances>
+(20 → 68 FPS). Sellado con /work:sellar:run (todo verde): staged CLAUDE.md del orquestador y README de ~/bin; SIN
+COMMITEAR: VR (src, e2e), orquestador (bin/importar-en-produccion, bin/lib/entrar-vr.mjs, refs.yaml, docs/), ~/bin/fase-tildar,
+~/.claude/commands (flow/tildar.md, work/resume/new-concept.md), Laboratorio (35 FASE con la casilla Mergeado + fases.html +
+calidad.html; FASE 18, 30, 33, 34, 35 traían cambios de otra sesión).
+
+AL RETOMAR (2026-10-18, cierre por cuota) — hecho ese día: API `0dbfbb9` desplegada (tarjetas de cierre = trámite; dedo 3
+«pendiente sin trámites» en la VR, build index-XwwoaPKg.js); 16 tarjetas nuevas de TRABAJO importadas; 20 tarjetas descartadas
+con cita (FASE_16 §Pasada del dedo 3); reconciliación del Draft de la HU 20379 COMPLETA: brechas
+`Brechas/Laboratorio/20379-dashboard-recepcion-2026-10-18.md`, reparto `Brechas/Laboratorio/20379-reparto-2026-10-18/` (12 piezas +
+task-25325/26309/26311; su README dice qué quedó flojo), Draft de Todoist reescrito y cara plan reimportada (12 nodos). Subagentes:
+Fable u Opus, NUNCA Sonnet (memoria feedback-evitar-subagentes-costosos).
+Sellado HECHO (2026-10-18 tarde): los 7 repos (grafo-tareas, grafo-tareas.vr, ~/bin, ~/.claude/commands, Laboratorio, Brechas,
+~/dotfiles) con todo stageado y su mensaje en `/tmp/commit-<repo>.txt`; los commits los corre Freddy. Re-auditoría de los 20 descartes
+hecha: 9 restaurados (perdían información), quedan 11 (FASE_16). Sin subagentes de acá en adelante (memoria).
+Pendiente de Freddy: commitear los 7; crear en Azure las 4 tasks del README del reparto; pasar task-26311.md a Thomas; decidir si
+pega task-25325.md en su tarjeta; el «sí» para cerrar las dudas 1, 2, 4 y 6 de la 19565 (FASE_17 §Revisión de las 6 dudas); y si
+arregla `~/bin/claude-bifurcar:46` (fallback que no corre con pipefail; arreglo: `|| true` dentro del `$(...)`).
 
 Siguiente, en orden:
-1. El corte (FASE 5 tarea 2, Freddy: «después del deploy» → ya se puede): tablero.kind: grafo con api = despliegue.api +
-   /api/v1, en este orquestador y en el Laboratorio (con su bloque escalera), según el plan de FASE_5 (D10).
-2. Lo de Freddy: abrir la PWA del Mac Mini en el teléfono e instalarla (FASE 12 c1), 2 monitores en Uptime Kuma
-   (FASE 12 t5, pide su contraseña), FPS en el visor (FASE 6-7: bin/probar-en-visor --api --abrir), usar la PWA una
-   semana (FASE 4 c1), tildar «Listo para PR» en las FASE 23-30 del Laboratorio.
-Abierto con Freddy: C10, si «funcional» es el nombre oficial de Producto, Neon (N1), instalador de un comando para el
-método (y probarlo en Mac/WSL), detectar el PR desde Azure.
-Contexto personal: memoria project-evaluacion1-fabian (evaluación 2 ~22-24 oct → indefinido).
+1. Freddy prueba los gestos con ?depurar y se calibran (umbrales en lib/conteo-dedos.ts, pose-mano.ts, gesto-voltear.ts).
+2. Freddy commitea/pushea lo de arriba (o pide «hazlo»).
+3. Próxima FASE (decidida en § Preguntas del producto): ver el sprint en la VR (iteración del PBI y fechas, Azure GET),
+   filtros 3 y 4 por personas («lo que espero de otros» / «lo que otros esperan de mí»), la tarjeta madre de tareas
+   repetitivas, y un comando que reconcilie el Draft con lo hecho (el flujo manual ya está en ~/Desktop/automatizandosag.md).
+4. Hay 16 tarjetas nuevas en TRABAJO sin importar (bin/importar-en-produccion todoist --proyecto 6VhFQg6v45qcJHPc --seco primero).
+5. FASE 16: el reporte final Todoist ↔ grafo; FASE 15 tarea 3 (trámites). El corte de Todoist (FASE 5) sigue PAUSADO hasta su «corta».
+Alcance del SAG: solo Agrícola. Contexto personal: memoria project-evaluacion1-fabian.
 ```
