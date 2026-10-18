@@ -65,6 +65,18 @@ a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja un
 - [ ] Calibración 2 — en curso: los primeros 16 s de la segunda grabación dan 7 cambios (`+ + − − + + +`); falta que Freddy diga cuáles
   quiso hacer
 
+### Tarea 7: más texto donde hay espacio
+- [x] 2026-10-17, vr `6fc9b9b`: `lineasPara` — cada página elige 2, 3 o 4 líneas por etiqueta según su espacio;
+  `medidasEtiqueta(lineas)` da texto, celda y letras (SSOT del acomodo y del dibujo). Test: con 4 líneas no se pisan textos. Producción
+  re-acomodada por página. «Sin HU» (53 nodos) sube a 4 líneas; la HU 19565 (98) queda en 2 (ahí se lee apuntando)
+- [ ] Freddy lo ve en el visor (se desconectó de adb: `offline`, probablemente dormido)
+
+### Tarea 8: al seleccionar, iluminar la familia
+- [x] 2026-10-17, api `640486d` (desplegada) + vr `6fc9b9b`: `GET /nodos/:id/familia` = el nodo, lo que cuelga de él (el mismo árbol
+  de las páginas, `arbol.ts` compartido) y con qué se conecta directo; la VR ilumina eso (color y líneas) y hunde lo demás hacia el
+  fondo. Unit 4 (rojo probado) + e2e. En producción: la familia de la HU 19565 son 90 nodos
+- [ ] Freddy lo prueba en el visor
+
 ### Tarea 6: marcar lo mergeado
 - [ ] Pedido de Freddy 2026-10-17: un botón en la fila de arriba que distinga lo ya mergeado (y ver qué le falta: URL commit, avisar a
   Thomas, compartir con el front). Qué es «mergeado» lo decide la API — **a confirmar con Freddy** (¿columna «Pull Request» / APROBADO?
@@ -74,7 +86,7 @@ a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja un
 
 1. **Trámites:** ¿el importador marca como trámite las tarjetas «falta URL commit / Evidencias / wiki», y la página las oculta de
    entrada con un botón para verlas?
-2. **Mergeado (tarea 6):** ¿qué cuenta como mergeado?
+2. **Mergeado (tarea 6):** ¿qué cuenta como mergeado? Freddy: «no hay un hook que lo detecte». Pista (2026-10-17): las subtareas de la tarjeta «🟣 Azure · lo hacés vos…» son justo lo mergeado sin cierre, y sus títulos lo dicen. Sin decidir
 
 Cerradas 2026-10-17: el contenido de una página (HU + FASE + tarjetas + piezas + lo que las bloquea) y la página «Sin HU» («me agrada
 todo eso»).
