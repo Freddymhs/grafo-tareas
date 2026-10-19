@@ -233,6 +233,26 @@ del arreglo: `git -C grafo-tareas.vr show 19aa13c:src/<archivo>`). Lo arreglado,
 - ✅ **Lista B, puntos 21-25** (con sus respuestas): 21 propuesta con su explicación · 22 cerrada (ya la revisó) · 23 p1, vence
   19-10 · 24 propuesta, para Fabián · 25 observación con su idea. Cada edición con motivo en la bitácora.
 
+### Freddy, 2026-10-19: las acciones de todos los días, en uno o dos clics (idea, sin pulir)
+
+> «las cosas específicas que yo voy a usar día a día van a ser bastante repetitivas… podríamos tener como ajustes
+> preconfigurados… pero es como una idea por si acaso. Aún hay que pulirlo»
+
+Hoy la API las permite todas, pero como piezas sueltas: crear el nodo y después cada conexión por separado. En la web,
+algunas no se pueden hacer. Medido el 19-10:
+
+| acción | API hoy | web hoy | lo que falta |
+|---|---|---|---|
+| **Crear un bloqueante para una persona**: la duda, a quién espera, qué frena y de quién es | 3-4 llamadas (nodo, `ESPERA_RESPUESTA_DE`, `BLOQUEADA_POR`, `PERTENECE_A`) | crear y después conectar a mano en el detalle | una acción que pida las tres cosas juntas. **El dueño es obligatorio**: sin él la duda cae en «Sin HU» (pasó el 19-10 con una duda para Thomas) |
+| **Cerrar una duda con su respuesta** | `PATCH estado` con `motivo` (≤ 500) | «Cerrar» **no pide motivo** y la respuesta no queda | pedir la respuesta al cerrar una duda: ese motivo es lo que la VR muestra como «Contestada el…» |
+| **Tomar una pieza del plan y darle su PBI** | `PATCH cara` + editar el título, sacar la etiqueta `por-crear` | «Mover a Trabajo» sí; el título y las etiquetas, no | una acción «tomar» que pida el id de la task y deje el título `[id] …` |
+| **Crear una persona** | `POST /nodos` tipo PERSONA | sí, eligiendo el tipo PERSONA | nada |
+| **Completar una FASE (mergeada)** | la deja el importador desde `FASE_n.md` | solo lectura (D10) | nada en la web: se tilda en la FASE (`/flow:tildar`) y se importa |
+
+La regla que ya quedó (19-10, API `b8b3be3`): **una duda se muestra en la cara de quien es dueña**, su `PERTENECE_A`. Si es
+de las dos caras, gana lo real, y lo que frena a la otra cara se ve como la pieza de la que se depende. Lo que puede
+volver a fallar es crear una duda sin dueño, y eso lo resuelve la primera fila.
+
 ## El arreglo (para aprobar)
 
 - **`fase-tildar`**, después de tildar, llama al mismo `fase-tilde.sh` con el JSON de un `Edit` sobre esa FASE. Así la regla
