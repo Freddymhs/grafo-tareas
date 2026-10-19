@@ -122,6 +122,7 @@ roles:
 complementos:
   duda-negocio:   { nombre: Duda de negocio, nodo: DUDA, escalera: negocio }
   duda-codigo:    { nombre: Duda de código, nodo: DUDA, escalera: codigo }
+  espera:         { nombre: Esperando a otro (ya pedido), nodo: DUDA }
   dolor:          { nombre: Dolor (PBI vs código), nodo: TAREA, accionable: false }
   supuesto:       { nombre: Supuesto, nodo: TAREA, accionable: false }
   decision:       { nombre: Decisión, nodo: TAREA, accionable: false }

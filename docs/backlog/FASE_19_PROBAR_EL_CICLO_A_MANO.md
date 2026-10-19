@@ -248,6 +248,16 @@ algunas no se pueden hacer. Medido el 19-10:
 | **Tomar una pieza del plan y darle su PBI** | `PATCH cara` + editar el título, sacar la etiqueta `por-crear` | «Mover a Trabajo» sí; el título y las etiquetas, no | una acción «tomar» que pida el id de la task y deje el título `[id] …` |
 | **Crear una persona** | `POST /nodos` tipo PERSONA | sí, eligiendo el tipo PERSONA | nada |
 | **Completar una FASE (mergeada)** | la deja el importador desde `FASE_n.md` | solo lectura (D10) | nada en la web. Al tildar «Mergeado», el hook `fase-tilde` mueve la tarjeta a APROBADO solo; el cierre y la marca `mergeada` llegan recién al importar (`bin/importar-en-produccion fases`, a mano). Idea de Freddy: que su comando de cierre corra también la importación |
+| **Marcar lo que ya pedí y espera a otro** (que entregue o valide) | el complemento `espera` de `roles.yaml`: una DUDA con la etiqueta `complemento:espera` | ✅ **hecho el 19-10**: la casilla «Ya lo pedí: queda esperando» al agregar un bloqueante, y en una duda abierta el botón «Ya lo pedí: ⏳ esperando» (y «Ya no espera»). Se ve con ⏳ | nada. En la VR se lee «espera ·» delante, porque la fuente 3D no tiene ⏳, y la leyenda dice «N esperando a otros» aparte de las abiertas |
+
+**Freddy, 2026-10-19, lo que dio origen a la última fila:** *«yo le pedía… un archivo Excel… el laboratorio y su comuna
+correspondiente, pero no me lo ha pasado todavía y eso es algo que se me va a olvidar… la acción de pedirle, que era una tarea,
+yo ya la hice. Ahora me falta que él… me entregue la información. Ese debería ser otro tipo de cosa que considerar en el grafo»*.
+Decisiones del agente:
+- **Es un complemento del catálogo, no un tipo nuevo.** Va como DUDA, así que frena lo que cuelga como cualquier bloqueante, y al
+  llegar se cierra con lo que llegó como motivo. No necesita migración ni código en la API.
+- **Una duda pasa a «esperando» cambiando su complemento.** La API lee uno solo por nodo, así que reemplaza el `duda-*` que tenía.
+- **Se cuenta aparte en la VR:** «dudas: N abiertas · K esperando a otros · ✓ M contestadas». Así se ve qué está en la cancha del otro.
 
 La regla que ya quedó (19-10, API `b8b3be3`): **una duda se muestra en la cara de quien es dueña**, su `PERTENECE_A`. Si es
 de las dos caras, gana lo real, y lo que frena a la otra cara se ve como la pieza de la que se depende. Lo que puede
