@@ -202,6 +202,26 @@ del arreglo: `git -C grafo-tareas.vr show 19aa13c:src/<archivo>`). Lo arreglado,
   sin escribir) y el backend falso no lo veía. Arreglo en `nodos.service.ts` (`conVenceComoFecha`, crear y editar) + e2e en
   `pulido.e2e-spec.ts`, rojo visto (`Expected 201, Received 500`). API unit 120 · e2e 58 · tsc 0 · lint 0. **Falta desplegar**:
   commit, push y `bin/desplegar` (de Freddy). Mientras, la fecha completa (`…T00:00:00.000Z`) funciona.
+- ✅ **Segunda vuelta en el visor (18-10, build `index-6XCMVtms`):** (1) el 1 volvió a ser «todo»: lo que molestaba era el
+  pellizco de Meta leído como 1, no el 1 (`numeroDeLaMano(…, pellizco)`, `esPellizco`); mostrar otra vez el número sigue
+  apagando el filtro. (2) **Textos apilados en la HU 20379**: medido con el código de la VR sobre producción, 7 pares (real) y 5
+  (plan); causa: con menos nodos tras los descartes, `lineasPara` subió a 4 líneas sobre posiciones acomodadas para menos, y 8
+  invitadas del plan se ubicaban al vuelo. Arreglo: `lineasQueCaben` (una página guardada sube de líneas solo si no agrega
+  pisadas; rojo probado) + rearmado de las dos caras (75 posiciones, respaldo en el tmp de la sesión) → 1 y 0 pares. (3) Al
+  seleccionar, el título entero (`LARGO_SELECCION` 120 → 300). (4) El carril «C · Recepción» era violeta y se leía como PBI:
+  `COLORES_CARRIL` sin morados (API, sin desplegar) y el nodo en producción a `#eab308`.
+- ✅ **«Sin HU» limpia, con evidencia** (respaldo `grafo-2026-10-19_0001.dump`): la tarjeta de las 12 URL se repartió en los
+  trámites de cada FASE (6 ya las tenían) y se descartó; [26317] cerrada (FASE 30 mergeada); [25682] (Done en Azure), «c1»
+  (carril liberado) y la de arquitectura de la 24690 (decidida el 24-09) descartadas; y las 13 que ya estaban cerradas. La
+  tarjeta de la 25325 pasó al formato `[25325] …` (la VR la ve PBI y `etapa` la encuentra) y la duda del texto del aviso a los
+  analistas se cerró: desde el 14-10 el aviso va al solicitante.
+- ✅ **Tercera vuelta (18-10, de noche):** el plan de la HU 20379 «abruma: hay un infierno de dudas» → **filtro 4 = lo que
+  frena** (dudas, personas, «para decir» y la HU; sus hilos hacia lo que bloquean siguen encendidos). Decisión del agente: un
+  filtro y no una tercera cara (las pestañas extra estorbaron; el contraste de un lente sí sirvió) y vale igual en lo real y en el
+  plan. Datos, con evidencia: cerrada la duda «Para Freddy: ¿la 25325 es todo el confirmar?» (su texto en Azure dice
+  «recepcionada o recepcionada con observacion»); descartadas las dos de la 26311 (cronjob de inactividad, de Thomas); el dolor
+  de `laboratorio_analisis` colgado de la 25325 (criterio 8) con «acción: ninguna». Pendiente: la cercanía en el plan (FASE y
+  piezas cerca de la HU, dudas alrededor de lo que frenan), que es otro acomodo.
 - ✅ **Lista B, puntos 21-25** (con sus respuestas): 21 propuesta con su explicación · 22 cerrada (ya la revisó) · 23 p1, vence
   19-10 · 24 propuesta, para Fabián · 25 observación con su idea. Cada edición con motivo en la bitácora.
 
