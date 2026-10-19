@@ -17,7 +17,7 @@
 # grafo, la web y la VR (Freddy, 2026-10-18: «tiene que quedar guardado con ciertas propiedades… para que de verdad sea
 # útil»). Antes era una TAREA con la etiqueta `daily`, la de Todoist, y nada la separaba de una tarea.
 # El título es `<DD-mmm> · <texto>`: la fecha es el ÚNICO agregado (regla de /flow:todo §2: literal, con
-# sus typos). Una etiqueta, nunca dos. `--vence` es una fecha ISO (la API no parsea "monday").
+# sus typos), y no se agrega si el texto ya empieza con una (real 2026-10-19: «19-oct · 19-oct · …»). Una etiqueta, nunca dos. `--vence` es una fecha ISO (la API no parsea "monday").
 # `--persona` solo tiene sentido con `bloqueo`: la DUDA queda ESPERA_RESPUESTA_DE esa PERSONA (se crea si
 # falta) y "si X contesta, se liberan N" la cuenta. Es una extensión del contrato: ningún flow la pasa aún.
 set -euo pipefail
@@ -26,6 +26,7 @@ source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
 # La etiqueta que la API pone a un complemento (`complemento:<clave>`) y el ritual donde se dice, para /flow:todo.
 readonly PARA_DECIR=complemento:para-decir
 readonly RITUAL_DE_LA_DAILY=daily
+readonly YA_TRAE_FECHA='^[0-9]{2}-(ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic) · '
 
 TIPO="${1:?uso: pendiente <tipo> <texto> [--vence <fecha>] [--descripcion <texto>] [--persona <nombre>]}"
 TEXTO="${2:?falta el texto}"; shift 2
@@ -54,7 +55,8 @@ esac
 RITUAL_ID=""
 [ -z "$RITUAL" ] || RITUAL_ID=$(nodo_de_ritual "$RITUAL")
 
-CUERPO=$(jq -nc --arg t "$NODO" --arg ti "$(fecha_hoy) · $TEXTO" --argjson pr "$(prioridad_api "$PRIORIDAD")" \
+if [[ "$TEXTO" =~ $YA_TRAE_FECHA ]]; then TITULO="$TEXTO"; else TITULO="$(fecha_hoy) · $TEXTO"; fi
+CUERPO=$(jq -nc --arg t "$NODO" --arg ti "$TITULO" --argjson pr "$(prioridad_api "$PRIORIDAD")" \
   --arg e "$ETIQUETA" --arg d "$DESCRIPCION" --arg v "$VENCE" \
   '{tipo: $t, titulo: $ti, prioridad: $pr, etiquetas: [$e]}
    + (if $d != "" then {descripcion: $d} else {} end)

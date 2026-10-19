@@ -33,6 +33,8 @@ caso pendiente_es_duda      '"tipo":"DUDA"'         0 jq -c '.[0]' "$NODOS"
 caso pendiente_espera_persona 'ESPERA_RESPUESTA_DE' 0 bash -c "jq -c '.[0]' '$CONEXIONES' && jq -r '.[] | select(.tipo == \"PERSONA\") | .titulo' '$NODOS'"
 caso pendiente_literal      "· queera, sinonigmia"  0 "$OP/pendiente" informe "queera, sinonigmia"
 caso pendiente_tipo_malo    "tipo desconocido"      64 "$OP/pendiente" urgente "x"
+caso pendiente_fecha_una_vez "igual"                0 bash -c "'$OP/pendiente' informe '18-oct · ya traía la fecha' >/dev/null &&
+  [ \"\$(jq -r '.[-1].titulo' '$NODOS')\" = '18-oct · ya traía la fecha' ] && echo igual"
 caso pendiente_guardo_p1    '"prioridad":1'         0 jq -c '.[0]' "$NODOS"
 caso pendiente_una_etiqueta '"etiquetas":["bloqueo"]' 0 jq -c '.[0]' "$NODOS"
 caso pendiente_vence        '"vence":"2026-10-20"'  0 bash -c "'$OP/pendiente' confirmacion 'x' --vence 2026-10-20 >/dev/null && jq -c '.[-1]' '$NODOS'"
