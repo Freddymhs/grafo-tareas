@@ -243,11 +243,11 @@ algunas no se pueden hacer. Medido el 19-10:
 
 | acción | API hoy | web hoy | lo que falta |
 |---|---|---|---|
-| **Crear un bloqueante para una persona**: la duda, a quién espera, qué frena y de quién es | 3-4 llamadas (nodo, `ESPERA_RESPUESTA_DE`, `BLOQUEADA_POR`, `PERTENECE_A`) | crear y después conectar a mano en el detalle | una acción que pida las tres cosas juntas. **El dueño es obligatorio**: sin él la duda cae en «Sin HU» (pasó el 19-10 con una duda para Thomas) |
+| **Crear un bloqueante para una persona**: la duda, a quién espera, qué frena y de quién es | 3-4 llamadas (nodo, `ESPERA_RESPUESTA_DE`, `BLOQUEADA_POR`, `PERTENECE_A`) | ✅ **hecho el 19-10** (web `7b444ac`): «Agregar bloqueante» en el detalle de una tarea o FASE pide la pregunta y a quién espera; la duda nace siendo de ese nodo y frenándolo | nada. **El dueño ya es obligatorio** por construcción: sin él la duda caía en «Sin HU» (pasó el 19-10 con una duda para Thomas) |
 | **Cerrar una duda con su respuesta** | `PATCH estado` con `motivo` (≤ 500) | «Cerrar» **no pide motivo** y la respuesta no queda | pedir la respuesta al cerrar una duda: ese motivo es lo que la VR muestra como «Contestada el…» |
 | **Tomar una pieza del plan y darle su PBI** | `PATCH cara` + editar el título, sacar la etiqueta `por-crear` | «Mover a Trabajo» sí; el título y las etiquetas, no | una acción «tomar» que pida el id de la task y deje el título `[id] …` |
 | **Crear una persona** | `POST /nodos` tipo PERSONA | sí, eligiendo el tipo PERSONA | nada |
-| **Completar una FASE (mergeada)** | la deja el importador desde `FASE_n.md` | solo lectura (D10) | nada en la web: se tilda en la FASE (`/flow:tildar`) y se importa |
+| **Completar una FASE (mergeada)** | la deja el importador desde `FASE_n.md` | solo lectura (D10) | nada en la web. Al tildar «Mergeado», el hook `fase-tilde` mueve la tarjeta a APROBADO solo; el cierre y la marca `mergeada` llegan recién al importar (`bin/importar-en-produccion fases`, a mano). Idea de Freddy: que su comando de cierre corra también la importación |
 
 La regla que ya quedó (19-10, API `b8b3be3`): **una duda se muestra en la cara de quien es dueña**, su `PERTENECE_A`. Si es
 de las dos caras, gana lo real, y lo que frena a la otra cara se ve como la pieza de la que se depende. Lo que puede
