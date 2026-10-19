@@ -222,6 +222,14 @@ del arreglo: `git -C grafo-tareas.vr show 19aa13c:src/<archivo>`). Lo arreglado,
   «recepcionada o recepcionada con observacion»); descartadas las dos de la 26311 (cronjob de inactividad, de Thomas); el dolor
   de `laboratorio_analisis` colgado de la 25325 (criterio 8) con «acción: ninguna». Pendiente: la cercanía en el plan (FASE y
   piezas cerca de la HU, dudas alrededor de lo que frenan), que es otro acomodo.
+- ✅ **«¿No nos olvidamos de nada que sea bloqueante?»** (Freddy, 18-10): sí — por tipo, el 4 solo veía dudas y personas, y
+  frena también el TRABAJO del que otro depende. Ahora lo dice la API (C1): cada página trae `frenan` (lo abierto de lo que
+  algo abierto de ella depende, espera respuesta o está bloqueado, `CONEXIONES_BLOQUEANTES`). En la HU 20379, el plan pasa a
+  15: 8 dudas, 2 personas y 5 trabajos (0.5 Esquema, 0.4, 3.1, la propuesta del esquema y [25325]). Sin desplegar, la VR vuelve
+  a elegir por tipo. Una FASE mergeada sigue ABIERTO en la API (frena a la 33 y la 35); la VR la apaga igual (`pendientes`).
+  Datos: la duda de la recepción a medias con su pregunta lista; la del id de quien recepciona, con lo de develop (la sesión ya
+  trae el id de identidad: D5 puede usarlo y la migración a texto sale de la rama); al Daily del 19, «revisar yo la propuesta
+  del esquema»; descartado el dolor de la migración (no pedía nada).
 - ✅ **Lista B, puntos 21-25** (con sus respuestas): 21 propuesta con su explicación · 22 cerrada (ya la revisó) · 23 p1, vence
   19-10 · 24 propuesta, para Fabián · 25 observación con su idea. Cada edición con motivo en la bitácora.
 
