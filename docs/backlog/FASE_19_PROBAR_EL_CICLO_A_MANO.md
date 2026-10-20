@@ -263,6 +263,25 @@ La regla que ya quedó (19-10, API `b8b3be3`): **una duda se muestra en la cara 
 de las dos caras, gana lo real, y lo que frena a la otra cara se ve como la pieza de la que se depende. Lo que puede
 volver a fallar es crear una duda sin dueño, y eso lo resuelve la primera fila.
 
+### Lo que faltó en la API al usarla de verdad (19-10, un día entero editando el grafo solo por la API)
+
+Freddy: *«si algunas funcionalidades no existen y no están en el API, entonces hay que desarrollarlas»*. Cada vez que hubo que
+hacerlo a mano, ahí faltaba algo. En orden de cuánto costó:
+
+1. **Azure → grafo, solo lectura.** Para saber qué tasks estaban cerradas, con evidencia o con PR, hubo que leer Azure con
+   scripts y cerrar a mano los trámites por PATCH. Falta un importador que lea Azure y lo deje en el grafo: el estado de cada task,
+   la URL commit, la evidencia y los PR. Con eso, Azure y el grafo dicen lo mismo sin que nadie los compare.
+2. **Un bloqueante en una sola llamada.** Crear una duda o una espera con su persona y su dueño fueron 3 llamadas, y una falló a la
+   mitad (dejó el nodo sin conexiones). `POST /nodos/:id/complementos` ya cuelga y frena; le falta recibir la `persona`.
+3. **La API no pide autenticación.** Cualquiera dentro de la tailnet puede escribir.
+4. **Los trámites del grafo y las casillas del `FASE_n.md` se separan.** Al cerrar un trámite por la API, el `.md` queda sin tildar.
+   El importador lee el `.md`, pero nada escribe de vuelta.
+5. **Un PBI son dos nodos con tres nombres:** la FASE, la tarjeta `[id]` y el título de Azure (la 25325 se llamaba «Recepcionado
+   con observación», «Estados y confirmar recepción» y «Backend - Recepcionado con observacion»). Propuesta: un nodo morado por
+   task, con el nombre de Azure.
+6. **El tipo de un nodo no se puede cambiar** (`UpdateNodoDto` no tiene `tipo`): una TAREA que en realidad era una espera tuvo que
+   quedarse como estaba y se le colgó una espera nueva.
+
 ## El arreglo (para aprobar)
 
 - **`fase-tildar`**, después de tildar, llama al mismo `fase-tilde.sh` con el JSON de un `Edit` sobre esa FASE. Así la regla
