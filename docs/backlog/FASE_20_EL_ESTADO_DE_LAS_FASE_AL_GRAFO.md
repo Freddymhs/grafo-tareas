@@ -122,7 +122,8 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
   `~/dotfiles` `853c159`, sin push); `test_fase_tildar` 5/5 y los tests de roles de dotfiles en verde
 - [x] Mergeado — 2026-10-21, con el sí de Freddy: en `main` y pusheado (`~/.claude/commands` `ef62def`, `~/dotfiles`
   `853c159`; el orquestador ya estaba)
-- [ ] Adoptado
+- [ ] Adoptado — abierto a propósito (Freddy, 21-10): se tilda cuando la próxima FASE nazca sin «Listo para PR» en el
+  encabezado y con `**Estado**` solo con la rama
 
 ## Cierre oficial en Azure
 
