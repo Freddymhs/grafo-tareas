@@ -118,7 +118,8 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
 
 ## QA
 
-- [ ] Listo para PR
+- [x] Listo para PR — 2026-10-21: commiteada (orquestador `0bef1a0`…`2c43ce0`, pusheados; `~/.claude/commands` `ef62def` y
+  `~/dotfiles` `853c159`, sin push); `test_fase_tildar` 5/5 y los tests de roles de dotfiles en verde
 - [ ] Mergeado
 - [ ] Adoptado
 
