@@ -3,8 +3,8 @@
 **Destraba**: que cada cosa tenga un solo dueño: la FASE es el plan y la memoria de programación de una PBI; el estado (qué
 espera, qué falta, quién responde) vive solo en el grafo. Hoy el mismo hecho se escribe en 3 a 6 lugares y eso alimenta el
 bucle de pregunta y respuesta
-**Estado**: sin rama · hecha el 21-10. Faltan los commits de Freddy en `~/.claude/commands` (`work/create-backlog.md`) y
-`~/dotfiles` (las 6 plantillas)
+**Estado**: sin rama · hecha el 21-10 · commits: `~/.claude/commands` `ef62def`, `~/dotfiles` `853c159` (con el sí de
+Freddy; sin push)
 **Azure**: no aplica (tracker: none)
 **Tipo**: devex
 **Dependencias**: FASE 19 (Freddy prueba los comandos con una task real)
@@ -80,8 +80,7 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
   (su línea `**Listo para PR**: no · <por qué todavía no>`), las plantillas de `~/dotfiles/workspace-template/docs/backlog/plantillas/`
   (`**Estado**` = solo la rama) y `/work:resume:new-concept` — 21-10, con el sí de Freddy: `create-backlog` ya no la
   escribe; las 6 plantillas dicen `**Estado**: <solo la rama entre backticks; el resto del estado vive en el grafo>`;
-  `new-concept` no escribía ninguna de las dos. Tests de dotfiles (roles) en verde. Sin commitear: dotfiles y comandos
-  son de Freddy
+  `new-concept` no escribía ninguna de las dos. Tests de dotfiles (roles) en verde. Commits `ef62def` y `853c159`
 - [x] **Tarea 4** · ensayarlo en una copia de `Laboratorio/docs/backlog/` (`fase-tildar` acepta `FASE_DIR`) — 21-10:
   aplicada a ciegas, **la D3 pierde información**, así que no se aplica en bloque. De las 20 FASE abiertas, 19 tienen la
   línea `**Listo para PR**:`. Leídas una por una, solo algunas repiten la casilla de `## QA` (la 22: `PR 5090` está en
