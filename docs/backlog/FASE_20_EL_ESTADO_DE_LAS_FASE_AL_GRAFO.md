@@ -4,7 +4,7 @@
 espera, qué falta, quién responde) vive solo en el grafo. Hoy el mismo hecho se escribe en 3 a 6 lugares y eso alimenta el
 bucle de pregunta y respuesta
 **Estado**: sin rama · hecha el 21-10 · commits: `~/.claude/commands` `ef62def`, `~/dotfiles` `853c159` (con el sí de
-Freddy; sin push)
+Freddy; pusheados). Falta «Adoptado»: la primera FASE nueva con la plantilla
 **Azure**: no aplica (tracker: none)
 **Tipo**: devex
 **Dependencias**: FASE 19 (Freddy prueba los comandos con una task real)
@@ -120,7 +120,8 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
 
 - [x] Listo para PR — 2026-10-21: commiteada (orquestador `0bef1a0`…`2c43ce0`, pusheados; `~/.claude/commands` `ef62def` y
   `~/dotfiles` `853c159`, sin push); `test_fase_tildar` 5/5 y los tests de roles de dotfiles en verde
-- [ ] Mergeado
+- [x] Mergeado — 2026-10-21, con el sí de Freddy: en `main` y pusheado (`~/.claude/commands` `ef62def`, `~/dotfiles`
+  `853c159`; el orquestador ya estaba)
 - [ ] Adoptado
 
 ## Cierre oficial en Azure
