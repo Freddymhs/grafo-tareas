@@ -15,18 +15,20 @@ rendimiento durante el próximo día») · **Fuente:** la sesión del grafo del 
 
 **Ninguna herramienta reordena Herdr ni decide su orden.** A lo más sugiere movimientos con su motivo.
 
-## Los puentes: datos en el grafo
+**Herdr nunca escribe en el grafo** (Freddy, 21-10: «yo puedo hacer cualquier tontería en mi Herdr… vamos a romper cosas
+de la base de datos»). Herdr es un borrador de trabajo y el grafo es la base. Por eso la daily lee Herdr para su parte y no
+copia su orden al grafo. El orden de AHORA se queda en Herdr.
 
-| de → a | qué | cómo |
-|---|---|---|
-| mañana → noche | el orden de AHORA | `PUT /api/v1/nodos/orden-del-dia {"ids":[…]}`: las tarjetas `[id]` llevan `hoy:1…n` y las de otro día lo pierden, en una transacción. La VR lo muestra con el lente «hoy» (botón B después del filtro 4). |
-| noche → mañana | lo que cambió anoche | `GET /api/v1/cambios`, filtrado por `createdAt` ≥ ayer 18:00 (bitácora con `tipo`, `campo`, `antes`, `despues`, `titulo`). |
-| el parte | terminé, en curso, detenido, para decir | `GET /api/v1/derivado/dia` (`?desde=`): no se recalcula en la daily. |
+## Lo que la daily lee del grafo
 
-Restricciones de `orden-del-dia`:
-- Solo acepta tarjetas TAREA. Una FASE da 400, porque `importar:fases` le reescribe las etiquetas.
-- Mover la etiqueta conserva `updatedAt`; si no, una tarjeta cerrada ayer saldría en «terminé» del parte.
-- `{"ids":[]}` deja el día vacío.
+| qué | cómo |
+|---|---|
+| lo que cambió anoche (lo hecho en la VR) | `GET /api/v1/cambios`, filtrado por `createdAt` ≥ ayer 18:00 (bitácora con `tipo`, `campo`, `antes`, `despues`, `titulo`). |
+| el parte: terminé, en curso, detenido, para decir | `GET /api/v1/derivado/dia` (`?desde=`): no se recalcula en la daily. |
+| a quién espera cada task | `GET /api/v1/nodos/:id/bloqueado` sobre la tarjeta y la FASE. |
+
+`PUT /api/v1/nodos/orden-del-dia` y el lente «hoy» de la VR existen, pero nada los alimenta desde Herdr. Si algún día el
+orden del día vive en el grafo, se elige en el grafo mismo (web o VR), nunca copiado de Herdr.
 
 ## Lo que `/flow:daily` necesita además de su diseño (7 puntos, 21-10)
 
@@ -41,11 +43,8 @@ Restricciones de `orden-del-dia`:
 2. **«Propuesta del día» = movimientos sugeridos con su motivo**, una línea cada uno, y nunca reordenar. Ejemplo: «26610
    está mergeada y le faltan la evidencia y la wiki: es trámite, ¿sale de AHORA?».
 3. **Abrir con lo que cambió desde anoche** (`GET /cambios`): lo que Freddy hizo en la VR.
-4. **Cerrar escribiendo AHORA en el grafo** (`PUT /nodos/orden-del-dia`).
-   - La tarjeta de cada PBI se busca con `GET /nodos?q=<id>&tipo=TAREA` y es la que empieza con `[<id>]`.
-   - Si un PBI de AHORA no tiene tarjeta, se crea con el adaptador `tarjeta` o se avisa.
-   - Como Herdr se reordena durante el día, conviene un modo corto que solo resincronice el orden; `sonar` también podría
-     llamarlo en cada corrida, porque ya lee Herdr.
+4. **No escribir nada**: ni en Herdr ni en el grafo. Lo que la daily encuentre mal en el grafo (una espera que ya no
+   frena, una tarjeta sin su HU) se dice en el parte y lo corrige Freddy o la sesión que corresponde.
 5. **Una línea por task de AHORA:** `id · corto · estado del PR · próxima acción · a quién espera`.
    - La próxima acción es la primera casilla sin tildar de Tareas en su FASE.
    - A quién espera sale de `GET /nodos/:id/bloqueado`, sobre la tarjeta y la FASE.
@@ -59,4 +58,5 @@ Restricciones de `orden-del-dia`:
 - Cada mundo contesta una pregunta distinta: la cola del día, el «qué sé hoy» y el «por qué / qué quedó colgando».
 - Copiar uno en otro duplica y le quita a Freddy el control del orden. Copiar la lista de Herdr en la VR obliga a leer
   en 3D; una daily que reordena Herdr pisa su decisión.
-- El grafo es lo único que los tres comparten. Por eso los puentes son datos en el grafo y no texto en un chat.
+- El grafo es la base que los tres comparten; Herdr no. Por eso el grafo se lee desde todos lados y solo se escribe con
+  intención (la web, la VR, los comandos que anotan), nunca como copia de la barra.
