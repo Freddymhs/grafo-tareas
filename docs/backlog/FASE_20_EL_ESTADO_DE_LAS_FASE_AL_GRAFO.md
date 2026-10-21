@@ -82,7 +82,18 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
   escribe; las 6 plantillas dicen `**Estado**: <solo la rama entre backticks; el resto del estado vive en el grafo>`;
   `new-concept` no escribía ninguna de las dos. Tests de dotfiles (roles) en verde. Sin commitear: dotfiles y comandos
   son de Freddy
-- [ ] **Tarea 4** · ensayarlo en una copia de `Laboratorio/docs/backlog/` (`fase-tildar` acepta `FASE_DIR`)
+- [x] **Tarea 4** · ensayarlo en una copia de `Laboratorio/docs/backlog/` (`fase-tildar` acepta `FASE_DIR`) — 21-10:
+  aplicada a ciegas, **la D3 pierde información**, así que no se aplica en bloque. De las 20 FASE abiertas, 19 tienen la
+  línea `**Listo para PR**:`. Leídas una por una, solo algunas repiten la casilla de `## QA` (la 22: `PR 5090` está en
+  las dos). Las demás traen lo que no está en otro lado:
+  - **FASE 18:** 12 líneas con la declaración para el PR (la recepción abandonada, `/sigsa:documentar`, la clave que
+    falta en Consul, el código de Thomas que se toca, lo que ve el solicitante) y el resultado de Postman.
+  - **FASE 30 y 32:** el PR y el commit del merge; en la 32, además, la ruta de la auditoría.
+  - **FASE 17:** el cambio de diseño del `q` y su ADR.
+  - **FASE 39 y 41:** el «por qué todavía no» (entra después de la 25325; no abrir el PR del BFF antes de su merge).
+
+  El `**Estado**` también trae commits y versiones (FASE 18: un commit por repo con su versión). Las dos páginas leen la
+  casilla de `## QA`, no el encabezado, así que sacarla no las rompe; lo que se pierde es memoria.
 - [ ] **Tarea 5** · aplicar D3 solo en las FASE **abiertas**: las terminadas están en solo lectura (chmod 444 + hook
   `fase-cerrada`) y no lo necesitan
 
