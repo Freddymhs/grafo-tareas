@@ -29,8 +29,9 @@ barra solo para compararla; no copia nada de un lado al otro.
 | el parte: terminé, en curso, detenido, para decir | `GET /api/v1/derivado/dia` (`?desde=`): no se recalcula en la daily. |
 | a quién espera cada task | `GET /api/v1/nodos/:id/bloqueado` sobre la tarjeta y la FASE. |
 
-`PUT /api/v1/nodos/orden-del-dia` y el lente «hoy» de la VR existen, pero nada los alimenta desde Herdr. Si algún día el
-orden del día vive en el grafo, se elige en el grafo mismo (web o VR), nunca copiado de Herdr.
+El 21-10 se probó guardar el orden de AHORA en el grafo (`PUT /nodos/orden-del-dia` y un lente «hoy» en la VR), copiado
+de Herdr. Se sacó el mismo día (revert `1cd8226` y del lente en la VR): Herdr no mueve el grafo «ni para un lado ni para
+el otro».
 
 ## `/flow:daily`
 
