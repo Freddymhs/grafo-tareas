@@ -4,7 +4,7 @@
 espera, qué falta, quién responde) vive solo en el grafo. Hoy el mismo hecho se escribe en 3 a 6 lugares y eso alimenta el
 bucle de pregunta y respuesta
 **Estado**: sin rama · hecha el 21-10 · commits: `~/.claude/commands` `ef62def`, `~/dotfiles` `853c159` (con el sí de
-Freddy; pusheados). Falta «Adoptado»: la primera FASE nueva con la plantilla
+Freddy; pusheados). Adoptada en la FASE 21
 **Azure**: no aplica (tracker: none)
 **Tipo**: devex
 **Dependencias**: FASE 19 (Freddy prueba los comandos con una task real)
@@ -80,7 +80,9 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
   (su línea `**Listo para PR**: no · <por qué todavía no>`), las plantillas de `~/dotfiles/workspace-template/docs/backlog/plantillas/`
   (`**Estado**` = solo la rama) y `/work:resume:new-concept` — 21-10, con el sí de Freddy: `create-backlog` ya no la
   escribe; las 6 plantillas dicen `**Estado**: <solo la rama entre backticks; el resto del estado vive en el grafo>`;
-  `new-concept` no escribía ninguna de las dos. Tests de dotfiles (roles) en verde. Commits `ef62def` y `853c159`
+  `new-concept` no escribía ninguna de las dos. Tests de dotfiles (roles) en verde. Commits `ef62def` y `853c159`.
+  Faltaba la copia de las 6 plantillas de cada orquestador (`docs/backlog/plantillas/`, la que nombra su `roles.yaml`):
+  la de grafo-tareas tenía el «Estado» viejo y se corrigió el mismo día; quedó idéntica a la del método
 - [x] **Tarea 4** · ensayarlo en una copia de `Laboratorio/docs/backlog/` (`fase-tildar` acepta `FASE_DIR`) — 21-10:
   aplicada a ciegas, **la D3 pierde información**, así que no se aplica en bloque. De las 20 FASE abiertas, 19 tienen la
   línea `**Listo para PR**:`. Leídas una por una, solo algunas repiten la casilla de `## QA` (la 22: `PR 5090` está en
@@ -122,11 +124,11 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
   `~/dotfiles` `853c159`, sin push); `test_fase_tildar` 5/5 y los tests de roles de dotfiles en verde
 - [x] Mergeado — 2026-10-21, con el sí de Freddy: en `main` y pusheado (`~/.claude/commands` `ef62def`, `~/dotfiles`
   `853c159`; el orquestador ya estaba)
-- [ ] Adoptado — abierto a propósito (Freddy, 21-10): se tilda cuando la próxima FASE nazca sin «Listo para PR» en el
-  encabezado y con `**Estado**` solo con la rama
+- [x] Adoptado — 2026-10-21: la FASE 21 nació de la plantilla corregida, sin «Listo para PR» en el encabezado y con
+  `**Estado**: sin rama`
 
 ## Cierre oficial en Azure
 
-- [ ] URL commit — no aplica (tracker: none)
-- [ ] Evidencias — no aplica
-- [ ] Wiki actualizada — no aplica
+- [x] URL commit — no aplica (tracker: none)
+- [x] Evidencias — no aplica (tracker: none)
+- [x] Wiki actualizada — no aplica (tracker: none)

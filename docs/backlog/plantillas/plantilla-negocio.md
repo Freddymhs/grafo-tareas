@@ -4,7 +4,7 @@
      cambiarla allá. Copiar como docs/backlog/FASE_<N>_<NOMBRE>.md; toda casilla nace [ ]. -->
 
 **Destraba**: <qué task, HU o persona queda libre al cerrar esta FASE>
-**Estado**: <rama, PR, merge — se completa al avanzar>
+**Estado**: <solo la rama entre backticks; el resto del estado vive en el grafo>
 **Azure**: <task y PBI padre · o «no aplica (tracker: none)»>
 **Tipo**: negocio
 **Dependencias**: <FASE o task que tiene que estar antes · o «ninguna»>
