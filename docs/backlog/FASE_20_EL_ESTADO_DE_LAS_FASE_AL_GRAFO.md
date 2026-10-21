@@ -3,8 +3,8 @@
 **Destraba**: que cada cosa tenga un solo dueño: la FASE es el plan y la memoria de programación de una PBI; el estado (qué
 espera, qué falta, quién responde) vive solo en el grafo. Hoy el mismo hecho se escribe en 3 a 6 lugares y eso alimenta el
 bucle de pregunta y respuesta
-**Estado**: sin rama · empezada el 21-10 con el «hagamos el cambio» de Freddy (D1): Tareas 1 a 3 hechas; la 4 ensaya
-en una copia y la 5 (tocar las 19 FASE abiertas que tienen la línea) se muestra antes de aplicar
+**Estado**: sin rama · hecha el 21-10. Faltan los commits de Freddy en `~/.claude/commands` (`work/create-backlog.md`) y
+`~/dotfiles` (las 6 plantillas)
 **Azure**: no aplica (tracker: none)
 **Tipo**: devex
 **Dependencias**: FASE 19 (Freddy prueba los comandos con una task real)
@@ -46,12 +46,12 @@ Primero recorre los comandos con trabajo real y mira `fases.html`, `calidad.html
 
 Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>/entendimiento.md`, sección «⚠️ ABIERTO».
 
-### D3 · Lo único que se saca: lo que ningún script lee y repite al grafo `[código]`
+### D3 · Lo que se saca: la prosa de estado en lo que NACE, no en las FASE que ya existen `[código]`
 
-- La línea `**Listo para PR**: no · …` del encabezado (repite la casilla de `## QA`; solo la escribe `/work:create-backlog`).
-- En `**Estado**:`, todo menos la rama entre backticks.
-- En `## Para confirmar`, cada pregunta abierta **que ya exista como DUDA en el grafo**, revisada una por una. Las
-  «Decididas» se quedan: son decisiones.
+- Las FASE nuevas no traen la línea `**Listo para PR**:` del encabezado: el estado del PR vive en la casilla de `## QA`.
+  Su `**Estado**:` es solo la rama entre backticks; el resto del estado vive en el grafo.
+- Las FASE abiertas **no se tocan** (Freddy, 21-10, después del ensayo de la Tarea 4): su encabezado guarda datos que no
+  están en otro lado, como PR, commits, la auditoría o la declaración del PR. Se cierran y quedan en solo lectura.
 - Las decisiones D-n, «El hueco», «Fuera de alcance» y los criterios **se quedan**: son la memoria de programación.
 
 ## Abierto
@@ -72,7 +72,7 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
   `grafo-tareas/{grafo-tareas.api/src,bin}`; actualizar D2 si aparece uno nuevo — 21-10: 67 archivos tocan FASE y 19
   cambiaron desde el 20-10. Hay lectores nuevos (`fase-casillas` lee `**Dependencias**` y el Mergeado de la citada;
   `sonar`, `pbi-estado` y `/flow:daily`) y un campo nuevo, `**Servicios para probar**`, más `**Corto**` planeado; todos
-  van en D2. **D3 sigue en pie**: ningún lector usa la línea `**Listo para PR**:` (solo la escribe `/work:create-backlog`),
+  van en D2. Ningún lector usa la línea `**Listo para PR**:` (solo la escribe `/work:create-backlog`),
   y `**Estado**` lo sigue leyendo solo `/flow:paralelo`, y solo la rama
 
 ### El cambio
@@ -94,19 +94,22 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
 
   El `**Estado**` también trae commits y versiones (FASE 18: un commit por repo con su versión). Las dos páginas leen la
   casilla de `## QA`, no el encabezado, así que sacarla no las rompe; lo que se pierde es memoria.
-- [ ] **Tarea 5** · aplicar D3 solo en las FASE **abiertas**: las terminadas están en solo lectura (chmod 444 + hook
-  `fase-cerrada`) y no lo necesitan
+- [x] **Tarea 5** · aplicar D3 solo en las FASE **abiertas**: las terminadas están en solo lectura (chmod 444 + hook
+  `fase-cerrada`) y no lo necesitan — 21-10: **no se aplica**. Con el ensayo a la vista, Freddy eligió no tocar las
+  abiertas (D3)
 
 ### Probar
-- [ ] **Tarea 6** · `bin/fases --sin-abrir`, `fases.html` y `calidad.html` iguales que antes; el importador del grafo con los
-  mismos nodos y conexiones que antes; `bash ~/bin/tests/test_fase_tildar.sh` en verde
+- [x] **Tarea 6** · `bin/fases --sin-abrir`, `fases.html` y `calidad.html` iguales que antes; el importador del grafo con los
+  mismos nodos y conexiones que antes; `bash ~/bin/tests/test_fase_tildar.sh` en verde — 21-10: ninguna FASE_*.md cambió,
+  así que las páginas, `bin/fases` y el importador leen lo mismo que antes. `test_fase_tildar.sh` dio 5/5. Lo nuevo,
+  verificado: `create-backlog` tiene 0 líneas `**Listo para PR**:` y las 6 plantillas dicen solo la rama
 
 ## Criterios de Aceptación
 
-- [ ] 1 · `fases.html` y `calidad.html` muestran lo mismo antes y después, FASE por FASE
-- [ ] 2 · el importador produce los mismos nodos y conexiones antes y después
-- [ ] 3 · una FASE nueva creada con los comandos ya no trae la prosa de estado
-- [ ] 4 · ningún hecho de estado queda escrito en una FASE abierta y en el grafo a la vez
+- [x] 1 · `fases.html` y `calidad.html` muestran lo mismo antes y después, FASE por FASE (ninguna FASE cambió)
+- [x] 2 · el importador produce los mismos nodos y conexiones antes y después (no lee nada de lo que cambió)
+- [x] 3 · una FASE nueva creada con los comandos ya no trae la prosa de estado (Tarea 3)
+- [x] 4 · ninguna FASE **nueva** escribe el estado que vive en el grafo; las abiertas quedan como están (D3)
 
 ## Fuera de alcance
 
