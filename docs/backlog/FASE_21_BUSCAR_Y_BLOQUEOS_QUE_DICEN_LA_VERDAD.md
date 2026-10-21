@@ -85,6 +85,9 @@ Ninguno.
 - [x] 4 · en producción no queda ninguna ruta ni etiqueta que copie Herdr al grafo (`orden-del-dia` publicadas: 0;
   etiquetas `hoy:`: 0)
 
+Verificados de nuevo contra producción el 21-10, a pedido de Freddy («verifica antes y cierras si corresponde»): dan los
+4, y los 11 commits citados existen en sus repos. Cerrada.
+
 ## Fuera de alcance
 
 - Elegir el día desde el grafo mismo (en la web o en la VR): no se pidió.
