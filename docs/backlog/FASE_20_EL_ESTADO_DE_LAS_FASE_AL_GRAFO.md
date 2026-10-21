@@ -3,7 +3,8 @@
 **Destraba**: que cada cosa tenga un solo dueño: la FASE es el plan y la memoria de programación de una PBI; el estado (qué
 espera, qué falta, quién responde) vive solo en el grafo. Hoy el mismo hecho se escribe en 3 a 6 lugares y eso alimenta el
 bucle de pregunta y respuesta
-**Estado**: sin rama · **no se empieza hasta que Freddy diga «hagamos el cambio»** (D1)
+**Estado**: sin rama · empezada el 21-10 con el «hagamos el cambio» de Freddy (D1): Tareas 1 y 2 hechas; la 3 cambia
+archivos de comandos y plantillas y se muestra antes de aplicar
 **Azure**: no aplica (tracker: none)
 **Tipo**: devex
 **Dependencias**: FASE 19 (Freddy prueba los comandos con una task real)
@@ -32,12 +33,14 @@ Primero recorre los comandos con trabajo real y mira `fases.html`, `calidad.html
 |---|---|---|
 | nombre del archivo | `FASE_<n>_<NOMBRE>.md` | las dos páginas, `bin/fases`, los hooks, `~/bin/fase-tildar`, el importador |
 | título | `# FASE n: título` | importador (número y título del nodo), hook `fase-tilde` |
-| `**Azure**:` | `task NNNNN`, la task como primer número de 5-6 dígitos | las dos páginas (exigen la palabra `task` para el link), `bin/fases`, el importador, hooks `fase-tilde` y `fase-casillas` (`ref docs.campo_task`) |
+| `**Azure**:` | `task NNNNN`, la task como primer número de 5-6 dígitos | las dos páginas (exigen la palabra `task` para el link), `bin/fases`, el importador, hooks `fase-tilde` y `fase-casillas`, `~/bin/sonar` (el aviso de tildar), `Laboratorio/bin/pbi-estado`, `/flow:daily` (`ref docs.campo_task`) |
 | `**Tipo**:` | `calidad` / `producto` / … | las dos páginas, `bin/fases`, `fase-tilde`, el importador (rol y columnas) |
-| `**Dependencias**:` | cita «FASE N» | importador: cada una es una conexión DEPENDE_DE |
+| `**Dependencias**:` | cita «FASE N» **en su primera línea** | importador: cada una es una conexión DEPENDE_DE. Hook `fase-casillas` (desde el 20-10): si la FASE citada no tiene `- [x] Mergeado` en su `## QA`, avisa «❌ NO ABRIR EL PR» |
+| `**Servicios para probar**:` (nuevo, 21-10) | nombres separados por coma; lo que va entre paréntesis se ignora; `ninguno` | `Laboratorio/bin/pbi-estado`, `~/bin/areas/laboratorio-carril` (`--servicios`), `Laboratorio/.claude/espacio-carril.md` (un pane por servicio) |
+| `**Corto**:` (planeado, 21-10) | el nombre corto de la task | `/flow:daily` lo usa si existe; la sesión control lo va a agregar para el título de los spaces |
 | `**Destraba**:` | texto | importador: va a la descripción del nodo FASE |
 | `**Estado**:` | **solo** la rama entre backticks | `/flow:paralelo` (rotula el space «FASE n») |
-| secciones y casillas | `## Understand` (Entendimiento) · `## Tareas` · `## QA` (Colección, Auditoría, Listo para PR, Mergeado) · `## Cierre oficial en Azure` (URL commit, Evidencias, Wiki actualizada) | las dos páginas, `bin/fases`, `fase-tilde`, `fase-casillas`, `fase-tildar`, el importador |
+| secciones y casillas | `## Understand` (Entendimiento) · `## Tareas` · `## QA` (Colección, Auditoría, Listo para PR, Mergeado) · `## Cierre oficial en Azure` (URL commit, Evidencias, Wiki actualizada) | las dos páginas, `bin/fases` (además **escribe** las casillas del Cierre que Azure confirma), `fase-tilde`, `fase-casillas`, `fase-tildar`, el importador, `~/bin/sonar` (`- [x] Mergeado`), `/flow:daily` (la primera `- [ ]` de `## Tareas` como próxima acción) |
 | los `###` de `## Tareas` | el nombre decide el grupo | `calidad.html` y el importador (amarrar/cambiar/red), `fase-tilde`, el espacio de carril (`### Microservicio (…)` / `### BFF (…)`: qué repos abrir) |
 | `docs/backlog/README.md` | la tabla | `/work:backlog:next`, `:review`, `:sync` (la reescribe), `/flow:postman:build` (qué FASE es de cada task), el contraste de docs del precommit, `bin/whatsapp-digest` |
 
@@ -62,10 +65,15 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
 ## Tareas
 
 ### Antes del cambio
-- [ ] **Tarea 1** · Freddy recorre los comandos con trabajo real (FASE 19) y dice «hagamos el cambio»
-- [ ] **Tarea 2** · re-grepear los lectores (pueden haber cambiado desde el 20-10): todo lo que abre `FASE_` en
+- [x] **Tarea 1** · Freddy recorre los comandos con trabajo real (FASE 19) y dice «hagamos el cambio» — lo dijo el
+  21-10 («Hagamos el cambio»)
+- [x] **Tarea 2** · re-grepear los lectores (pueden haber cambiado desde el 20-10): todo lo que abre `FASE_` en
   `~/.claude/{commands,hooks,skills}`, `~/bin`, `~/dotfiles`, `Laboratorio/{bin,.claude,CLAUDE.md,refs.yaml}` y
-  `grafo-tareas/{grafo-tareas.api/src,bin}`; actualizar D2 si aparece uno nuevo
+  `grafo-tareas/{grafo-tareas.api/src,bin}`; actualizar D2 si aparece uno nuevo — 21-10: 67 archivos tocan FASE y 19
+  cambiaron desde el 20-10. Hay lectores nuevos (`fase-casillas` lee `**Dependencias**` y el Mergeado de la citada;
+  `sonar`, `pbi-estado` y `/flow:daily`) y un campo nuevo, `**Servicios para probar**`, más `**Corto**` planeado; todos
+  van en D2. **D3 sigue en pie**: ningún lector usa la línea `**Listo para PR**:` (solo la escribe `/work:create-backlog`),
+  y `**Estado**` lo sigue leyendo solo `/flow:paralelo`, y solo la rama
 
 ### El cambio
 - [ ] **Tarea 3** · cambiar a la vez lo que **escribe** esa prosa, o vuelve en la próxima FASE: `/work:create-backlog`
