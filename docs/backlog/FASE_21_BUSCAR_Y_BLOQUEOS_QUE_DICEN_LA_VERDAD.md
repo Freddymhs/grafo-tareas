@@ -33,8 +33,9 @@ Medido el 21-10, antes de los cambios:
 
 ### D2 · Depender de algo ya mergeado está cumplido — 21-10 `[código]`
 
-- **La regla:** un DEPENDE_DE hacia un nodo con la etiqueta `mergeada` ya no bloquea. Esperar respuesta o estar bloqueada
-  por él sí siguen frenando.
+- **La regla:** un DEPENDE_DE hacia algo mergeado ya no bloquea. Mergeado es la etiqueta `mergeada` (la lleva el nodo
+  FASE) o estar en la columna APROBADO, que según `roles.yaml` es «mergeado: el PR entró a la base» (ahí deja el hook a la
+  tarjeta `[<id>]`, sin etiqueta). Esperar respuesta o estar bloqueada por algo mergeado siguen frenando.
 - **Dónde vive:** `dependenciaCumplida` (pura), con su espejo en Prisma, `BLOQUEA_AHORA`.
 - **A qué aplica:** `/bloqueado`, «hoy puedo», el parte del día y lo que frena en cada página (el filtro 4).
 
@@ -65,7 +66,10 @@ Ninguno.
 
 ### `grafo-tareas.api`
 - [x] **Tarea 3** · `src/modules/derivado/dependencia-cumplida.ts`, `derivado.repository.ts` (`BLOQUEA_AHORA`) y
-  `calcular-paginas.ts` — lo mergeado no bloquea (unitario y e2e rojos primero) · `284aa1d`
+  `calcular-paginas.ts` — lo mergeado no bloquea (unitario y e2e rojos primero) · `284aa1d`. Con la 25325 mergeada
+  apareció que la tarjeta [26998] seguía frenada por la tarjeta [25325], que está en APROBADO y no lleva la etiqueta;
+  se suma la columna, y «sin columna» se pide explícito, porque el NULL de SQL rompía «hoy puedo» (3 e2e lo atraparon) ·
+  `f8663af`
 - [x] **Tarea 4** · `src/importadores/fases/dependencias-viejas.ts` y el importador — informa y, con `--podar`, borra
   (unitario y e2e rojos primero) · `dbb1692`; `bin/importar-en-produccion` pasa `--podar` · `3ab1128`
 - [x] **Tarea 5** · el orden del día: `PUT /nodos/orden-del-dia` (`0d09b44`) y el lente «hoy» de la VR (`471e32b`,
@@ -75,8 +79,8 @@ Ninguno.
 
 - [x] 1 · con «Adonis», el tablero de producción muestra «1 con «Adonis» en el título o la descripción» y la duda
   (Playwright sobre la PWA, 21-10)
-- [x] 2 · en producción, `GET /nodos/<FASE 18>/bloqueado` da `bloqueado: false`, y la FASE 41, que depende de la 18 sin
-  mergear, sigue bloqueada
+- [x] 2 · en producción, `GET /nodos/<FASE 18>/bloqueado` da `bloqueado: false`. Con la 25325 mergeada (21-10), la
+  FASE 39, la FASE 41 y la tarjeta [26998] quedan libres
 - [x] 3 · `importar-en-produccion fases … --seco` lista `dependenciasViejas` (hoy `[]`) y no borra nada sin `--podar`
 - [x] 4 · en producción no queda ninguna ruta ni etiqueta que copie Herdr al grafo (`orden-del-dia` publicadas: 0;
   etiquetas `hoy:`: 0)
@@ -89,7 +93,7 @@ Ninguno.
 ## QA
 
 - [x] Colección — no aplica (proyecto personal, sin Postman)
-- [x] Auditoría — 2026-10-21: API 130 unit · 63 e2e; web 41 · tsc · eslint; VR 158; rojos probados en cada tarea
+- [x] Auditoría — 2026-10-21: API 131 unit · 64 e2e; web 41 · tsc · eslint; VR 158; rojos probados en cada tarea
 - [x] Listo para PR — 2026-10-21: commiteada y pusheada (commits arriba); grafo-tareas no usa PR
 - [x] Mergeado — en `main` desde cada commit, desplegada en el Mac Mini (API y PWA 200)
 
