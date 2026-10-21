@@ -2,7 +2,7 @@
 # importar-en-produccion — corre los importadores de la API contra la base DESPLEGADA (FASE 12), no la del PC.
 #
 #   importar-en-produccion todoist --proyecto <id-de-todoist> [--seco]   (el `todoist.plan` del refs.yaml entra como plan)
-#   importar-en-produccion fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco]
+#   importar-en-produccion fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco] [--podar]
 #
 # todoist: el token viaja por stdin (sale de ~/.zsh_secrets; nunca en una línea de comandos ni en el Mac Mini).
 # fases:   copia al Mac Mini SOLO lo que el importador lee —`FASE_*.md`, `Tareas/<id>/entendimiento.md` y el mapa
@@ -10,13 +10,14 @@
 #          un contenedor de un solo uso de la API (`docker compose run`) y lo borra al terminar. El proyecto es la clave
 #          `proyecto` del refs.yaml del orquestador (el origen `fases-md:<proyecto>`); los roles, los del despliegue.
 # Siempre conviene `--seco` primero: cuenta contra la base real sin escribir (corre lo mismo y deshace la transacción).
+# El resumen lista en `dependenciasViejas` las DEPENDE_DE entre FASE que ningún .md declara; `--podar` las borra (A.1).
 set -euo pipefail
 
 ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 desde_refs() { REF_DESDE="$ORQ" ref "despliegue.$1" || { echo "importar-en-produccion: falta despliegue.$1 en refs.yaml" >&2; exit 1; }; }
 HOST_SSH="${GRAFO_HOST_SSH:-$(desde_refs ssh)}"
 DIR_REMOTO="apps/$(desde_refs app)"
-USO="uso: importar-en-produccion todoist --proyecto <id> [--seco] | fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco]"
+USO="uso: importar-en-produccion todoist --proyecto <id> [--seco] | fases <orquestador> [--proyecto <nombre>] [--adoptar <origen>] [--seco] [--podar]"
 
 falla() { echo "importar-en-produccion: $*" >&2; exit 1; }
 # El mismo prólogo en cada ssh: PATH de docker (ssh no carga el .zshrc) y la carpeta del compose.
@@ -80,6 +81,7 @@ importar_fases() {
       --proyecto) proyecto="${2:?--proyecto pide el nombre}"; shift ;;   # sin él, la clave `proyecto` de su refs.yaml
       --adoptar) extra+=(--adoptar "${2:?--adoptar pide el origen}"); shift ;;
       --seco) extra+=(--seco) ;;
+      --podar) extra+=(--podar) ;;   # A.1: borra las dependencias entre FASE que ningún .md declara (sin él, solo se listan)
       *) falla "$USO" ;;
     esac
     shift
