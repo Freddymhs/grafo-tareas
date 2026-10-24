@@ -43,6 +43,10 @@ tiene rituales (no hereda los del trabajo).
 
 ## Abierto
 
+- **Choca con una regla vigente:** `CLAUDE.md` §Trampas dice «El grafo de producción es el trabajo del SAG, nada más»
+  (Freddy, 17-10: «tenemos dos mundos… eso está mal»). Esa regla nació de FASE de otro orquestador mezcladas sin ningún
+  campo que las separara; esta FASE propone justamente ese campo. Si se confirma, la regla se reescribe en el mismo
+  cambio («cada mundo es un espacio; nada se mezcla sin espacio»), no se deja al lado.
 - ¿Qué espacios nacen además de `trabajo`? (propuesta: `personal`)
 - ¿Una conexión puede cruzar espacios?
 - ¿El importador de Todoist mapea un proyecto de Todoist a un espacio?
