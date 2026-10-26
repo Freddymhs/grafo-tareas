@@ -47,6 +47,11 @@
 - **`<Instances>` de drei arma sus buffers UNA vez, con el `limit` del primer render.** Con el tamaño de la página como límite,
   pasar de una página chica a una grande dejaba las esferas de más sin posición, pegadas a la cabeza: sin esferas y 20 FPS.
   Capacidad fija (`LIMITE_GRAFO`) y `key={capacidad}`; `range` dibuja las que hay. *(Real 2026-10-18, HU 20379 → HU 19565.)*
+- **Lo que dibuja muchas posiciones en UN objeto (`<Instances>`, `<lineSegments>`) va con `frustumCulled={false}`.** three calcula la
+  esfera que lo envuelve una sola vez (`Frustum.intersectsObject`, cuando vale `null`) y no la rehace al cambiar de página: queda la
+  de la página anterior y, si cae fuera de la vista, se descartan TODAS las esferas o líneas juntas. Las etiquetas, que son objetos
+  sueltos, sí se ven. Recién cargada no pasa; se mide en el visor enganchando `__THREE_DEVTOOLS__` por CDP. *(Real 2026-10-26, HU 24576
+  Plan: de frente solo etiquetas; esfera en x≈2, nodos en x −1,2…0,6.)*
 - **Con `set -e`, `X="…$([ cond ] && echo …)"` mata el script cuando la condición es falsa** (la asignación toma el exit 1 de la sustitución), sin imprimir nada y con exit 0 si va detrás de un pipe. Se arma con `[ cond ] || X=…`. *(Real 2026-10-17, `probar-en-visor` sin `--reordenar`.)*
 - **Lo descartado no está en `nodos`: está archivado en `descartes`** (FASE 16). Descartar mueve el nodo y sus conexiones; ninguna
   lectura tiene que filtrarlo. Un borrado de verdad (`DELETE /nodos/:id`) no deja rastro ni lo respeta el importador: para pulir se
