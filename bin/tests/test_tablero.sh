@@ -87,6 +87,18 @@ caso borrador_pide_pieza    '{"cara":"PLAN","carril":"C · Recepción"}' 0 jq -c
 caso borrador_descripcion   'de la pieza'           0 jq -r '.[-1].descripcion' "$NODOS"
 caso borrador_sin_spec      "falta --descripcion-archivo" 64 "$OP/borrador" "C · Recepción" "x"
 caso borrador_archivo_malo  "no existe"             1 "$OP/borrador" "A" "x" --descripcion-archivo "$T/nada.md"
+# La tarjeta de una task que ya existe, como la deja /flow:pbi:repartir en modo acomodar: con `[<task>]` en el título,
+# tomarla la pasa a trabajo. Con la task al final y sin corchetes (`· 25312`) se creaba otra (2026-10-26).
+printf '# 1.1 · Bandeja  HU 20379 · task 25312\n' > "$T/task.md"
+"$OP/borrador" "B · Bandeja" "1️⃣ 20379 · 1.1 · Bandeja · [25312]" --descripcion-archivo "$T/task.md" > /dev/null
+caso borrador_task_se_toma  "tomada"                0 "$OP/tarjeta" 25312 "Bandeja"
+caso borrador_task_una_sola "1"                     0 bash -c "jq '[.[] | select(.titulo | contains(\"25312\"))] | length' '$NODOS'"
+# El orden del reparto viaja con la pieza: `--depende-de <id>` deja la nueva DEPENDE_DE la anterior (2026-10-26: las flechas se
+# agregaron a mano después de pasar las tarjetas).
+PRIMERA=$("$OP/borrador" "B · Bandeja" "1️⃣ 20379 · 1.1 · Primera" --descripcion-archivo "$T/spec.md" | cut -f1)
+caso borrador_depende_crea  "Segunda"               0 "$OP/borrador" "B · Bandeja" "2️⃣ 20379 · 1.2 · Segunda" --descripcion-archivo "$T/spec.md" --depende-de "$PRIMERA"
+caso borrador_depende_flecha "DEPENDE_DE"            0 bash -c "jq -r --slurpfile n '$NODOS' '(\$n[0][] | select(.titulo | contains(\"1.2 · Segunda\")) | .id) as \$s | .[] | select(.origenId == \$s and .destinoId == \"$PRIMERA\") | .tipo' '$CONEXIONES'"
+caso borrador_depende_vacio "falta el id"           64 "$OP/borrador" "B · Bandeja" "x" --descripcion-archivo "$T/spec.md" --depende-de
 
 # Sin conexión con la API (el Mac Mini apagado), contra la API de verdad y no la falsa: curl escribe el código 000, y
 # eso no puede pasar por éxito. Real 2026-10-18, ensayo del corte: pendiente y tarjeta salían 0 sin haber guardado nada.

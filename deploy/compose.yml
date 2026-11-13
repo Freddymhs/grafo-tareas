@@ -43,6 +43,8 @@ services:
       THROTTLE_LIMIT: '100'
       ROLES_ARCHIVO: /area/roles.yaml
       REFS_ARCHIVO: /area/refs.yaml
+      # El id del proyecto SAG tras migrar; vacío = lo busca por nombre en el espacio con método de trabajo.
+      PROYECTO_POR_DEFECTO: ''
     volumes:
       # Los mismos archivos del área que usa bin/dev en el PC; la API los lee al arrancar.
       - ../docs/roles.yaml:/area/roles.yaml:ro

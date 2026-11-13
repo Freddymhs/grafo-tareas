@@ -4,20 +4,29 @@
 # La API (`POST /piezas`) le aplica la misma regla que el importador: cara PLAN, `pieza` y `ronda:N`, y la cuelga de
 # su HU (la de la cabecera de la especificación) y de la RAMA de su carril, la columna del plan.
 #
-#   borrador <carril> <título> --descripcion-archivo <ruta>     → `<id>\t<titulo>`
+#   borrador <carril> <título> --descripcion-archivo <ruta> [--depende-de <id>]…     → `<id>\t<titulo>`
+#
+# `--depende-de` (se repite) deja la pieza nueva DEPENDE_DE otra ya creada: el orden del reparto, con el id que imprimió
+# el `borrador` de esa otra.
 #
 # En el grafo la especificación es obligatoria: su primera línea (`# N.M · título  HU <n> · …`) dice de qué HU es la
 # pieza. Sin ella, o con un carril que no es `<letra> · <zona>`, la API responde 400 y no guarda nada.
 set -euo pipefail
 source "$(dirname "$(readlink -f "$0")")/lib/tablero.sh"
 CARRIL="${1:?uso: borrador <carril> <título> --descripcion-archivo <ruta>}"; TITULO="${2:?falta el título}"; shift 2
-ARCHIVO=""
+ARCHIVO=""; DEPENDE=()
 while [ $# -gt 0 ]; do
-  case "$1" in --descripcion-archivo) ARCHIVO="${2:?--descripcion-archivo necesita una ruta}"; shift 2 ;; *) echo "argumento desconocido: $1" >&2; exit 64 ;; esac
+  case "$1" in
+    --descripcion-archivo) ARCHIVO="${2:?--descripcion-archivo necesita una ruta}"; shift 2 ;;
+    --depende-de) [ -n "${2:-}" ] || { echo "--depende-de: falta el id de la pieza de la que depende" >&2; exit 64; }; DEPENDE+=("$2"); shift 2 ;;
+    *) echo "argumento desconocido: $1" >&2; exit 64 ;;
+  esac
 done
 [ -n "$ARCHIVO" ] || { echo "falta --descripcion-archivo: la especificación de la pieza dice de qué HU es" >&2; exit 64; }
 [ -f "$ARCHIVO" ] || { echo "no existe: $ARCHIVO" >&2; exit 1; }
 
 CUERPO=$(jq -nc --arg c "$CARRIL" --arg ti "$TITULO" --rawfile d "$ARCHIVO" '{carril: $c, titulo: $ti, descripcion: $d}')
 NUEVA=$(gr_pieza "$CUERPO")
+ID_NUEVA=$(jq -r .id <<<"$NUEVA")
+for dep in "${DEPENDE[@]}"; do gr_conectar "$ID_NUEVA" "$dep" DEPENDE_DE > /dev/null; done
 printf '%s\n' "$NUEVA" | linea
