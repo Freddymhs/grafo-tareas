@@ -116,12 +116,12 @@ nodo_por_prefijo() {   # $1 prefijo · $2 tipo (opcional)
   gr_listar "$1" "${2:-}" | jq -c --arg p "$1" '[.[] | select(.titulo | startswith($p))] | first // empty'
 }
 
-# El externo con el que `importar:fases` (grafo-tareas.api) escribe las FASE: `fases-md:<proyecto>` / `fase:<n>`.
-# Es el mismo valor que `origenFases()` de la API (src/importadores/fases/traducir-fases.ts): si cambia allá, cambia acá.
+# El externo de las FASE en el grafo: `fases-md:<proyecto>` / `fase:<n>`. Lo dejó el viejo `importar:fases` (salió en la
+# FASE 25) y lo sigue usando este adaptador al crear la tarjeta: las FASE que ya están lo llevan, no se cambia.
 readonly ORIGEN_FASES_PREFIJO=fases-md
 
-# La FASE n de ESTE orquestador, abierta o cerrada: el mismo nodo que escribe el importador. Así el hook (por
-# `etapa`) y `importar:fases` marcan un solo nodo, y una «FASE n» de otro proyecto o de Todoist no se toca (C10).
+# La FASE n de ESTE orquestador, abierta o cerrada, por su externo: el hook (por `etapa`) y el adaptador marcan un solo
+# nodo, y una «FASE n» de otro proyecto o de otro origen no se toca (C10).
 nodo_fase() {   # $1 número
   local proyecto
   proyecto=$(REF_DESDE="$ORQ" ref proyecto) || { echo "falta \`proyecto\` en refs.yaml: sin él no sé de qué orquestador es la FASE" >&2; return 1; }
@@ -129,7 +129,7 @@ nodo_fase() {   # $1 número
     jq -c --arg o "$ORIGEN_FASES_PREFIJO:$proyecto" --arg i "fase:$1" '[.[] | select(.externoOrigen == $o and .externoId == $i)] | first // empty'
 }
 
-externo_fase() {   # $1 número → {externoOrigen, externoId} para crearla igual que el importador
+externo_fase() {   # $1 número → {externoOrigen, externoId} para crearla con el externo de las FASE
   jq -nc --arg o "$ORIGEN_FASES_PREFIJO:$(REF_DESDE="$ORQ" ref proyecto)" --arg i "fase:$1" '{externoOrigen: $o, externoId: $i}'
 }
 

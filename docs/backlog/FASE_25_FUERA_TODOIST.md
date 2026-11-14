@@ -2,7 +2,7 @@
 
 **Destraba**: que la API deje de nombrar a una herramienta que el trabajo ya no usa (TRABAJO y Draft trabajo se portaron
 enteros al grafo), ni el puente de esa mudanza (`importar:fases`). Una FASE llega al grafo como tarjeta, por el adaptador.
-**Estado**: sin rama
+**Estado**: hecho en el árbol de trabajo (2026-11-14), sin commit
 **Azure**: no aplica (tracker: none)
 **Tipo**: devex
 **Dependencias**: ninguna
@@ -70,28 +70,31 @@ Ninguno.
 ## Tareas
 
 ### `grafo-tareas.api`
-- [ ] **Tarea 1** · D1 y D2: borrar `src/importadores/todoist/` y `src/importadores/fases/` con sus specs,
+- [x] **Tarea 1** · D1 y D2: borrar `src/importadores/todoist/` y `src/importadores/fases/` con sus specs,
   `test/importador.e2e-spec.ts`, `test/importador-fases.e2e-spec.ts`, los scripts `importar:todoist` e `importar:fases`
   y la excepción del CI (`ci.yml:52`), cuyo grep sigue pasando.
-- [ ] **Tarea 2** · D3: `plan.ts`, `aplicar-plan.ts` y `pieza.ts` (con sus specs) pasan a `modules/piezas`, y se
+- [x] **Tarea 2** · D3: `plan.ts`, `aplicar-plan.ts` y `pieza.ts` (con sus specs) pasan a `modules/piezas`, y se
   arreglan los imports. Los comentarios de `grafo.constants.ts:4` y `:67` y de `dia.dto.ts:86` dejan de nombrar al
   importador. Los unitarios y los e2e quedan en verde; los que salen con la Tarea 1 se cuentan.
 - [ ] **Tarea 3** · `README.md` y `openapi.json` sin los importadores; el cliente de web y VR, regenerado si cambió el
-  contrato.
+  contrato. *(2026-11-14: README y `openapi.json` hechos; el contrato no cambió de rutas ni tipos, solo 4 descripciones:
+  falta `api:generar` en web y VR, que solo cambia el comentario de `tramites` en `diaResponseDto.ts`.)*
 
 ### `bin`
-- [ ] **Tarea 4** · se borra `bin/importar-en-produccion`.
+- [x] **Tarea 4** · se borra `bin/importar-en-produccion`.
 
 ### `docs`
-- [ ] **Tarea 5** · `../CLAUDE.md`, `_CONCEPTO.md`, `roles.yaml` y `diagrams/DIAGRAMAS_COMPONENTES.md` sin los
+- [x] **Tarea 5** · `../CLAUDE.md`, `_CONCEPTO.md`, `roles.yaml` y `diagrams/DIAGRAMAS_COMPONENTES.md` sin los
   importadores como pieza viva. Las FASE que los cuentan (3, 5, 10, 13, 16, 17 y 21) son historia y no se tocan.
 
 ## Criterios de Aceptación
 
-- [ ] 1 · `grep -rni todoist grafo-tareas.api/src grafo-tareas.api/test` = 0.
-- [ ] 2 · Una FASE en APROBADO sin la etiqueta `mergeada` no bloquea a quien depende de ella. Hay que confirmar si ese e2e
-  ya existe y, si no, se escribe; antes de cerrar este criterio se hace fallar sacando la columna de la regla.
-- [ ] 3 · `ls grafo-tareas.api/src/importadores` = no existe; `pnpm build`, unitarios y e2e en verde.
+- [x] 1 · `grep -rni todoist grafo-tareas.api/src grafo-tareas.api/test` = 0.
+- [x] 2 · Una FASE en APROBADO sin la etiqueta `mergeada` no bloquea a quien depende de ella. Hay que confirmar si ese e2e
+  ya existe y, si no, se escribe; antes de cerrar este criterio se hace fallar sacando la columna de la regla. *(2026-11-14: no existía para una
+  FASE; `test/grafo.e2e-spec.ts` «una FASE en APROBADO sin la etiqueta `mergeada` no bloquea», que falla con la columna
+  fuera de `bloqueaAhora`.)*
+- [x] 3 · `ls grafo-tareas.api/src/importadores` = no existe; `pnpm build`, unitarios y e2e en verde.
 - [ ] 4 · Desplegado: `GET /nodos?tipo=FASE` devuelve lo mismo que antes del despliegue.
 
 ## Fuera de alcance

@@ -13,7 +13,6 @@ flowchart LR
   WEB -->|REST · hooks Orval| API
   MET -->|bin/adapters/grafo · F2| API
   API -->|Prisma| DB[(Postgres · Neon)]
-  TOD[Todoist] -.->|importador, una vez, solo lectura| API
 ```
 
 ## Componentes principales
@@ -22,7 +21,7 @@ flowchart LR
 flowchart TB
   subgraph Tailscale["Tailnet (sin login en v0)"]
     subgraph MacMini["Mac Mini · Docker"]
-      API[NestJS · Fastify<br/>nodos · conexiones · ramas · derivado<br/>importadores/todoist]
+      API[NestJS · Fastify<br/>nodos · conexiones · ramas · derivado · piezas]
       WEBS[Next.js PWA]
       VRS[Vite build VR]
     end

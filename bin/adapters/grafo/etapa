@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # etapa — mueve la tarjeta de una task (`[<id>]`, TAREA por prefijo) o una FASE (`FASE <n>`: el nodo FASE de este
-# orquestador, por el mismo externo que usa `importar:fases`, abierto o cerrado) a su etapa. Es la proyección del estado del PBI en el
+# orquestador, por su externo `fases-md:<proyecto>`, abierto o cerrado) a su etapa. Es la proyección del estado del PBI en el
 # tablero (/flow:todo §6): la mueven /flow:pbi:get, /flow:paircoding y el hook fase-tilde, nunca una mano.
 #
 #   etapa <id | "FASE <n>"> <etapa> [--titulo <título corto>]

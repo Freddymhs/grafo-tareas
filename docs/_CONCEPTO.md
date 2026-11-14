@@ -14,7 +14,7 @@ Si una sesión nueva solo lee esto, no se desvía. Cada punto apunta a dónde es
 4. **Orden fijo, sin saltarse pasos:** **F-1 prueba de portabilidad** → `nuevo-workspace` → `refs.yaml` → **`/work:resume:new-project`** (no se arranca escribiendo código: lee este concepto, elige plantilla con inspección real, planta `_CONCEPTO.md`, registra el draft en `resume.json`) → **`/work:create-backlog`** → **F1.0 la prueba en el visor** → recién ahí la API (§ Estado al 2026-10-16).
 5. **F1.0 primero, y chica:** ~500 nodos alrededor en el Quest Browser con R3F. Si no rinde o no se lee, se revisa la decisión del 3D antes de escribir la API. Es la protección contra "la IA dibujando horas sin resultado".
 6. **Hecho para que una IA lo construya sin romperlo:** TypeScript en todo, librerías declarativas con documentación (R3F + @react-three/xr, `d3-force-3d`, `<Text>` de drei), plantillas propias con tests. Nada de three.js imperativo a mano (la lección de `helical-scroll-cards`). Sin sobreingeniería: monolito modular, sin microservicios ni MCP, sin login (Tailscale), lo que nadie pide no se escribe (§ Stack).
-7. **Lo agnóstico está garantizado por construcción:** la API no conoce Todoist, Azure ni el SAG; solo los adaptadores e importadores nombran herramientas. El switch es `tablero.kind` en `refs.yaml`, y el contrato del tablero ya existe y anda (F0, PORTAR.md).
+7. **Lo agnóstico está garantizado por construcción:** la API no conoce Todoist, Azure ni el SAG; solo los adaptadores nombran herramientas (la API no tiene importadores desde la FASE 25). El switch es `tablero.kind` en `refs.yaml`, y el contrato del tablero ya existe y anda (F0, PORTAR.md).
 8. **Las decisiones son de Freddy y ya están tomadas** (12, en § Stack): tres repos separados, Neon, R3F, Orval, Next desde su plantilla, todo en Tailscale. No se re-deciden; si algo choca, se marca y se le pregunta.
 9. **Lo que sigue abierto** se confirma antes de importar datos reales: N1 (datos del cliente en Neon), N2 (si `🎯 Crecimiento Profesional` entra), C1-C4 (§ Para confirmar).
 10. **Cómo se trabaja el código, siempre:** las reglas globales de Freddy (`~/.claude/CLAUDE.md`: `const`, sin `any`, SSOT, read-before-write, verificar que un chequeo pueda fallar) y su ciclo: FASE → código → `/work:sellar:run` (precommit en bucle + stage + mensaje) → el commit lo corre Freddy salvo que pida lo contrario.
@@ -148,13 +148,13 @@ React Native (solo paneles 2D en Quest), Meta Spatial SDK (Kotlin, grafo desde c
 - **Operaciones del contrato — las 5 medidas e implementadas** (PORTAR.md §El contrato del tablero es la fuente): `pendiente <tipo> <texto> [--vence] [--descripcion]` (tipo ∈ bloqueo · confirmacion · informe · propuesta · observacion · supuesto) · `buscar <palabras>` · `tarjeta <id> <título>` (idempotente) · `etapa <id|FASE n> <etapa> [--titulo]` (exit 4 sin tarjeta) · `borrador <carril> <título> [--descripcion-archivo]`. Salida `<id>\t<content>`; error → exit ≠ 0. `cerrar` y `abiertas` NO existen: ningún flow los pide todavía; se escriben con el primero que lo pida (el adaptador `grafo` probablemente los necesite para "hoy puedo" y "si X contesta").
 - **Adaptador `todoist`:** cumple el contrato sobre `~/bin/lib/todoist-api.sh` (REST, ya existe, ya lo usan los bots). Los `flow` pasan de `ref todoist.*` a `ref tablero.*`. Nada cambia para Freddy; se verifica con Todoist funcionando igual. Los hooks que hoy *sugieren* mover la tarjeta pasan a llamarlo: determinista.
 - **Adaptador `grafo`:** cumple el mismo contrato contra la API REST (Swagger). Un `pendiente` tipo `bloqueo` = nodo DUDA + conexión `ESPERA_RESPUESTA_DE` a la PERSONA; `etapa` = estado del nodo FASE/TAREA; `abiertas --persona` = `libera(persona)`.
-- **Migración, una sola vez:** importador Todoist → grafo (TRABAJO, Draft, y los proyectos personales que Freddy elija), idempotente por `externo { origen, id }`. Después, `tablero.kind: grafo` y Todoist queda solo para lo que el grafo no cubre (ver § Para confirmar, N2).
-- Importadores de contexto, en F2: `FASE_*.md` + `entendimiento.md` §ABIERTO (dependencias más ricas que cualquier tablero).
+- **Migración, una sola vez:** importador Todoist → grafo (TRABAJO, Draft, y los proyectos personales que Freddy elija), idempotente por `externo { origen, id }`. Después, `tablero.kind: grafo` y Todoist queda solo para lo que el grafo no cubre (ver § Para confirmar, N2). Hecha; el importador salió en la FASE 25.
+- Los `FASE_*.md` no se importan (FASE 25): una FASE entra como tarjeta por el adaptador (`etapa "FASE <n>" <etapa> --titulo …`) o por el hook al tildarla; sus casillas y criterios siguen en el `.md`, que es su dueño.
 - Sesiones interactivas consultan por el mismo CLI o por HTTP. MCP: no está en el plan.
 
 ### Prueba de que sigue agnóstico
 
-El grep de PORTAR §Verificar, aplicado al repo de la API: `grep -rnE "sag\.laboratorio|Laboratorio/|dev\.azure|6VhFQg6v45qcJHPc|todoist" grafo-tareas.api/src` → **0 hits fuera de `importadores/`**. Se corre en el CI.
+El grep de PORTAR §Verificar, aplicado al repo de la API: `grep -rnE "sag\.laboratorio|Laboratorio/|dev\.azure|6VhFQg6v45qcJHPc|todoist" grafo-tareas.api/src` → **0 hits, sin excepciones** (desde la FASE 25 no hay `importadores/`). Se corre en el CI.
 
 ## practice-wishlist
 
@@ -369,17 +369,19 @@ LEER ANTES DE TOCAR NADA, en este orden (eso es la fuente; este prompt solo apun
    feedback-mergeado-se-tilda, feedback-evitar-subagentes-costosos, project-evaluacion1-fabian (contexto personal).
 
 DE DÓNDE SALE CADA DATO (una fuente por concepto):
-- El estado de una task (etapas, Mergeado, cierre) sale de su FASE_N.md del Laboratorio, vía `importar:fases`. Se tilda con
+- El estado de una task (etapas, Mergeado, cierre) sale de su FASE_N.md del Laboratorio; en el grafo es su tarjeta, que el
+  hook mueve (`etapa`; APROBADO al tildar Mergeado). Se tilda con
   /flow:tildar (fase-tildar), o lo tilda el hook fase-tilde cuando Claude escribe el artefacto de la etapa.
-- Las tarjetas de TRABAJO y del «🚀 Draft trabajo» (la cara PLAN) salen de Todoist, vía el importador (lee solo las ACTIVAS).
+- Las tarjetas de TRABAJO y del «🚀 Draft trabajo» (la cara PLAN) se importaron de Todoist y viven en el grafo (el importador
+  salió en la FASE 25).
 - Lo que pide una HU: la wiki del equipo guía y el work item de Azure valida (regla 18). Azure: solo GET.
 - Lo que se pule (descartar, renombrar, etiquetar) va SOLO en el grafo, con motivo: queda en la bitácora (GET /cambios) y
-  el importador lo respeta. Todoist no se toca sin su «sí».
+  nada lo pisa. Todoist no se toca sin su «sí».
 - Producción es la base del Mac Mini; la del PC es de desarrollo, y los e2e corren solo contra *_test.
 
 DECISIONES VIGENTES (cada una con su FASE; no se reabren sin que Freddy lo pida):
 - El árbol HU → pieza/PBI → FASE → tarjeta [id] (C12, FASE 13). La tarjeta y su FASE son la misma task vista dos veces.
-- «FASE n» en una tarjeta es la FASE del Laboratorio, por externo, nunca por título (C10: --adoptar todoist, --fases-de).
+- «FASE n» en una tarjeta es la FASE del Laboratorio, por externo, nunca por título (C10: externo `fases-md:<proyecto>` / `fase:n`).
 - Cada HU es un libro con dos caras: REAL (TRABAJO) y PLAN (Draft). El plan son piezas N.M agrupadas por carril (una RAMA con
   la etiqueta `carril`) y por ronda (`ronda:N`) (FASE 17).
 - Las columnas son las etapas del método, en una lista fija (C9), más TRÁMITES DE CIERRE a la derecha de CERRADO (URL commit,
@@ -399,7 +401,7 @@ DOLORES Y LECCIONES (por qué las cosas son como son):
 - Le da miedo borrar: se descarta con motivo y se puede restaurar. Antes de descartar, leer cada tarjeta entera
   (9 de 20 descartes perdían información).
 - Le da miedo la lógica nueva en el backend: un dato raro se explica con su fuente y él lo arregla donde nace; no se inventan
-  heurísticas en los importadores.
+  heurísticas en la API.
 - La confusión se ve en el tablero: «Sin etapa», una columna de «FASE n» (eran duplicados), tarjetas en columnas que no son
   de su flujo (AMARRAR en Producto). Cuando algo confunde, primero se mide en producción qué es.
 - Con los compañeros solo se comparte Azure; los .md propios (task-*.md, entendimiento) no se les pasan.
@@ -410,7 +412,7 @@ FLUJOS DEL LABORATORIO QUE MUEVEN EL GRAFO (el guion para probarlos a mano está
 - La colección, la auditoría y la guía (QA/<proy>/…) tildan las casillas de ## QA.
 - /flow:tildar → fase-tildar tilda mergeado, url, evidencias y wiki.
 - /flow:brechas + /flow:pbi:repartir → el Draft por carril → la cara PLAN.
-- `bin/importar-en-produccion todoist|fases` (siempre --seco primero) y `bin/desplegar`.
+- `bin/desplegar`.
 
 CÓMO TRABAJAR CON FREDDY:
 - En diseño y UX no se pregunta: se decide, se anota en «Decisiones del agente» y se pide el «sí». Se le pregunta solo por
@@ -441,8 +443,8 @@ Abiertas:
 - FASE 16: el reporte final Todoist ↔ grafo.
 - FASE 18: normalizar las tarjetas; espera el «sí».
 - CORTE HECHO (2026-10-18, FASE 5): el Laboratorio escribe en el grafo (`tablero.kind: grafo`); Todoist TRABAJO y el
-  Draft quedan congelados y sus importadores no se corren más; `importar fases` sigue (el estado de cada FASE sale de sus
-  casillas). Volver: `git show d8281c7:refs.yaml` en el Laboratorio. Reporte previo: FASE 16 § Reporte final.
+  Draft quedan congelados y sus importadores no se corren más; `importar fases` siguió hasta la FASE 25 (2026-11-13), que lo sacó
+  (el estado de cada FASE sale de sus casillas). Volver: `git show d8281c7:refs.yaml` en el Laboratorio. Reporte previo: FASE 16 § Reporte final.
   Después del corte: 10 tarjetas [FASE n] descartadas, un trámite por FASE (con el texto para pegar de Todoist), la prosa
   de los comandos dice «el tablero» y el `ah` está al día (lo que ya no existe, marcado).
 - FASE 19 (2/3, desplegada: api d47e4f7 · orquestador 05e8821): ensayo del corte y sus arreglos (fase-tildar llama

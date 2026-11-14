@@ -1,7 +1,7 @@
 # roles.yaml — los tipos de trabajo de esta área (C11, 2026-10-17). Una FASE declara su rol con la línea
 # `**Tipo**: <marca>` de la cabecera; sin esa línea, cae en `defecto`. Es la fuente ÚNICA de:
 #   · las plantillas de FASE (`plantilla`) que usan /work:resume:new-concept y /work:create-backlog,
-#   · la etapa de cada FASE derivada de sus casillas (importar:fases de grafo-tareas, bin/fases),
+#   · la etapa de cada FASE derivada de sus casillas (bin/fases),
 #   · las columnas de cada tablero por rol en la PWA.
 # Un rol nuevo = una entrada acá + su plantilla. Se copia a cada área con `nuevo-workspace`: cada empresa
 # ajusta los suyos sin tocar los de otra. `bash tests/test_roles.sh` (dotfiles) falla si rol y plantilla no calzan.
