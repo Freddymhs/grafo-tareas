@@ -84,8 +84,10 @@ Ninguno.
 
 ## Criterios de Aceptación
 
-- [ ] 1 · Un commit de prueba pusheado a `main` de la web queda en producción sin correr nada a mano, y su job `deploy`
+- [x] 1 · Un commit de prueba pusheado a `main` de la web queda en producción sin correr nada a mano, y su job `deploy`
   aparece en verde en GitHub.
+  Hecho el 2026-11-14: web `98af349`, api `7ff09fa`, vr `9e8e674` y la raíz `8afa34f`, los cuatro con tests y `deploy` en verde.
+  El de la raíz verificó 5 contenedores, health/PWA/VR 200 y CORS de web y VR.
 - [ ] 2 · Con el ThinkPad apagado, el Quest abre la VR desde la URL del Mac Mini y muestra las pestañas.
 - [ ] 3 · Un push con un test rojo no despliega: se prueba a propósito una vez.
 
