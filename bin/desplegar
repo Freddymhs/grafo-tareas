@@ -1,30 +1,17 @@
 #!/usr/bin/env bash
-# desplegar — FASE 12: lleva el `main` PUBLICADO de grafo-tareas (orquestador, api, web) al Mac Mini y lo levanta con
-# deploy/compose.yml. Repetible: correrlo dos veces seguidas no cambia nada.
+# desplegar — el camino A MANO al Mac Mini (emergencia). El de todos los días es el push: el job `deploy` del CI de api,
+# web y vr corre deploy/desplegar-aqui.sh en el runner del Mac Mini (FASE 27). Este script corre ese MISMO archivo, por ssh:
 #
 #   1. aquí: lo que no está en GitHub no se despliega → aborta si algún `main` local va adelante de origin
-#   2. allá (ssh): clona o trae los tres repos a ~/apps/<app>, escribe deploy/.env (la contraseña de Postgres se crea
-#      una vez y se conserva; 600), `docker compose up -d --build`, `tailscale serve` del puerto de cada URL
-#   3. aquí: verifica por el tailnet health, PWA, CORS de PATCH, puertos solo en 127.0.0.1 y restart unless-stopped
-#
-# El runner de GitHub del Mac Mini solo toma repos de fmarcos-labs (su ~/CLAUDE.md); éstos son de Freddymhs: por eso ssh.
+#   2. allá (ssh): deploy/desplegar-aqui.sh tal como está en origin/main — trae los repos, compose, tailscale serve y
+#      la verificación por el tailnet (health, PWA, VR, CORS, puertos solo en 127.0.0.1, restart unless-stopped)
 set -euo pipefail
 
 ORQ="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 # Dónde corre sale de refs.yaml (`despliegue`), no de este script: lo leen también probar-en-visor y el corte.
-desde_refs() { REF_DESDE="$ORQ" ref "despliegue.$1" || { echo "desplegar: falta despliegue.$1 en refs.yaml" >&2; exit 1; }; }
-HOST_SSH="${GRAFO_HOST_SSH:-$(desde_refs ssh)}"
-DIR_REMOTO="apps/$(desde_refs app)"                               # convención del Mac Mini: ~/apps/<app>
-URL_API="$(desde_refs api)"
-URL_WEB="$(desde_refs web)"
-GITHUB="${GRAFO_GITHUB:-git@github.com:Freddymhs}"
-REPOS_INTERNOS=(grafo-tareas.api grafo-tareas.web)
+HOST_SSH="${GRAFO_HOST_SSH:-$(REF_DESDE="$ORQ" ref despliegue.ssh)}" || { echo "desplegar: falta despliegue.ssh en refs.yaml" >&2; exit 1; }
+REPOS_INTERNOS=(grafo-tareas.api grafo-tareas.web grafo-tareas.vr)
 RAMA=main
-PUERTO_API=3007                                                  # 127.0.0.1 del Mac Mini; apps generales: 3001-3009
-PUERTO_WEB=3008
-HTTPS_API="${URL_API##*:}"                                       # tailscale serve solo da HTTPS en 443, 8443 y 10000
-HTTPS_WEB="${URL_WEB##*:}"                                       # (el 443 del Mac Mini es de otro servicio)
-SEGUNDOS_ESPERA=180
 INTENTOS_GIT=3
 
 falla() { echo "desplegar: $*" >&2; exit 1; }
@@ -43,88 +30,5 @@ for repo in "" "${REPOS_INTERNOS[@]}"; do
   [ -z "$(git -C "$dir" status --porcelain)" ] || echo "aviso: $nombre tiene cambios sin commitear; no viajan (se despliega origin/$RAMA)"
 done
 
-# 2. En el Mac Mini.
-ssh "$HOST_SSH" bash -s -- "$DIR_REMOTO" "$GITHUB" "$RAMA" "$PUERTO_API" "$PUERTO_WEB" "$HTTPS_API" "$HTTPS_WEB" \
-  "$URL_API" "$URL_WEB" "${REPOS_INTERNOS[@]}" <<'REMOTO'
-set -euo pipefail
-export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"   # ssh no carga el .zshrc: sin esto no hay docker
-# Sin la attestation de procedencia (lleva la hora del build) el mismo código da la misma imagen y `up --build` no
-# recrea nada. Va por variable: compose 2.x construye con bake y no respeta `provenance: false` (medido 2026-10-17).
-export BUILDX_NO_DEFAULT_ATTESTATIONS=1
-TAILSCALE=/Applications/Tailscale.app/Contents/MacOS/Tailscale
-DIR="$HOME/$1"; GITHUB=$2; RAMA=$3
-export PUERTO_API=$4 PUERTO_WEB=$5; HTTPS_API=$6; HTTPS_WEB=$7; export URL_API=$8 URL_WEB=$9
-shift 9
-
-reintentar() {   # el mismo corte de GitHub puede pasar acá; bash 3.2 (el de macOS): nada de mapfile ni `local -n`
-  for n in 1 2 3; do "$@" && return 0; echo "reintento $n/3: $*" >&2; sleep 5; done
-  return 1
-}
-traer() {   # traer <dir> <repo>: clona la primera vez; después solo avanza (nunca pisa: --ff-only)
-  if [ -d "$1/.git" ]; then
-    reintentar git -C "$1" fetch -q origin "$RAMA"
-    git -C "$1" checkout -q "$RAMA" && git -C "$1" merge -q --ff-only "origin/$RAMA"
-  else reintentar git clone -q --branch "$RAMA" "$GITHUB/$2.git" "$1"; fi
-  echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
-}
-mkdir -p "$(dirname "$DIR")"
-# La API lee roles.yaml y refs.yaml SOLO al arrancar: si el despliegue los cambia, hay que reiniciarla (abajo).
-huella_area() { cat "$DIR/docs/roles.yaml" "$DIR/refs.yaml" 2>/dev/null | shasum | cut -c1-40; }
-AREA_ANTES=$(huella_area)
-traer "$DIR" grafo-tareas
-for repo in "$@"; do traer "$DIR/$repo" "$repo"; done
-
-ENV="$DIR/deploy/.env"
-# deploy/.env es el `.env` que compose lee solo desde deploy/: así un `docker compose ps` a mano también funciona.
-# La contraseña se crea una vez y se conserva; puertos y URLs se reescriben en cada despliegue (su fuente es este script).
-CLAVE=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$ENV" 2>/dev/null || true)
-[ -n "$CLAVE" ] || { CLAVE=$(openssl rand -hex 24); echo "contraseña nueva de Postgres en deploy/.env"; }
-umask 077
-printf 'POSTGRES_PASSWORD=%s\nPUERTO_API=%s\nPUERTO_WEB=%s\nURL_API=%s\nURL_WEB=%s\n' \
-  "$CLAVE" "$PUERTO_API" "$PUERTO_WEB" "$URL_API" "$URL_WEB" > "$ENV.nuevo" && mv "$ENV.nuevo" "$ENV"
-umask 022
-mkdir -p "$DIR/deploy/respaldos"
-
-cd "$DIR/deploy"
-docker compose up -d --build --remove-orphans 2>&1 | grep -vE '^ *#|^$' | tail -12
-if [ "$AREA_ANTES" != "$(huella_area)" ]; then
-  docker compose restart api >/dev/null 2>&1 && echo "roles.yaml o refs.yaml cambiaron: API reiniciada para leerlos"
-fi
-
-"$TAILSCALE" serve --bg --https="$HTTPS_API" "http://127.0.0.1:$PUERTO_API" >/dev/null
-"$TAILSCALE" serve --bg --https="$HTTPS_WEB" "http://127.0.0.1:$PUERTO_WEB" >/dev/null
-
-echo "--- contenedores (puerto publicado · reinicio)"
-CONTENEDORES=$(docker compose ps -q)
-set -- $CONTENEDORES   # contar con $# y no con `wc -w`: el wc de macOS rellena con espacios y "   4" ≠ "4"
-[ $# = 4 ] || { echo "FALLA: se esperaban 4 contenedores corriendo y hay $#" >&2; exit 1; }
-for c in $CONTENEDORES; do
-  docker inspect -f '{{.Name}} · {{range $p, $b := .HostConfig.PortBindings}}{{range $b}}{{.HostIp}}:{{.HostPort}} {{end}}{{end}}· {{.HostConfig.RestartPolicy.Name}}' "$c"
-  # D2 y la convención del Mac Mini: nada en la LAN, y todo vuelve solo tras un reinicio.
-  ips=$(docker inspect -f '{{range $p, $b := .HostConfig.PortBindings}}{{range $b}}{{.HostIp}} {{end}}{{end}}' "$c")
-  for ip in $ips; do [ "$ip" = 127.0.0.1 ] || { echo "FALLA: $c publica en $ip, no solo en 127.0.0.1" >&2; exit 1; }; done
-  [ "$(docker inspect -f '{{.HostConfig.RestartPolicy.Name}}' "$c")" = unless-stopped ] || { echo "FALLA: $c sin restart unless-stopped" >&2; exit 1; }
-done
-REMOTO
-
-# 3. Verificar desde afuera, por el tailnet: lo que ve el teléfono.
-echo "--- verificación por el tailnet"
-espera_200() {   # espera_200 <url>: reintenta hasta SEGUNDOS_ESPERA (la API aplica migraciones al arrancar)
-  local fin=$((SECONDS + SEGUNDOS_ESPERA)) codigo=000
-  while [ $SECONDS -lt $fin ]; do
-    codigo=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$1" || true)
-    [ "$codigo" = 200 ] && break
-    sleep 3
-  done
-  echo "$codigo"
-}
-health=$(espera_200 "$URL_API/api/v1/health"); echo "API health: $health"
-web=$(espera_200 "$URL_WEB/"); echo "PWA: $web"
-metodos=$(curl -s -D - -o /dev/null -m 10 -X OPTIONS -H "Origin: $URL_WEB" -H 'Access-Control-Request-Method: PATCH' \
-  "$URL_API/api/v1/nodos" | tr -d '\r' | grep -i '^access-control-allow-methods:' || true)
-echo "CORS: ${metodos:-sin cabecera}"
-
-[ "$health" = 200 ] || falla "la API no responde 200 por $URL_API"
-[ "$web" = 200 ] || falla "la PWA no responde 200 por $URL_WEB"
-grep -q PATCH <<<"$metodos" || falla "el preflight no permite PATCH desde $URL_WEB (trampa CORS de la FASE 4)"
-echo "listo: PWA $URL_WEB · API $URL_API"
+# 2. En el Mac Mini, el script publicado.
+git -C "$ORQ" show "origin/$RAMA:deploy/desplegar-aqui.sh" | ssh "$HOST_SSH" bash -s

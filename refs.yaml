@@ -11,11 +11,12 @@ tablero: none                          # F0-F1: apagado hasta que Freddy elija (
 #   secciones: { entendimiento: ENTENDIMIENTO, codigo: EN CODIGO, coleccion: Collection Created, auditoria: TESTEADO, listo: LISTO PARA PR, amarrar: "AMARRAR 🧰", cambiar: "CAMBIAR 🧰", red: "RED 🧰", pr: Pull Request, aprobado: APROBADO }   # 10 de GET /etapas (smoke 2026-10-17; aprobado, 2026-10-18)
 #   entrada: { proyecto: grafo-tareas, seccion: Entrada }   # /flow:pbi:repartir la lee; sin ella pregunta. El adaptador no la usa: el carril es una RAMA
 qa: none
-despliegue:                            # FASE 12: dónde corre el grafo. La leen bin/desplegar, bin/probar-en-visor y el corte (tablero.api)
+despliegue:                            # FASE 12 y 27: dónde corre el grafo. La leen deploy/desplegar-aqui.sh, bin/desplegar, bin/probar-en-visor y el corte (tablero.api)
   ssh: mac-mini                        # alias de ~/.ssh/config
   app: grafo-tareas                    # vive en ~/apps/<app> del Mac Mini (convención de su ~/CLAUDE.md)
   api: https://mac-mini-server.tail1798c7.ts.net:8443    # tailscale serve → 127.0.0.1:3007
   web: https://mac-mini-server.tail1798c7.ts.net:10000   # tailscale serve → 127.0.0.1:3008
+  vr: https://mac-mini-server.tail1798c7.ts.net:8448     # tailscale serve → 127.0.0.1:3013 (FASE 27)
 docs: { dir: docs }
 repos: {}                              # los gates (typecheck/lint/test) por repo se llenan tras inspeccionar cada plantilla en new-project
 

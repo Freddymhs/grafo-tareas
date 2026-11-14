@@ -1,7 +1,8 @@
-# grafo-tareas en el Mac Mini (FASE 12). Lo levanta `bin/desplegar`; a mano solo para mirar (`docker compose ps`).
+# grafo-tareas en el Mac Mini (FASE 12 y 27). Lo levanta deploy/desplegar-aqui.sh: el job `deploy` del CI en cada push a
+# main, o `bin/desplegar` a mano en una emergencia. A mano solo para mirar (`docker compose ps`).
 # Rutas relativas a esta carpeta: el orquestador en ~/apps/grafo-tareas y los repos adentro, como en el PC.
 # Nada se publica en la LAN: Postgres sin puerto, API y PWA en 127.0.0.1; afuera solo `tailscale serve` (HTTPS).
-# Las variables salen de deploy/.env: lo escribe bin/desplegar en cada despliegue (conserva la contraseña), 600, fuera de git.
+# Las variables salen de deploy/.env: lo escribe desplegar-aqui.sh en cada despliegue (conserva la contraseña), 600, fuera de git.
 name: grafo-tareas
 
 x-reinicio: &reinicio
@@ -36,8 +37,8 @@ services:
       NODE_ENV: production
       PORT: '3000'
       DATABASE_URL: postgresql://grafo:${POSTGRES_PASSWORD}@postgres:5432/grafo_tareas?schema=public
-      # La PWA del tailnet y la VR del visor (adb reverse: su origen es localhost del Quest).
-      CORS_ORIGINS: ${URL_WEB:?falta URL_WEB},http://localhost:4173,http://localhost:5173
+      # La PWA y la VR del tailnet, y la VR de prueba en el visor (adb reverse: su origen es localhost del Quest).
+      CORS_ORIGINS: ${URL_WEB:?falta URL_WEB},${URL_VR:?falta URL_VR},http://localhost:4173,http://localhost:5173
       PINO_LOG_LEVEL: info
       THROTTLE_TTL: '60'
       THROTTLE_LIMIT: '100'
@@ -60,6 +61,17 @@ services:
       - api
     ports:
       - '127.0.0.1:${PUERTO_WEB:?falta PUERTO_WEB}:3000'
+
+  vr:
+    # FASE 27: la VR del Quest, siempre encendida (antes solo existía mientras el ThinkPad corría bin/probar-en-visor).
+    # Estática, nginx sin root; la URL de la API queda fija en el build, como la web.
+    <<: *reinicio
+    build:
+      context: ../grafo-tareas.vr
+      args:
+        VITE_API_URL: ${URL_API:?falta URL_API}
+    ports:
+      - '127.0.0.1:${PUERTO_VR:?falta PUERTO_VR}:8080'
 
   respaldo:
     # pg_dump diario, 14 copias, en deploy/respaldos/ del Mac Mini (D5). Un contenedor y no launchd: en este Mini

@@ -51,9 +51,11 @@ Ninguno.
 ## Tareas
 
 ### `deploy` + `grafo-tareas.vr`
-- [ ] **Tarea 1** · servicio `vr` en `deploy/compose.yml`, con `Dockerfile` y `.dockerignore` (usuario no root, §9) en la
+- [x] **Tarea 1** · servicio `vr` en `deploy/compose.yml`, con `Dockerfile` y `.dockerignore` (usuario no root, §9) en la
   VR. El build lo hace Docker en el Mac Mini, con npm y no con pnpm. Suma su puerto a `tailscale serve` y al chequeo
-  del despliegue.
+  del despliegue. Hecho el 2026-11-14: `grafo-tareas.vr/Dockerfile` (npm, nginx-unprivileged, uid 101), `deploy/nginx.conf`
+  (sin caché para `sw.js`/`index.html`), `127.0.0.1:3013` → `tailscale serve :8448` (`despliegue.vr`), CORS de la API suma la URL.
+  Probado en el ThinkPad: 200, `no-cache` en lo que decide el build, la URL de la API adentro.
 
 ### CI de cada repo
 - [x] **Tarea 2** · registrar el runner de D3 en el Mac Mini, como servicio que arranca solo, igual al de `fmarcos-labs`.
@@ -64,12 +66,18 @@ Ninguno.
     symlinks `bin/` y `externals/` hacia `~/actions-runner`, y `config.sh` lo tomaba por ya configurado.
   - De paso se vio que el runner de `fmarcos-labs` está caído desde el 2026-11-13 a las 10:06, antes de esta tarea:
     `Get next message failed with non-retryable error` en `~/Library/Logs/actions.runner.fmarcos-labs.mac-mini/stdout.log`.
-- [ ] **Tarea 3** · job `deploy` en el `ci.yml` de `api`, `web` y `vr` (D2). La lógica de despliegue sale de
+- [x] **Tarea 3** · job `deploy` en el `ci.yml` de `api`, `web` y `vr` (D2). La lógica de despliegue sale de
   `bin/desplegar` a un script que corre en el Mac Mini, sin duplicarla. `bin/desplegar` pasa a llamar a ese mismo script.
+  Hecho el 2026-11-14: `deploy/desplegar-aqui.sh` (candado `mkdir`, lee `despliegue` de `refs.yaml`, verifica 5 contenedores
+  y CORS de web y VR). El job lo corre desde `origin/main` del orquestador. Un 4.º runner, `mac-mini-grafo-raiz`, para el
+  workflow `Despliegue` de la raíz. Los 4 runners y el de `fmarcos-labs` llevan `KeepAlive`: el de `fmarcos-labs` estuvo
+  caído desde el 13-11 porque, tras un corte de red, el LaunchAgent solo tenía `RunAtLoad` (probado: se mata y vuelve en <75 s).
+  Antes el CI de los tres repos estaba en rojo: ubuntu-latest pasó a 26.04 sin Playwright (se fija 24.04), los e2e de web
+  y vr no simulaban `/espacios` tras la FASE 26, y la API nombraba `todoist` (FASE 25).
 
 ### Docs
-- [ ] **Tarea 4** · `deploy/README` o `CLAUDE.md`: el flujo es «push a main». `bin/desplegar` queda como el camino a mano
-  para una emergencia.
+- [x] **Tarea 4** · `deploy/README` o `CLAUDE.md`: el flujo es «push a main». `bin/desplegar` queda como el camino a mano
+  para una emergencia. Hecho el 2026-11-14 en `CLAUDE.md` §Comandos.
 
 ## Criterios de Aceptación
 

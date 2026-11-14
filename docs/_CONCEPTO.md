@@ -419,7 +419,7 @@ CÓMO TRABAJAR CON FREDDY:
   hechos de sus datos, y se le pide el «sí» para migraciones, descartes y escrituras en Todoist.
 - El hilo principal hace el trabajo, en serie. Subagentes solo si él los pide, y entonces 1 o 2, Opus o Fable; nunca Sonnet
   ni Haiku.
-- Commit y push los corre él, salvo que diga «hazlo». Desplegar = commit + push + bin/desplegar (las migraciones piden su «sí»).
+- Commit y push los corre él, salvo que diga «hazlo». Desplegar = commit + push (FASE 27: el CI prueba y despliega; `bin/desplegar` queda a mano para una emergencia; las migraciones piden su «sí»).
   Las correcciones sin prioridad cuelgan de la rama «🧹 Normalización».
 - Una tarjeta «resuelta» se cierra solo con evidencia citada; lo que se afirma del código lleva archivo:línea.
 - Reglas globales: sin let ni any, SSOT, todo chequeo tiene que poder fallar (probar el rojo) e imprimir su denominador.

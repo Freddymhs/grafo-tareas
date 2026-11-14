@@ -1,0 +1,22 @@
+name: Despliegue
+
+# El orquestador no tiene código que probar: un push a main que toca lo que corre en producción (compose, el script de
+# despliegue, refs.yaml o roles.yaml, que la API lee al arrancar) se despliega igual que un push de api, web o vr.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/**'
+      - 'refs.yaml'
+      - 'docs/roles.yaml'
+
+jobs:
+  deploy:
+    name: Desplegar en el Mac Mini
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, mac-mini, grafo]
+    steps:
+      - name: deploy/desplegar-aqui.sh de origin/main del orquestador
+        run: |
+          git -C "$HOME/apps/grafo-tareas" fetch -q origin main
+          git -C "$HOME/apps/grafo-tareas" show origin/main:deploy/desplegar-aqui.sh | bash -s
