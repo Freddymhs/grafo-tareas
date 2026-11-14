@@ -11,6 +11,14 @@ export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"   # ni ssh ni el LaunchAgen
 # Sin la attestation de procedencia (lleva la hora del build) el mismo código da la misma imagen y `up --build` no
 # recrea nada. Va por variable: compose 2.x construye con bake y no respeta `provenance: false` (medido 2026-10-17).
 export BUILDX_NO_DEFAULT_ATTESTATIONS=1
+# El ayudante de credenciales de Docker Desktop (`credsStore: desktop`) se cuelga fuera de la sesión de Freddy: desde el
+# LaunchAgent del runner el build quedó 35 min en `load metadata` y murió con «error getting credentials» (2026-11-14).
+# Las imágenes base son públicas: el deploy usa una config sin ayudante, con los mismos plugins (compose, buildx).
+DOCKER_SIN_AYUDANTE="$HOME/.docker-despliegue"
+mkdir -p "$DOCKER_SIN_AYUDANTE"
+printf '{"auths":{}}\n' > "$DOCKER_SIN_AYUDANTE/config.json"
+ln -sfn "$HOME/.docker/cli-plugins" "$DOCKER_SIN_AYUDANTE/cli-plugins"
+export DOCKER_CONFIG="$DOCKER_SIN_AYUDANTE" DOCKER_HOST="unix://$HOME/.docker/run/docker.sock"
 
 DIR="$HOME/apps/${GRAFO_APP:-grafo-tareas}"                 # convención del Mac Mini: ~/apps/<app>
 GITHUB="${GRAFO_GITHUB:-git@github.com:Freddymhs}"
@@ -23,7 +31,6 @@ CONTENEDORES_ESPERADOS=5                                 # postgres, api, web, v
 TAILSCALE=/Applications/Tailscale.app/Contents/MacOS/Tailscale
 SEGUNDOS_ESPERA=180
 CANDADO="$DIR.desplegando"                               # dos pushes a la vez (api y web) no corren compose juntos
-SEGUNDOS_CANDADO=900
 
 falla() { echo "desplegar: $*" >&2; exit 1; }
 reintentar() {   # GitHub corta a veces el ssh (`Connection reset by peer`, 2026-10-17); bash 3.2 de macOS: sin mapfile
@@ -42,12 +49,17 @@ desde_refs() {   # desde_refs <refs.yaml> <clave>: una clave de `despliegue:` (e
     dentro && $1 == clave":" {print $2; exit}' "$1"
 }
 
-# El candado: mkdir es atómico (macOS no trae flock). Si otro despliegue corre, se espera; uno colgado se rompe a los 15 min.
-fin_espera=$((SECONDS + SEGUNDOS_CANDADO))
+# El candado: mkdir es atómico (macOS no trae flock) y guarda el pid de su dueño. Se espera mientras el dueño viva, sin
+# reloj: con 15 min fijos, el primer build (35 min) dejó a web y vr romperlo y correr tres composes juntos (2026-11-14).
+# Un dueño muerto (job cancelado, Mac reiniciado) no deja el candado tomado. El tope lo pone `timeout-minutes` del job.
 until mkdir "$CANDADO" 2>/dev/null; do
-  [ $SECONDS -lt $fin_espera ] || { echo "candado viejo en $CANDADO: lo rompo" >&2; rm -rf "$CANDADO"; continue; }
-  echo "otro despliegue en curso; espero…"; sleep 10
+  dueno=$(cat "$CANDADO/pid" 2>/dev/null || true)
+  if [ -n "$dueno" ] && ! kill -0 "$dueno" 2>/dev/null; then
+    echo "candado de un despliegue que ya no corre (pid $dueno): lo libero" >&2; rm -rf "$CANDADO"; continue
+  fi
+  echo "otro despliegue en curso (pid ${dueno:-?}); espero…"; sleep 10
 done
+echo $$ > "$CANDADO/pid"
 trap 'rm -rf "$CANDADO"' EXIT
 
 mkdir -p "$(dirname "$DIR")"

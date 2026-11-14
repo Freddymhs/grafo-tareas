@@ -74,6 +74,9 @@ Ninguno.
   caído desde el 13-11 porque, tras un corte de red, el LaunchAgent solo tenía `RunAtLoad` (probado: se mata y vuelve en <75 s).
   Antes el CI de los tres repos estaba en rojo: ubuntu-latest pasó a 26.04 sin Playwright (se fija 24.04), los e2e de web
   y vr no simulaban `/espacios` tras la FASE 26, y la API nombraba `todoist` (FASE 25).
+  Trampa del primer despliegue automático (run 43614272807): `credsStore: desktop` se cuelga desde el LaunchAgent
+  (`load metadata` 35 min, «error getting credentials»), así que el script usa su propio `DOCKER_CONFIG` sin ayudante. Y el
+  candado de 15 min fijos lo rompieron web y vr: ahora guarda el pid de su dueño y solo se libera si ese pid murió.
 
 ### Docs
 - [x] **Tarea 4** · `deploy/README` o `CLAUDE.md`: el flujo es «push a main». `bin/desplegar` queda como el camino a mano
