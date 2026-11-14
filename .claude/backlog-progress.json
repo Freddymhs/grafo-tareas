@@ -1,22 +1,16 @@
 {
   "project": "grafo-tareas",
   "tech": "NestJS + Next.js + Vite/R3F (WebXR)",
-  "current_phase": "FASE_12",
+  "current_phase": "FASE_27",
   "phases": {
     "FASE_1": {
-      "status": "done",
-      "tasks": 5,
-      "total": 5
+      "status": "done"
     },
     "FASE_2": {
-      "status": "completed",
-      "tasks": 6,
-      "total": 6
+      "status": "done"
     },
     "FASE_3": {
-      "status": "done",
-      "tasks": 3,
-      "total": 3
+      "status": "done"
     },
     "FASE_4": {
       "status": "done",
@@ -24,8 +18,8 @@
       "total": 4
     },
     "FASE_5": {
-      "status": "in_progress",
-      "tasks": 2,
+      "status": "done",
+      "tasks": 3,
       "total": 3
     },
     "FASE_6": {
@@ -64,12 +58,12 @@
       "total": 5
     },
     "FASE_13": {
-      "status": "completed",
+      "status": "done",
       "tasks": 4,
       "total": 4
     },
     "FASE_14": {
-      "status": "completed",
+      "status": "done",
       "tasks": 3,
       "total": 3
     },
@@ -92,7 +86,50 @@
       "status": "pending",
       "tasks": 0,
       "total": 3
+    },
+    "FASE_19": {
+      "status": "in_progress",
+      "tasks": 2,
+      "total": 3
+    },
+    "FASE_20": {
+      "status": "done",
+      "tasks": 6,
+      "total": 6
+    },
+    "FASE_21": {
+      "status": "done",
+      "tasks": 5,
+      "total": 5
+    },
+    "FASE_22": {
+      "status": "done"
+    },
+    "FASE_23": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 7
+    },
+    "FASE_24": {
+      "status": "done",
+      "tasks": 8,
+      "total": 8
+    },
+    "FASE_25": {
+      "status": "pending",
+      "tasks": 0,
+      "total": 5
+    },
+    "FASE_26": {
+      "status": "in_progress",
+      "tasks": 4,
+      "total": 4
+    },
+    "FASE_27": {
+      "status": "in_progress",
+      "tasks": 1,
+      "total": 4
     }
   },
-  "updated_at": "2026-10-18"
+  "updated_at": "2026-11-14"
 }

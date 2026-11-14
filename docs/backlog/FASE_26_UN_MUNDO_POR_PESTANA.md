@@ -12,7 +12,8 @@ qué hay dos tabs» · sobre los filtros: «la función está casi perfecta, per
 
 ## El hueco, medido
 
-Medido el 2026-11-13 en el visor, con el build de la FASE 24 y la API de producción:
+Medido el 2026-11-13 en el visor, con el build de la FASE 24 y la API de producción. Las líneas citadas son las de
+antes de esta FASE: vr `e5cff95` y web `c970224^` (`git show e5cff95:src/lib/filas-de-alcance.ts`); hoy ya no dicen eso:
 - **La fila de espacios suma «Todo»**, que mezcla todos los mundos (`grafo-tareas.vr/src/lib/filas-de-alcance.ts:58-59`,
   `TEXTO_TODO` en `lib/constants/alcance.ts`). La web hace lo mismo (`NOMBRE_TODO`/`NOMBRE_TODO_EL_ESPACIO` en
   `grafo-tareas.web/src/lib/constants/index.ts:112`).
