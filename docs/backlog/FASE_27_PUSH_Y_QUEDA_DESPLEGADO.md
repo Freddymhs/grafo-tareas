@@ -2,7 +2,7 @@
 
 **Destraba**: que Freddy solo commitee y pushee. El CI prueba y despliega, y el visor abre la VR desde el Mac Mini sin que
 el ThinkPad esté encendido ni haya que correr nada.
-**Estado**: sin rama
+**Estado**: 2026-11-15: (a), (b) y (d) hechos, (c) en D1; faltan los criterios 2 y 3
 **Azure**: no aplica (tracker: none)
 **Tipo**: devex
 **Dependencias**: FASE 12 (el despliegue en el Mac Mini)
@@ -27,7 +27,7 @@ Medido el 2026-11-13:
 
 - Es un servicio más en `deploy/compose.yml`: build estático, servido en `127.0.0.1` y publicado con `tailscale serve`
   en su propio puerto HTTPS. WebXR exige contexto seguro, y el certificado del tailnet lo da.
-- La PWA del Quest se reinstala desde esa URL una vez.
+- La URL queda guardada como favorito en el navegador del Quest (Meta no instala PWAs: `_CONCEPTO.md:272`).
 - `bin/probar-en-visor` queda solo para medir FPS con el ThinkPad, no para usar la VR.
 
 ### D2 · El despliegue lo hace el CI, después de que los tests pasan — 2026-11-13 `[código]`
@@ -42,10 +42,10 @@ conexión hacia GitHub, así que no se expone nada a internet.
 
 ## Abierto
 
-- **(a) 2026-11-14 · Un commit rojo se despliega con el push verde de otro repo.** `desplegar-aqui.sh` `traer` hace ff a `origin/main` de los 4 repos. Arreglo: avanzar solo `GRAFO_REPO` a `GITHUB_SHA`, el repo cuyo CI pasó.
+- ~~**(a) 2026-11-14 · Un commit rojo se despliega con el push verde de otro repo.**~~ Hecho 2026-11-15: `traer` de `desplegar-aqui.sh` hacía ff a `origin/main` de los 4 repos, así un commit con test rojo en un repo salía con el push verde de otro. Ahora el CI de cada repo pasa `GRAFO_REPO` y `GRAFO_SHA="$GITHUB_SHA"` (el workflow `Despliegue` de la raíz, `grafo-tareas`): solo ese repo avanza a ese commit, el orquestador sigue a `origin/main` y los otros se quedan como estaban (un repo nunca clonado se clona de `main`). Sin `GRAFO_REPO` (`bin/desplegar` a mano) los tres avanzan a `origin/main`. Un `GRAFO_REPO` desconocido o sin sha falla. Simulado contra el script real con repos bare: 8 casos (incl. repo desconocido, sin sha y vr sin clonar). Orden de push: raíz primero (el script se lee de `origin/main` de la raíz; los CI viejos no pasan las variables y siguen como antes).
 - ~~**(b) 2026-11-14 · No hay monitor de la VR.**~~ Hecho 2026-11-15: en Kuma no había ninguno del grafo (el `~/uptime-kuma-setup.py` del Mac listaba api y web, pero no estaban cargados). Ahora están API `:3007/api/v1/health`, web `:3008` y VR `:3013`, con aviso al Telegram de Hermes. Ojo: ese script borra todos los monitores antes de crear su lista vieja; no correrlo.
-- **(c) 2026-11-14 · D1 dice «la PWA del Quest se reinstala», pero `_CONCEPTO.md:272` dice que Meta no instala PWAs.** Arreglo: cambiar D1 a «URL guardada como favorito» y comprobarlo en el criterio 2.
-- **(d) 2026-11-14 · El lint del CI de api es `eslint --fix`, que nunca falla** (`grafo-tareas.api/package.json:16`, `ci.yml:44`). Arreglo: script `lint:ci` sin `--fix` y que el CI lo llame.
+- ~~**(c) 2026-11-14 · D1 dice «la PWA del Quest se reinstala», pero `_CONCEPTO.md:272` dice que Meta no instala PWAs.**~~ D1 corregido el 2026-11-15 a «URL guardada como favorito»; falta comprobarlo en el criterio 2.
+- ~~**(d) 2026-11-14 · El lint del CI de api es `eslint --fix`, que nunca falla**~~ (`--fix` arregla solo lo arreglable y sale en verde, así que un `let` nunca ponía el CI en rojo). Hecho 2026-11-15: `lint:ci` en `grafo-tareas.api/package.json` (el mismo eslint sin `--fix`) y `ci.yml` lo llama. Probado: rc=0 hoy; con un `let` de prueba en `src/main.ts` (revertido) da rojo, `prefer-const`.
 
 ## Understand
 

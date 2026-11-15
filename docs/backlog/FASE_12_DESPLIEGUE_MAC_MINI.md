@@ -1,7 +1,7 @@
 # FASE 12: DESPLIEGUE EN EL MAC MINI — API, BASE Y PWA SIEMPRE ENCENDIDAS, SOLO POR EL TAILNET
 
 **Destraba**: el corte de Todoist (FASE 5 tarea 2) y el criterio 4 de la FASE 2: el grafo deja de depender de que el PC esté prendido, y hay **una sola** base de verdad
-**Listo para PR**: casi · 2026-10-17: desplegado y verificado desde el PC por el tailnet (tareas 1-4 ✅, 5 casi); falta lo de Freddy: abrir la PWA en el teléfono (criterio 1) y agregar los 2 monitores en Uptime Kuma (pide su contraseña)
+**Listo para PR**: casi · 2026-10-17: desplegado y verificado desde el PC por el tailnet (tareas 1-4 ✅, 5 casi); falta lo de Freddy: abrir la PWA en el teléfono (criterio 1); los monitores de Uptime Kuma quedaron hechos el 2026-11-15 (FASE 27 (b))
 **Prioridad**: Alta
 **Dependencias**: FASE 2 (API), FASE 4 (PWA). Mac Mini: Docker 29.4 arm64, acceso a GitHub, `tailscale serve` con el 443 ya ocupado (proxy a `:18789`, no es nuestro)
 **Fuente**: `docs/_CONCEPTO.md` § Stack (fila Despliegue: «API y fronts en el Mac Mini (Docker), acceso solo por Tailscale»), § Para confirmar N1 · reglas globales §9 (Docker)
@@ -56,7 +56,7 @@ Desde 2026-11-14 los dumps van a `~/respaldos/grafo-tareas` del Mac, la carpeta 
 ### Tarea 5: los consumidores apuntan al Mac Mini
 - `refs.yaml` (bloque `tablero` comentado, para el corte), `bin/probar-en-visor --api`, CLAUDE.md del orquestador, la tabla «Apps corriendo» del `~/CLAUDE.md` del Mac Mini y un monitor INTERNO en Uptime Kuma (checklist del Mac Mini, punto 12).
 - [x] `refs.yaml` → `despliegue: { ssh, app, api, web }` (la fuente; el bloque `tablero` del corte apunta a `despliegue.api`) · `probar-en-visor --api` contra el Mac Mini (bundle con su URL, sin `adb reverse` del 3000; probado con adb falso) · CLAUDE.md del orquestador · `~/CLAUDE.md` del Mac Mini (fila nueva, respaldo `.antes-grafo-*`) · `tailscale serve` del PC apagado (sus rutas apuntaban a la API local, ya sin uso)
-- [ ] Monitores INTERNOS en Uptime Kuma — **Freddy**: agregados a la lista de `~/uptime-kuma-setup.py` (`grafo-api` → `http://host.docker.internal:3007/api/v1/health`, `grafo-web` → `:3008`, los dos alcanzables desde el contenedor, medido); crearlos pide su usuario de Kuma — en la UI son 2 monitores HTTP, o correr el script (ojo: borra y recrea todos)
+- [x] Monitores INTERNOS en Uptime Kuma — hecho 2026-11-15 (ver FASE 27 (b): API, web y VR cargados, con aviso al Telegram de Hermes). Antes quedaba para **Freddy**: agregados a la lista de `~/uptime-kuma-setup.py` (`grafo-api` → `http://host.docker.internal:3007/api/v1/health`, `grafo-web` → `:3008`, los dos alcanzables desde el contenedor, medido); crearlos pide su usuario de Kuma — en la UI son 2 monitores HTTP, o correr el script (ojo: borra y recrea todos)
 
 ## Criterios de Aceptación
 

@@ -78,7 +78,7 @@ Ninguno.
   importador. Los unitarios y los e2e quedan en verde; los que salen con la Tarea 1 se cuentan.
 - [ ] **Tarea 3** · `README.md` y `openapi.json` sin los importadores; el cliente de web y VR, regenerado si cambió el
   contrato. *(2026-11-14: README y `openapi.json` hechos; el contrato no cambió de rutas ni tipos, solo 4 descripciones:
-  falta `api:generar` en web y VR, que solo cambia el comentario de `tramites` en `diaResponseDto.ts`.)*
+  `api:generar` en web y VR: aplicado el comentario de `tramites` en `diaResponseDto.ts` (2026-11-15); la regeneración completa cambia además 4 descripciones (`complementoResponseDto`, `nodoResponseDto`, `piezaDelPlanDto`, `pulido.ts`), sin aplicar.)*
 
 ### `bin`
 - [x] **Tarea 4** · se borra `bin/importar-en-produccion`.

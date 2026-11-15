@@ -35,7 +35,7 @@ Un push a `main` basta. Lo que corre en producción vive en un Mac Mini propio, 
 
 1. En `api`, `web` y `vr` el CI (GitHub Actions) corre type-check, lint, tests y e2e; este repo despliega directo cuando cambian `deploy/`, `refs.yaml` o `docs/roles.yaml`.
 2. Pasados los tests, el job `deploy` corre en un runner self-hosted del Mac Mini y ejecuta [`deploy/desplegar-aqui.sh`](deploy/desplegar-aqui.sh), siempre la versión publicada en `origin/main`.
-3. El script toma un **candado** (dos pushes simultáneos no corren `docker compose` a la vez), avanza los repos con `--ff-only` y levanta [`deploy/compose.yml`](deploy/compose.yml): Postgres 16, API, web, VR y un contenedor de respaldo diario (`pg_dump`, 14 copias).
+3. El script toma un **candado** (dos pushes simultáneos no corren `docker compose` a la vez), avanza con `--ff-only` solo el repo cuyo CI pasó (a su commit, `GRAFO_REPO`/`GRAFO_SHA`; el orquestador a `origin/main`, los otros no se mueven) y levanta [`deploy/compose.yml`](deploy/compose.yml): Postgres 16, API, web, VR y un contenedor de respaldo diario (`pg_dump`, 14 copias).
 4. Publica cada servicio con `tailscale serve` (HTTPS) y **verifica** por la tailnet: `/health` de la API, la PWA y la VR responden 200, el preflight CORS permite `PATCH` desde cada origen, todo puerto publicado queda solo en `127.0.0.1` y todo contenedor reinicia solo (`unless-stopped`). Si algo falla, el job falla.
 5. Es repetible: correrlo dos veces seguidas no cambia nada. Para una emergencia, [`bin/desplegar`](bin/desplegar) corre ese mismo script por ssh.
 

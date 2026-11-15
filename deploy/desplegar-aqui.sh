@@ -2,10 +2,12 @@
 # desplegar-aqui.sh — FASE 27: corre EN el Mac Mini y deja en producción el `main` publicado de grafo-tareas
 # (orquestador, api, web y vr) con deploy/compose.yml. Lo llaman dos caminos, con el mismo código:
 #   · el job `deploy` del CI de api, web y vr (runner del Mac Mini), después de que pasan los tests:
-#       git -C ~/apps/grafo-tareas fetch -q origin main && git -C ~/apps/grafo-tareas show origin/main:deploy/desplegar-aqui.sh | bash -s
+#       git -C ~/apps/grafo-tareas fetch -q origin main && git -C ~/apps/grafo-tareas show origin/main:deploy/desplegar-aqui.sh \
+#         | GRAFO_REPO=<repo que disparó> GRAFO_SHA=<su commit> bash -s
 #     (se lee de origin/main para correr siempre la versión publicada del script, aunque el clon local vaya atrás)
 #   · bin/desplegar desde el ThinkPad, por ssh: el camino a mano para una emergencia.
-# Repetible: correrlo dos veces seguidas no cambia nada. Lo despliega todo junto, y lo que no cambió no se reconstruye.
+# Repetible: correrlo dos veces seguidas no cambia nada. Lo que no cambió no se reconstruye. El repo que disparó el CI avanza
+# a SU commit (el que pasó los tests); el orquestador, a origin/main; los otros repos se quedan como estaban (ver GRAFO_REPO).
 set -euo pipefail
 export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"   # ni ssh ni el LaunchAgent del runner cargan el .zshrc
 # Sin la attestation de procedencia (lleva la hora del build) el mismo código da la misma imagen y `up --build` no
@@ -24,6 +26,10 @@ DIR="$HOME/apps/${GRAFO_APP:-grafo-tareas}"                 # convención del Ma
 GITHUB="${GRAFO_GITHUB:-git@github.com:Freddymhs}"
 RAMA=main
 REPOS_INTERNOS="grafo-tareas.api grafo-tareas.web grafo-tareas.vr"
+# Qué commit pidió este despliegue (FASE 27 (a)): el job de api, web o vr pasa su repo y su sha, y SOLO ese repo avanza a ese
+# commit; los otros dos se quedan como están. Sin esto, un commit con test rojo en un repo salía con el push verde de otro.
+# Vacío = uso a mano (bin/desplegar): los tres avanzan a origin/main.
+GRAFO_REPO="${GRAFO_REPO:-}"; GRAFO_SHA="${GRAFO_SHA:-}"
 PUERTO_API=3007                                          # 127.0.0.1 del Mac Mini (lsof 2026-11-14: 3013+ libres)
 PUERTO_WEB=3008
 PUERTO_VR=3013
@@ -37,10 +43,10 @@ reintentar() {   # GitHub corta a veces el ssh (`Connection reset by peer`, 2026
   for n in 1 2 3; do "$@" && return 0; echo "reintento $n/3: $*" >&2; sleep 5; done
   return 1
 }
-traer() {   # traer <dir> <repo>: clona la primera vez; después solo avanza (nunca pisa: --ff-only)
+traer() {   # traer <dir> <repo> [<meta>]: clona la primera vez; después solo avanza (nunca pisa: --ff-only) a <meta> (def. origin/main)
   if [ -d "$1/.git" ]; then
     reintentar git -C "$1" fetch -q origin "$RAMA"
-    git -C "$1" checkout -q "$RAMA" && git -C "$1" merge -q --ff-only "origin/$RAMA"
+    git -C "$1" checkout -q "$RAMA" && git -C "$1" merge -q --ff-only "${3:-origin/$RAMA}"
   else reintentar git clone -q --branch "$RAMA" "$GITHUB/$2.git" "$1"; fi
   echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
 }
@@ -67,8 +73,17 @@ mkdir -p "$(dirname "$DIR")"
 # Tolerante: la primera vez $DIR no existe y `cat` falla; con pipefail eso mataba el script en silencio (huella de vacío).
 huella_area() { { cat "$DIR/docs/roles.yaml" "$DIR/refs.yaml" 2>/dev/null || true; } | shasum | cut -c1-40; }
 AREA_ANTES=$(huella_area)
-traer "$DIR" grafo-tareas
-for repo in $REPOS_INTERNOS; do traer "$DIR/$repo" "$repo"; done
+if [ -n "$GRAFO_REPO" ]; then
+  case " grafo-tareas $REPOS_INTERNOS " in *" $GRAFO_REPO "*) ;; *) falla "GRAFO_REPO desconocido: $GRAFO_REPO" ;; esac
+  [ -n "$GRAFO_SHA" ] || falla "GRAFO_REPO=$GRAFO_REPO sin GRAFO_SHA"
+fi
+traer "$DIR" grafo-tareas   # el orquestador (compose, este script, refs.yaml) siempre avanza a origin/main
+for repo in $REPOS_INTERNOS; do
+  if [ -z "$GRAFO_REPO" ]; then traer "$DIR/$repo" "$repo"
+  elif [ "$repo" = "$GRAFO_REPO" ]; then traer "$DIR/$repo" "$repo" "$GRAFO_SHA"
+  elif [ -d "$DIR/$repo/.git" ]; then echo "$repo @ $(git -C "$DIR/$repo" rev-parse --short HEAD) (sin avanzar)"
+  else traer "$DIR/$repo" "$repo"; fi   # nunca clonado: no hay nada que "dejar como está"
+done
 
 URL_API=$(desde_refs "$DIR/refs.yaml" api); URL_WEB=$(desde_refs "$DIR/refs.yaml" web); URL_VR=$(desde_refs "$DIR/refs.yaml" vr)
 [ -n "$URL_API" ] && [ -n "$URL_WEB" ] && [ -n "$URL_VR" ] || falla "faltan despliegue.api/web/vr en refs.yaml"
