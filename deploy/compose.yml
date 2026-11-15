@@ -95,14 +95,16 @@ services:
         set -u
         while true; do
           archivo="/respaldos/grafo-$$(date +%Y-%m-%d_%H%M).dump"
-          if pg_dump -h postgres -U grafo -d grafo_tareas -Fc -f "$$archivo.parcial"; then
+          # Solo se poda si el dump nuevo salió bien y no está vacío: si pg_dump fallara 14 días seguidos, podar
+          # igual borraría todos los respaldos.
+          if pg_dump -h postgres -U grafo -d grafo_tareas -Fc -f "$$archivo.parcial" && [ -s "$$archivo.parcial" ]; then
             mv "$$archivo.parcial" "$$archivo"
             echo "respaldo: $$archivo ($$(du -h "$$archivo" | cut -f1))"
+            find /respaldos -name 'grafo-*.dump' -mtime +"$$DIAS_A_GUARDAR" -delete
           else
             rm -f "$$archivo.parcial"
-            echo "respaldo FALLÓ: $$archivo" >&2
+            echo "respaldo FALLÓ: $$archivo (no se poda)" >&2
           fi
-          find /respaldos -name 'grafo-*.dump' -mtime +"$$DIAS_A_GUARDAR" -delete
           sleep "$$SEGUNDOS_ENTRE_RESPALDOS"
         done
 
