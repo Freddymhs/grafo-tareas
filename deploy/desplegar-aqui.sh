@@ -79,11 +79,15 @@ ENV="$DIR/deploy/.env"
 # La contraseña se crea una vez y se conserva; puertos y URLs se reescriben en cada despliegue (su fuente es este script).
 CLAVE=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$ENV" 2>/dev/null || true)
 [ -n "$CLAVE" ] || { CLAVE=$(openssl rand -hex 24); echo "contraseña nueva de Postgres en deploy/.env"; }
+# Los dumps van a ~/respaldos/, la carpeta que el ThinkPad copia cada día (lab-respaldo.timer): fuera del Mac (D5).
+DIR_RESPALDOS="$HOME/respaldos/grafo-tareas"
 umask 077
-printf 'POSTGRES_PASSWORD=%s\nPUERTO_API=%s\nPUERTO_WEB=%s\nPUERTO_VR=%s\nURL_API=%s\nURL_WEB=%s\nURL_VR=%s\n' \
-  "$CLAVE" "$PUERTO_API" "$PUERTO_WEB" "$PUERTO_VR" "$URL_API" "$URL_WEB" "$URL_VR" > "$ENV.nuevo" && mv "$ENV.nuevo" "$ENV"
+printf 'POSTGRES_PASSWORD=%s\nPUERTO_API=%s\nPUERTO_WEB=%s\nPUERTO_VR=%s\nURL_API=%s\nURL_WEB=%s\nURL_VR=%s\nDIR_RESPALDOS=%s\n' \
+  "$CLAVE" "$PUERTO_API" "$PUERTO_WEB" "$PUERTO_VR" "$URL_API" "$URL_WEB" "$URL_VR" "$DIR_RESPALDOS" > "$ENV.nuevo" && mv "$ENV.nuevo" "$ENV"
 umask 022
-mkdir -p "$DIR/deploy/respaldos"
+mkdir -p "$DIR_RESPALDOS"
+# Una sola vez: los dumps que quedaron en la ruta vieja pasan a la nueva.
+for viejo in "$DIR"/deploy/respaldos/grafo-*.dump; do [ -e "$viejo" ] && mv -n "$viejo" "$DIR_RESPALDOS/"; done
 
 cd "$DIR/deploy"
 docker compose up -d --build --remove-orphans 2>&1 | grep -vE '^ *#|^$' | tail -12

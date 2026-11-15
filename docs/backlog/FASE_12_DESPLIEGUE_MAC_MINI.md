@@ -30,6 +30,7 @@ no está en GitHub no se despliega: por eso se pushea antes.
 
 ### D5 · Respaldo diario
 Una vez que el grafo reemplaza a Todoist, perder la base es perder el trabajo. `pg_dump` diario, 14 copias, en un contenedor `respaldo` del mismo compose con `restart: unless-stopped`: el `~/CLAUDE.md` del Mac Mini registra que los LaunchAgents no siempre cargan en ese equipo headless, y un LaunchDaemon pide `sudo`.
+Desde 2026-11-14 los dumps van a `~/respaldos/grafo-tareas` del Mac, la carpeta que el `lab-respaldo.timer` del ThinkPad copia entera cada día: antes quedaban solo en el disco del Mac, y si ese disco moría se perdían la base y sus respaldos juntos.
 
 ## Understand
 

@@ -74,7 +74,8 @@ services:
       - '127.0.0.1:${PUERTO_VR:?falta PUERTO_VR}:8080'
 
   respaldo:
-    # pg_dump diario, 14 copias, en deploy/respaldos/ del Mac Mini (D5). Un contenedor y no launchd: en este Mini
+    # pg_dump diario, 14 copias, en ~/respaldos/grafo-tareas del Mac Mini (D5): esa carpeta la copia cada día al
+    # ThinkPad su lab-respaldo.timer, así el respaldo sale de la máquina. Un contenedor y no launchd: en este Mini
     # los LaunchAgents no siempre cargan (su ~/CLAUDE.md) y un LaunchDaemon pide sudo.
     <<: *reinicio
     image: postgres:16-alpine
@@ -86,7 +87,7 @@ services:
       DIAS_A_GUARDAR: '14'
       SEGUNDOS_ENTRE_RESPALDOS: '86400'
     volumes:
-      - ./respaldos:/respaldos
+      - ${DIR_RESPALDOS:-./respaldos}:/respaldos
     entrypoint:
       - sh
       - -c
