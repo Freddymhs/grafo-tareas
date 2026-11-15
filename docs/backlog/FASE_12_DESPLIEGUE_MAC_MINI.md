@@ -24,6 +24,8 @@ Los datos del PC (`grafo-tareas-postgres`, 5433) se copian **una vez** al Mac Mi
 PC es de desarrollo: `bin/dev` y `bin/servir-tailnet` siguen sirviendo para probar código, no para trabajar.
 
 ### D4 · El despliegue es un comando repetible
+Superado por FASE 27 D2/D3 (2026-11-14): 4 runners para repos de Freddymhs; el push despliega solo. bin/desplegar queda como camino a mano.
+
 `bin/desplegar` (orquestador, por ssh): el runner de GitHub del Mac Mini solo toma repos de `fmarcos-labs` y éstos son de `Freddymhs`. En el Mac Mini (`~/apps/grafo-tareas`, la convención del equipo) trae los repos a su `main` publicado, construye y levanta `deploy/compose.yml`,
 aplica las migraciones (`prisma migrate deploy` al arrancar la API), configura `tailscale serve` y verifica health y CORS. Lo que
 no está en GitHub no se despliega: por eso se pushea antes.
