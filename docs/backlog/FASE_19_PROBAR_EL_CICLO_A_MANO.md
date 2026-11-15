@@ -97,7 +97,7 @@ después se borraron (222 nodos antes y después). Ni Todoist ni el `refs.yaml` 
   `test_tablero.sh`, 37/37.
 - ✅ **Arreglado: `fase-tildar` no movía la tarjeta.** Ahora, después de tildar, llama al mismo hook con el aviso de un `Edit`.
   Prueba: `~/bin/tests/test_fase_tildar.sh`, 4 casos, vistos en rojo.
-- ✅ **Arreglado: el importador tomaba «Thomas» por Carabantes** (`ALIAS_PERSONAS`). Ahora es Tomás Soto, con su prueba.
+- ✅ **Arreglado: el importador tomaba «Persona B» por Persona A** (`ALIAS_PERSONAS`). Ahora es Persona B, con su prueba.
 - ✅ **Agnóstico: las personas salieron del código** (Freddy: «dale»). Viven en `personas:` del `refs.yaml` del área, como
   las escaleras de dudas (C11: «las personas son del cliente»). `leerArea` las valida y `AreaService` las entrega, y el
   importador las recibe: sin esa clave no crea ninguna. En `src` no queda ningún nombre del cliente, tampoco en los ejemplos de
@@ -165,7 +165,7 @@ del arreglo: `git -C grafo-tareas.vr show 19aa13c:src/<archivo>`). Lo arreglado,
 - **«[correcciones viejas]…» y las 6 «01-oct · retro: …» «no sé qué son».** Las correcciones son un trámite real de Azure
   (vincular/desvincular PR), hija de «🟣 Cierres pendientes». Las retro son propuestas de proceso: cuelgan de FASE 1, 6, 7, 8 y 13
   porque **citan** sus números como ejemplo (PERTENECE_A por mención), y por eso caen en la página de la HU 19565.
-- **Tomás Carabantes: «Libre: nada lo frena».** Es su nodo PERSONA (le esperan 8 dudas abiertas). El texto de la selección
+- **Persona A: «Libre: nada lo frena».** Es su nodo PERSONA (le esperan 8 dudas abiertas). El texto de la selección
   pregunta qué frena al nodo (`lib/seleccion.ts:7`): para una persona la pregunta es al revés, quién la espera.
 - **El rayo cuesta.** Es el de `@react-three/xr` por defecto (`createXRStore({ emulate: false })`, `App.tsx:31`), que se desvanece.
 - **Gestos que estorban.** La pose de apuntar cuenta como 1 dedo (y el 1 es «ver todo»); el pellizco del pulgar con el índice y
@@ -219,7 +219,7 @@ del arreglo: `git -C grafo-tareas.vr show 19aa13c:src/<archivo>`). Lo arreglado,
   frena** (dudas, personas, «para decir» y la HU; sus hilos hacia lo que bloquean siguen encendidos). Decisión del agente: un
   filtro y no una tercera cara (las pestañas extra estorbaron; el contraste de un lente sí sirvió) y vale igual en lo real y en el
   plan. Datos, con evidencia: cerrada la duda «Para Freddy: ¿la 25325 es todo el confirmar?» (su texto en Azure dice
-  «recepcionada o recepcionada con observacion»); descartadas las dos de la 26311 (cronjob de inactividad, de Thomas); el dolor
+  «recepcionada o recepcionada con observacion»); descartadas las dos de la 26311 (cronjob de inactividad, de Persona B); el dolor
   de `laboratorio_analisis` colgado de la 25325 (criterio 8) con «acción: ninguna». Pendiente: la cercanía en el plan (FASE y
   piezas cerca de la HU, dudas alrededor de lo que frenan), que es otro acomodo.
 - ✅ **«¿No nos olvidamos de nada que sea bloqueante?»** (Freddy, 18-10): sí — por tipo, el 4 solo veía dudas y personas, y
@@ -231,7 +231,7 @@ del arreglo: `git -C grafo-tareas.vr show 19aa13c:src/<archivo>`). Lo arreglado,
   trae el id de identidad: D5 puede usarlo y la migración a texto sale de la rama); al Daily del 19, «revisar yo la propuesta
   del esquema»; descartado el dolor de la migración (no pedía nada).
 - ✅ **Lista B, puntos 21-25** (con sus respuestas): 21 propuesta con su explicación · 22 cerrada (ya la revisó) · 23 p1, vence
-  19-10 · 24 propuesta, para Fabián · 25 observación con su idea. Cada edición con motivo en la bitácora.
+  19-10 · 24 propuesta, para Persona F · 25 observación con su idea. Cada edición con motivo en la bitácora.
 
 ### Freddy, 2026-10-19: las acciones de todos los días, en uno o dos clics (idea, sin pulir)
 
@@ -243,7 +243,7 @@ algunas no se pueden hacer. Medido el 19-10:
 
 | acción | API hoy | web hoy | lo que falta |
 |---|---|---|---|
-| **Crear un bloqueante para una persona**: la duda, a quién espera, qué frena y de quién es | 3-4 llamadas (nodo, `ESPERA_RESPUESTA_DE`, `BLOQUEADA_POR`, `PERTENECE_A`) | ✅ **hecho el 19-10** (web `7b444ac`): «Agregar bloqueante» en el detalle de una tarea o FASE pide la pregunta y a quién espera; la duda nace siendo de ese nodo y frenándolo | nada. **El dueño ya es obligatorio** por construcción: sin él la duda caía en «Sin HU» (pasó el 19-10 con una duda para Thomas) |
+| **Crear un bloqueante para una persona**: la duda, a quién espera, qué frena y de quién es | 3-4 llamadas (nodo, `ESPERA_RESPUESTA_DE`, `BLOQUEADA_POR`, `PERTENECE_A`) | ✅ **hecho el 19-10** (web `7b444ac`): «Agregar bloqueante» en el detalle de una tarea o FASE pide la pregunta y a quién espera; la duda nace siendo de ese nodo y frenándolo | nada. **El dueño ya es obligatorio** por construcción: sin él la duda caía en «Sin HU» (pasó el 19-10 con una duda para Persona B) |
 | **Cerrar una duda con su respuesta** | `PATCH estado` con `motivo` (≤ 500) | «Cerrar» **no pide motivo** y la respuesta no queda | pedir la respuesta al cerrar una duda: ese motivo es lo que la VR muestra como «Contestada el…» |
 | **Tomar una pieza del plan y darle su PBI** | `PATCH cara` + editar el título, sacar la etiqueta `por-crear` | «Mover a Trabajo» sí; el título y las etiquetas, no | una acción «tomar» que pida el id de la task y deje el título `[id] …` |
 | **Crear una persona** | `POST /nodos` tipo PERSONA | sí, eligiendo el tipo PERSONA | nada |

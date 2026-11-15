@@ -1,10 +1,10 @@
 # FASE 10: EL DÍA — EL PARTE, LO QUE ESTÁ EN CURSO Y LOS TRÁMITES DE CIERRE
 
-**Destraba**: llegar a la daily con el parte hecho (terminé / en curso / detenido) sin armarlo a mano, ver de un vistazo si hay más tarjetas en curso de las que se pueden llevar, y que ningún cierre («falta URL commit», evidencias, wiki) se quede sin hacer — lo que pidió Fabián en la evaluación 1
+**Destraba**: llegar a la daily con el parte hecho (terminé / en curso / detenido) sin armarlo a mano, ver de un vistazo si hay más tarjetas en curso de las que se pueden llevar, y que ningún cierre («falta URL commit», evidencias, wiki) se quede sin hacer — lo que pidió Persona F en la evaluación 1
 **Listo para PR**: sí · FASE escrita y cerrada el 2026-10-17 (Freddy: «complétalo todo, fase tras fase»)
 **Prioridad**: Alta
 **Dependencias**: FASE 8 (roles) · FASE 9 (complementos: «para decir», trámite)
-**Fuente**: `docs/_CONCEPTO.md` § C11 «Ideas a pedido» (1) parte, (2) cierres, (3) dos tarjetas en curso · memoria `project-evaluacion1-fabian`
+**Fuente**: `docs/_CONCEPTO.md` § C11 «Ideas a pedido» (1) parte, (2) cierres, (3) dos tarjetas en curso · memoria `project-evaluacion1-persona-f`
 
 > **Alcance:** leer el grafo y mostrarlo; sin botón de WhatsApp (Freddy: «primero todo bien montado»): el parte se copia.
 > Sin migraciones: todo sale de datos que ya hay.

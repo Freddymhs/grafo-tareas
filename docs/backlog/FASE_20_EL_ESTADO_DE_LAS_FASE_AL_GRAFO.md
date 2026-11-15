@@ -14,7 +14,7 @@ siento seguro, es muy peligroso» · «revalídalo mucho… de hacerlo mal… pu
 
 ## El hueco, medido
 
-- El 19 y 20-10, una sola decisión (no mandarle el esquema a Thomas) se escribió en 6 lugares: 5 frases de la FASE 18 del
+- El 19 y 20-10, una sola decisión (no mandarle el esquema a Persona B) se escribió en 6 lugares: 5 frases de la FASE 18 del
   Laboratorio, el esquema, el índice del backlog, 3 nodos del grafo y la memoria.
 - Revalidado el 20-10 leyendo **41 archivos** que abren FASE: scripts, hooks, el importador del grafo, `fases.html`,
   `calidad.html`, los comandos y las plantillas. El primer mapa (hecho grepeando solo algunos encabezados) tenía 7 errores;
@@ -88,7 +88,7 @@ Las dudas del grafo no salen de las FASE: el importador las toma de `Tareas/<id>
   línea `**Listo para PR**:`. Leídas una por una, solo algunas repiten la casilla de `## QA` (la 22: `PR 5090` está en
   las dos). Las demás traen lo que no está en otro lado:
   - **FASE 18:** 12 líneas con la declaración para el PR (la recepción abandonada, `/sigsa:documentar`, la clave que
-    falta en Consul, el código de Thomas que se toca, lo que ve el solicitante) y el resultado de Postman.
+    falta en Consul, el código de Persona B que se toca, lo que ve el solicitante) y el resultado de Postman.
   - **FASE 30 y 32:** el PR y el commit del merge; en la 32, además, la ruta de la auditoría.
   - **FASE 17:** el cambio de diseño del `q` y su ADR.
   - **FASE 39 y 41:** el «por qué todavía no» (entra después de la 25325; no abrir el PR del BFF antes de su merge).

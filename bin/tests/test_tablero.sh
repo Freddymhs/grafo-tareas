@@ -28,7 +28,7 @@ caso(){ N=$((N+1)); local nombre="$1" esperado="$2" codigo="$3"; shift 3
   if [ "$rc" = "$codigo" ] && [[ "$out" == *"$esperado"* ]]; then echo "ok   $nombre"; else echo "FALLA $nombre: rc=$rc out=[$out]"; F=$((F+1)); fi; }
 hoy=$(date +%d)
 
-caso pendiente_bloqueo      "$hoy-"                 0 "$OP/pendiente" bloqueo "esperando a Tomás por el esquema" --persona "Tomás Carabantes"
+caso pendiente_bloqueo      "$hoy-"                 0 "$OP/pendiente" bloqueo "esperando a Persona A por el esquema" --persona "Persona A"
 caso pendiente_es_duda      '"tipo":"DUDA"'         0 jq -c '.[0]' "$NODOS"
 caso pendiente_espera_persona 'ESPERA_RESPUESTA_DE' 0 bash -c "jq -c '.[0]' '$CONEXIONES' && jq -r '.[] | select(.tipo == \"PERSONA\") | .titulo' '$NODOS'"
 caso pendiente_literal      "· queera, sinonigmia"  0 "$OP/pendiente" informe "queera, sinonigmia"
@@ -50,7 +50,7 @@ caso pendiente_sin_ritual   "no declara el ritual «daily»" 1 bash -c "mkdir -p
   echo '{\"rituales\":[{\"clave\":\"retro\",\"nombre\":\"Retro\"}]}' > '$T/sin-daily/area.json' &&
   TABLERO_FAKE='$T/sin-daily' '$OP/pendiente' informe x"
 caso pendiente_sin_ritual_no_escribe "true"         0 jq -r 'length == 0' "$T/sin-daily/nodos.json"
-caso buscar_encuentra       "esquema"               0 "$OP/buscar" tomás esquema
+caso buscar_encuentra       "esquema"               0 "$OP/buscar" persona esquema
 caso buscar_vacio_es_0      ""                      0 "$OP/buscar" nadaquever
 caso buscar_no_cruza        ""                      0 bash -c "'$OP/buscar' queera esquema | grep -c . ; true"
 

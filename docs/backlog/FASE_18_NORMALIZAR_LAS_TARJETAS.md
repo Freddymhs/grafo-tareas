@@ -34,8 +34,8 @@ Dos ejes, con lo que el grafo ya tiene; nada nuevo en la API.
    - una corrección sin prioridad que no rompe nada (el tipo de muestra) → **propuesta**, colgada de la rama
      **🧹 Normalización** (ya creada el 2026-10-18)
    - lo que no encaja en nada → **captura** (Freddy decide después)
-2. **Para quién (el destinatario)** — la idea de Freddy, en tres áreas: **negocio** (Tomás Carabantes, Pablo) · **back**
-   (Thomas / Tomás Soto) · **front** (Nicolás, gbaeza), más **Fabián** para lo de proceso. Se guarda como **conexión a la
+2. **Para quién (el destinatario)** — la idea de Freddy, en tres áreas: **negocio** (Persona A, Persona D) · **back**
+   (Persona B) · **front** (Persona C, Persona E), más **Persona F** para lo de proceso. Se guarda como **conexión a la
    PERSONA** (`ESPERA_RESPUESTA_DE`), que el grafo ya tiene y la VR ya dibuja; el área sale de la persona, no se escribe dos
    veces. Esto es lo que alimenta los filtros 3 y 4.
 3. **La HU no es una etiqueta:** si se sabe de qué HU es, la tarjeta cuelga de ella (`PERTENECE_A`); si no hay PBI, queda en
@@ -49,7 +49,7 @@ queda en la bitácora y el importador lo respeta.
 
 1. **El catálogo de la FASE 9, no uno nuevo.** Ya tiene escalera, roles.yaml y lo lee la API; inventar otro duplicaría.
 2. **El destinatario es una persona conectada, no una etiqueta `para:back`.** Una etiqueta se desincroniza cuando la duda
-   escala (Carabantes → Thomas); la conexión la mueve `POST /nodos/:id/escalar`, que ya existe.
+   escala (Persona A → Persona B); la conexión la mueve `POST /nodos/:id/escalar`, que ya existe.
 3. **La fecha del título se deja.** Es como Freddy busca en Todoist; el grafo ya tiene `fechaOrigen` para ordenar.
 
 ## Understand

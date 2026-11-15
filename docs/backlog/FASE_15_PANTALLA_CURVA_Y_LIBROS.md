@@ -101,7 +101,7 @@ a Obsidian, pero en Obsidian se ve más segmentado, más ordenado»). Trabaja un
 - [x] Resuelta 2026-10-18 en la FASE 17 (tarea 6): mergeado = la casilla `Mergeado` de la FASE, que tilda Freddy; la VR la muestra
   con un anillo. Lo de «qué le falta» (URL commit, avisar, compartir) sigue en sus casillas y en los trámites
 - [x] Pedido de Freddy 2026-10-17: un botón en la fila de arriba que distinga lo ya mergeado (y ver qué le falta: URL commit, avisar a
-  Thomas, compartir con el front). Qué es «mergeado» lo decide la API — **a confirmar con Freddy** (¿columna «Pull Request» / APROBADO?
+  Persona B, compartir con el front). Qué es «mergeado» lo decide la API — **a confirmar con Freddy** (¿columna «Pull Request» / APROBADO?
   ¿«mergeado» en el título?)
 
 ## Preguntas para Freddy (abiertas)

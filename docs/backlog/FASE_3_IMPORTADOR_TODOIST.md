@@ -12,7 +12,7 @@
 ## Understand
 
 - [x] Entendimiento — 2026-10-16, `TRABAJO` completo por REST, solo lectura (134 tareas; 26 subtareas de 4 padres; 16 con fecha; 1 recurrente; 0 completadas en el export). Secciones: sin sección 42 · CERRADO 29 · 🔎 Precheck (archivadas) 25 · ENTENDIMIENTO 23 · DUDAS 4 · TESTEADO 3 · LISTO PARA PR 3 · PR 2 · AMARRAR 2 · APROBADO 1. Etiquetas: board 34 · propuesta 24 · retro 11 · daily 10 · supuesto 2. Prioridad p1 12 · p2 33 · p4 88.
-  **Señales por tarea:** `[2xxxx]` Azure 50 · `FASE n` 38 (20 fases distintas) · PR 18 · círculos de color 26 (🟢16 🔵5 🟡3 🟣2 🟠1) · Tomás/Thomas 33 · Carabantes 14 · Fabián 9 · emoji de orden 6 · BLOQUEO/esperando a 4 (3 nombran a Tomás Carabantes) · **"Depende de" 0 y dudas W# 0**: esas vivían en el Draft, que quedó fuera (N2). El concepto § Lo que Todoist no deja ver se midió sobre 100 tareas y el Draft; estas son las cifras del alcance real.
+  **Señales por tarea:** `[2xxxx]` Azure 50 · `FASE n` 38 (20 fases distintas) · PR 18 · círculos de color 26 (🟢16 🔵5 🟡3 🟣2 🟠1) · Persona A/Persona B 33 · Persona A 14 · Persona F 9 · emoji de orden 6 · BLOQUEO/esperando a 4 (3 nombran a Persona A) · **"Depende de" 0 y dudas W# 0**: esas vivían en el Draft, que quedó fuera (N2). El concepto § Lo que Todoist no deja ver se midió sobre 100 tareas y el Draft; estas son las cifras del alcance real.
 
 ## Las decisiones, y por qué (Freddy, 2026-10-16)
 
@@ -21,9 +21,9 @@
 - **D3 · Subtareas:** el padre `DEPENDE_DE` cada hija — cerrar la última lo libera, y `libera` ya lo calcula.
 - **D4 · Círculos de color → RAMA** por emoji (título = el emoji, color hex fijo); la tarea `PERTENECE_A` cada rama que lleve (🔵🟢 = dos ramas). Freddy las renombra en la PWA.
 - **D5 · `FASE n` → nodo FASE "FASE n"** (uno por número) y la tarea `PERTENECE_A` esa FASE.
-- **D6 · Personas:** solo cuando la tarea dice `BLOQUEO` o `esperando a` **y** nombra a alguien de la tabla de alias → nodo PERSONA + `ESPERA_RESPUESTA_DE`. Mencionar a Tomás en una descripción no es un bloqueo. Alias: Tomás · Thomas · Carabantes · Tomás Carabantes → "Tomás Carabantes"; Fabián → "Fabián" **(C8: confirmar que Tomás y Carabantes son la misma persona)**.
+- **D6 · Personas:** solo cuando la tarea dice `BLOQUEO` o `esperando a` **y** nombra a alguien de la tabla de alias → nodo PERSONA + `ESPERA_RESPUESTA_DE`. Mencionar a Persona A en una descripción no es un bloqueo. Alias: el nombre de pila y el apellido de la Persona A → "Persona A"; Persona F → "Persona F" **(C8: confirmar que nombre de pila y apellido son la misma persona)**.
 - **D7 · Emojis de orden 0️⃣…5️⃣: sin `DEPENDE_DE`** (6 tareas de contextos distintos darían dependencias falsas). Azure ids y PRs: texto, importadores de Azure/GitHub fuera de v1.
-- **D8 · Nodos sintetizados (RAMA, FASE, PERSONA) también llevan `externo`** (`todoist` + `rama:🟢` / `fase:32` / `persona:tomas-carabantes`): así la reimportación es idempotente por construcción (índice único de la API).
+- **D8 · Nodos sintetizados (RAMA, FASE, PERSONA) también llevan `externo`** (`todoist` + `rama:🟢` / `fase:32` / `persona:persona-a`): así la reimportación es idempotente por construcción (índice único de la API).
 - **D9 · Dentro del repo de la API**, módulo `src/importadores/todoist/` (único lugar que nombra Todoist): un cliente HTTP (paginado por `next_cursor`, el bug que Freddy ya sufrió), un **traductor puro** (tareas + secciones → plan de nodos y conexiones, con test sobre fixture real) y un servicio que aplica el plan con `upsert` por `externo`. `--seco` imprime el plan sin escribir.
 
 ## Tareas
@@ -45,7 +45,7 @@
 ## Criterios de Aceptación
 
 - [x] 1 · Idempotente: la segunda corrida crea 0 nodos y 0 conexiones — `test/importador.e2e-spec.ts` 3/3 contra la base de test
-- [x] 2 · **Ajustado a lo medido y a D6:** solo las tareas que dicen BLOQUEO/esperando a cuelgan de una PERSONA (3 de Tomás Carabantes); mencionar a alguien (33 tareas nombran a Tomás) no es un bloqueo. Fabián no bloquea ninguna
+- [x] 2 · **Ajustado a lo medido y a D6:** solo las tareas que dicen BLOQUEO/esperando a cuelgan de una PERSONA (3 de Persona A); mencionar a alguien (33 tareas nombran a Persona A) no es un bloqueo. Persona F no bloquea ninguna
 - [x] 3 · Ninguna llamada de escritura a Todoist — el cliente no tiene método que no sea GET (`todoist.client.spec.ts` lo verifica)
 
 ## QA

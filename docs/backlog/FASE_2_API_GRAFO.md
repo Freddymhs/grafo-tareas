@@ -40,7 +40,7 @@
 
 ### Tarea 3: módulo `derivado`
 - `GET /derivado/hoy-puedo`, `GET /nodos/:id/bloqueado`, `GET /nodos/:id/libera`. SQL recursivo con test de una cadena de 3 niveles y de un ciclo.
-- [x] Hecha — 2026-10-16: `WITH RECURSIVE` (`UNION`, no `UNION ALL`: termina con ciclos) trae lo aguas abajo; `calcular-libera.ts` (función pura, punto fijo) separa `directos` de `cadena`. "Si Tomás contesta": libera la duda directo y 3 tareas en cadena, medido en e2e
+- [x] Hecha — 2026-10-16: `WITH RECURSIVE` (`UNION`, no `UNION ALL`: termina con ciclos) trae lo aguas abajo; `calcular-libera.ts` (función pura, punto fijo) separa `directos` de `cadena`. "Si Persona A contesta": libera la duda directo y 3 tareas en cadena, medido en e2e
 - [x] Test rojo primero: `calcular-libera.spec.ts` 3/5 en rojo contra el stub, 5/5 después; el ciclo `A→B→A` responde 200 (e2e)
 
 ### Tarea 4: OpenAPI publicado y CI agnóstico

@@ -15,10 +15,10 @@ espera a quién. Hoy 48 de 85 tareas abiertas están sueltas (medido 2026-10-17 
 
 - **Azure (2026-10-17):** HU = PBI, un solo nivel (`Product Backlog Item`, verificado en el Laboratorio el 2026-09-13); debajo, **Tasks**.
   Freddy tiene 44 tasks: 27 de la 19565, 10 de la 20379, 4 de la 22204 (onboarding). **Creó él 23 de las 44** (24881, 25016, 25476,
-  25699, las 12 de Sonar…); Thomas 5, Fabián 14, Graciany 1. 19 sin cerrar (11 en revisión, 8 en espera).
+  25699, las 12 de Sonar…); Persona B 5, Persona F 14, Persona G 1. 19 sin cerrar (11 en revisión, 8 en espera).
 - **FASE ↔ Task:** 34 de las 35 `FASE_*.md` del Laboratorio traen `**Azure**: task <id> (padre HU <n>)`.
 - **TRABAJO:** 82 de 134 tarjetas citan un id de Azure; las 34 de las FASE aparecen todas. Sin FASE: 20379 (la HU), 24549, 24551, 24914
-  (tasks de otros), 25682 (Sonar) y 26469 (una task de Thomas que creó Freddy).
+  (tasks de otros), 25682 (Sonar) y 26469 (una task de Persona B que creó Freddy).
 - **Draft:** 7 piezas, todas de la HU 20379; título `<ronda> 20379 · <N.M> · <título> · <task|por crear>`, sección = carril
   (`A · Bandeja`, `B · Acceso y KPIs`, `C · Recepción`); el encaje (rondas, qué mergea primero) en la descripción del proyecto.
 - **Una pieza que se toma es la misma tarjeta** (`/flow:pbi:repartir` §5: «al tomarla, esa misma tarjeta pasa al tablero»): en Todoist
@@ -51,7 +51,7 @@ espera a quién. Hoy 48 de 85 tareas abiertas están sueltas (medido 2026-10-17 
 - [x] Hecha — 2026-10-17: `traducir.ts` reconoce la pieza por la cabecera de `repartir` (no por el título, que cambia al tomarla); carriles `A · zona` → RAMA con color; unit 5 casos sobre 3 tarjetas reales
 
 ### Tarea 4: medir y mirar
-- [x] 2026-10-17 en producción: **tareas abiertas sueltas 48 → 35** (de 92: + las 7 piezas); HU 19565 con 25 conexiones, HU 20379 con 16; **64 tarjetas** colgando de su FASE; 15 «FASE n» fusionadas, 0 duplicadas. VR: `?reordenar` (las posiciones guardadas no se movían con las conexiones nuevas, C2) + HU dorada con nombre fijo, FASE lila, aristas del árbol visibles; captura: el racimo de la 19565 alrededor de su HU. **Las 35 que quedan** son notas (retros, propuestas, «para Thomas») que ninguna regla de este modelo toca: si se quieren conectar, otra FASE con su regla aprobada
+- [x] 2026-10-17 en producción: **tareas abiertas sueltas 48 → 35** (de 92: + las 7 piezas); HU 19565 con 25 conexiones, HU 20379 con 16; **64 tarjetas** colgando de su FASE; 15 «FASE n» fusionadas, 0 duplicadas. VR: `?reordenar` (las posiciones guardadas no se movían con las conexiones nuevas, C2) + HU dorada con nombre fijo, FASE lila, aristas del árbol visibles; captura: el racimo de la 19565 alrededor de su HU. **Las 35 que quedan** son notas (retros, propuestas, «para Persona B») que ninguna regla de este modelo toca: si se quieren conectar, otra FASE con su regla aprobada
 
 ## Criterios de Aceptación
 

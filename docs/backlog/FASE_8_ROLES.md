@@ -29,7 +29,7 @@
 
 ## Criterios de Aceptación
 
-- [x] 1 · Cambiar una columna en `roles.yaml` cambia el tablero de ese rol sin tocar código — 2026-10-17: una copia con `CONVERSAR` → `CONVERSAR CON FABIÁN`, servida por una segunda API (puerto 3999, cerrada después): `GET /roles` de Negocio y `GET /etapas` la traen. Ojo: la API lee el archivo **al arrancar** (`bin/dev` de nuevo después de editarlo).
+- [x] 1 · Cambiar una columna en `roles.yaml` cambia el tablero de ese rol sin tocar código — 2026-10-17: una copia con `CONVERSAR` → `CONVERSAR CON PERSONA F`, servida por una segunda API (puerto 3999, cerrada después): `GET /roles` de Negocio y `GET /etapas` la traen. Ojo: la API lee el archivo **al arrancar** (`bin/dev` de nuevo después de editarlo).
 - [x] 2 · Las tarjetas y FASE reales siguen en su columna (ninguna etapa de la base queda fuera de `GET /etapas`) — 2026-10-17: las 10 etapas en uso en la base están en las 27 de `GET /etapas` (medido, 0 fuera)
 
 ## QA

@@ -17,9 +17,9 @@
 **Decisiones — las 6 ✅ Freddy, 2026-10-17:**
 1. **Sin migración:** un complemento es un nodo DUDA (las dos dudas) o TAREA (el resto) con la etiqueta `complemento:<tipo>`, conectado `PERTENECE_A` a su HISTORIA/TAREA — mismo patrón que el rol en la FASE 8 (etiqueta, filtro en la API). Alternativa: un valor nuevo en `TipoNodo` por tipo (9 valores, migración de Prisma). Propongo la etiqueta: los tipos son del método y cambian; el enum es esquema.
 2. **Los 12 tipos viven en `roles.yaml` del área** (bloque `complementos:` con clave, nombre, tipo de nodo), no en la API: misma SSOT que los roles, la PWA los lee por `GET /roles` (o `GET /complementos`).
-3. **La escalera vive en `refs.yaml` del área:** `escalera: { negocio: [codigo, carabantes, tomas-soto|nicolas], codigo: [tomas-soto, carabantes] }` con las personas como nodos PERSONA. Escalar = la DUDA pasa de `ESPERA_RESPUESTA_DE` la persona actual a la siguiente; la anterior queda en la descripción (quién, cuándo).
+3. **La escalera vive en `refs.yaml` del área:** `escalera: { negocio: [codigo, persona-a, persona-b|persona-c], codigo: [persona-b, persona-a] }` con las personas como nodos PERSONA. Escalar = la DUDA pasa de `ESPERA_RESPUESTA_DE` la persona actual a la siguiente; la anterior queda en la descripción (quién, cuándo).
 4. **Decisión = la duda contestada:** cerrar una DUDA pide «quién contestó y dónde quedó» y deja un nodo `complemento:decision` que la reemplaza en el PBI. No se borra la duda.
-5. **Para decir** cuelga de un ritual (`daily`, `retro`, `1:1 Fabián`) como DAILY_ITEM `EN_DAILY_DE` el nodo del ritual; el «parte para Fabián» (idea a pedido) sale de ahí.
+5. **Para decir** cuelga de un ritual (`daily`, `retro`, `1:1 Persona F`) como DAILY_ITEM `EN_DAILY_DE` el nodo del ritual; el «parte para Persona F» (idea a pedido) sale de ahí.
 6. **PBI borrador:** HISTORIA sin `externo` (sin número de Azure); cuando tiene número, se le pone el externo y queda conectada a su origen (rol Negocio → Producto).
 
 **Cómo se baja a código (lo que el diseño de arriba no decía):**

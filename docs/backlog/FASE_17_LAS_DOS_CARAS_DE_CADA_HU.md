@@ -160,24 +160,24 @@ voy a hacer en la aplicación web» (en Todoist era clic derecho → «Mover a»
 Viven en `Laboratorio/Tareas/<task>/entendimiento.md` §ABIERTO (no en las FASE; carpeta fuera de git). Cerrar = editar ahí, con
 el «sí» de Freddy. Veredictos con cita (Azure solo GET, reuniones, FASE):
 
-1. **24690 · A1 lab destino vs análisis derivados** → CONTESTADA: Carabantes, Azure 24852 (28-09) + reunión 29-09
-   (`docs/reuniones/reunion-2026-09-29-tomas-nicolas.md:46-60`): la actividad no se ofrece si el lab no la hace; el 422 queda de red.
+1. **24690 · A1 lab destino vs análisis derivados** → CONTESTADA: Persona A, Azure 24852 (28-09) + reunión 29-09
+   (`docs/reuniones/reunion-2026-09-29-persona-a-persona-c.md:46-60`): la actividad no se ofrece si el lab no la hace; el 422 queda de red.
 2. **24690 · A2 qué es un «análisis opcional»** → CONTESTADA por reencuadre (30-09/01-10): un parámetro que se agrega dentro de los
    5 análisis, no un 6º (`FASE_15:156-163` N1, `FASE_16:17-19`; 25180/25182 mergeadas).
-3. **24852 · rastro de tipo de muestra (Q4)** → SIGUE ABIERTA: negocio dijo que no va (Carabantes 28-09), pero nadie creó la task
-   para borrarlo (`docs/onboarding/propuestas.md:21`, a Fabián desde el 29-09).
+3. **24852 · rastro de tipo de muestra (Q4)** → SIGUE ABIERTA: negocio dijo que no va (Persona A 28-09), pero nadie creó la task
+   para borrarlo (`docs/onboarding/propuestas.md:21`, a Persona F desde el 29-09).
 4. **24852 · «Cerrados el 29-09…»** → no es duda: nota de cierre bajo el encabezado equivocado (`FASE_7:3,195-203,247-248`).
 5. **24972 · Q9 y Q10** → a medias: Q9 CONTESTADA (sí hay precarga, la unión; ADR `2026-09-30-mezcla-con-grupo-padre…`, Azure
-   25094); Q10 (microorganismos en mezclas) nunca se preguntó: dueño Carabantes.
-6. **24973 · para qué lo quiere el front** → CONTESTADA: gbaeza, Azure 24551 (28-09): `numero` es el id estable de la categoría.
+   25094); Q10 (microorganismos en mezclas) nunca se preguntó: dueño Persona A.
+6. **24973 · para qué lo quiere el front** → CONTESTADA: Persona E, Azure 24551 (28-09): `numero` es el id estable de la categoría.
 
 - [x] 2026-10-18 tarde (Freddy: «valídalas tú y si te parecen obvias, toma las respuestas»; evidencia recomprobada por el
   orquestador contra Azure y los docs): 1, 2, 4 y 6 cerradas en sus `entendimiento.md` (sin viñeta, con su cita; respaldo previo en
   el tmp de la sesión) y la 5 partida (Q9 cerrada · Q10 abierta). `importar:fases` en seco y real: 2 abiertos leídos, **4 dudas
-  cerradas** en producción, 1 actualizada. Quedan abiertas solo **Q4** (tipo de muestra: falta que Fabián cree la task) y **Q10**
-  (microorganismos en mezclas: nunca se preguntó a Carabantes)
+  cerradas** en producción, 1 actualizada. Quedan abiertas solo **Q4** (tipo de muestra: falta que Persona F cree la task) y **Q10**
+  (microorganismos en mezclas: nunca se preguntó a Persona A)
 - [x] 2026-10-18 tarde, Freddy: Q4 «me suena al sprint anterior» y Q10 «supuestamente está resuelto». Cerradas las dos: **Q4 no es
-  duda sino una propuesta a Fabián** (el negocio ya dijo que el tipo de muestra no va; borrarlo es una task que Fabián decide si entra;
+  duda sino una propuesta a Persona F** (el negocio ya dijo que el tipo de muestra no va; borrarlo es una task que Persona F decide si entra;
   `propuestas.md:21` y la tarjeta del 29-sep, que sigue viva); **Q10 se resolvió por alcance**: filtrar la cascada de microorganismos
   al grupo es del front (`FASE_10` §Fuera de alcance), y si el front lo hace distinto lo ve QA. Reimportado: 2 cerradas; **ninguna
   duda de FASE queda abierta**
@@ -220,16 +220,16 @@ se cierra solo al tildar su cierre. Nada se descarta sin el «sí» de Freddy, u
   «Sin etapa» no es información chueca: 30 tarjetas de TRABAJO sin sección en Todoist (las notas sueltas de arriba) + 5 trámites
 - [x] 2026-10-18, Q4 (tipo de muestra): Freddy no la quiere pedir todavía; es una corrección sin prioridad que no rompe nada.
   Rama **🧹 Normalización** creada en el grafo con la tarjeta del 29-sep colgada: el lugar de esas correcciones, visible en la
-  web (Ramas) y en la VR (color), para cuando decida llevarlas a Fabián. La propuesta de etiquetas siguió en la FASE 18
+  web (Ramas) y en la VR (color), para cuando decida llevarlas a Persona F. La propuesta de etiquetas siguió en la FASE 18
 - [x] 2026-10-18, Freddy: «revalidá en Azure y en develop si esas dudas se contestan; si no, son preguntas nuevas y van a la
   base». Revisadas las ~25 preguntas abiertas del reparto de la 20379 contra los 40 comentarios de Azure (la HU, sus 23 tasks,
   la 24433, la 20378 y la wiki 6738) y el develop de los 9 repos (sin cambios desde la foto de brechas). **Contestadas, no se
-  cargan:** el laboratorio no filtra (Carabantes 15-10: «un usuario no puede pertenecer a más de un laboratorio»); Rechazar es de
-  la 25015; los análisis sí tienen área (script `09_areas_funcionales.sql` de Thomas, `d785567`); los códigos OBSERVADA y
+  cargan:** el laboratorio no filtra (Persona A 15-10: «un usuario no puede pertenecer a más de un laboratorio»); Rechazar es de
+  la 25015; los análisis sí tienen área (script `09_areas_funcionales.sql` de Persona B, `d785567`); los códigos OBSERVADA y
   EN_VERIFICACION_SECCION existen en la rama de la 25325; el solicitante entra al buscador (la HU lo pide en tres lugares); en el
-  catálogo manda la planilla (FASE_18 D7). **Abiertas, cargadas en el grafo (16):** 8 dudas de negocio para Carabantes (Observar,
+  catálogo manda la planilla (FASE_18 D7). **Abiertas, cargadas en el grafo (16):** 8 dudas de negocio para Persona A (Observar,
   «Volver» del modal, texto del aviso a analistas, «con Observaciones» ¿requiere acción?, 5 días hábiles o corridos y ¿cada noche?,
-  quién confirma una recepción ajena, En Validación ¿de qué?, nombre y primer apellido ¿columna aparte?), 5 de código para Thomas
+  quién confirma una recepción ajena, En Validación ¿de qué?, nombre y primer apellido ¿columna aparte?), 5 de código para Persona B
   (aprobar el esquema + orquestación + ¿`recepcion_muestra` sobra?, analistas de un área sin endpoint y catálogos que no calzan,
   nombre y apellido por separado, dónde corre el nocturno, **con qué id se guarda una persona**: D5 eligió el de Keycloak y el
   solicitante usa el de identidad), 2 supuestos y 1 dolor de código (comentario viejo en la migración de `laboratorio_analisis`).

@@ -22,7 +22,7 @@
 
 ### Tarea 3: ramas y bloqueo desde la API
 - Color por rama (`PERTENECE_A`); "qué lo bloquea" sale de `GET /nodos/:id/bloqueado`, no se calcula en el front (C1).
-- [x] Hecha — 2026-10-17: `lib/bloqueo.ts` borrado y `CONEXIONES_BLOQUEANTES` fuera de `dominio.ts`; `SeleccionConBloqueo` pregunta a `GET /nodos/:id/bloqueado` (probado: tocar a «Tomás Carabantes» → "Libre: nada lo bloquea", 200). Color por rama desde el `color` de los nodos RAMA de la API. Con datos reales aparecieron dos defectos de lectura en 3D y se arreglaron: los emojis de los títulos (2️⃣, 🔵) salían como cajas y los títulos de 200 caracteres cruzaban la escena → `lib/texto-visible.ts` (sin pictogramas, 48 caracteres en la etiqueta, 120 en la selección).
+- [x] Hecha — 2026-10-17: `lib/bloqueo.ts` borrado y `CONEXIONES_BLOQUEANTES` fuera de `dominio.ts`; `SeleccionConBloqueo` pregunta a `GET /nodos/:id/bloqueado` (probado: tocar a «Persona A» → "Libre: nada lo bloquea", 200). Color por rama desde el `color` de los nodos RAMA de la API. Con datos reales aparecieron dos defectos de lectura en 3D y se arreglaron: los emojis de los títulos (2️⃣, 🔵) salían como cajas y los títulos de 200 caracteres cruzaban la escena → `lib/texto-visible.ts` (sin pictogramas, 48 caracteres en la etiqueta, 120 en la selección).
 
 ## Criterios de Aceptación
 
