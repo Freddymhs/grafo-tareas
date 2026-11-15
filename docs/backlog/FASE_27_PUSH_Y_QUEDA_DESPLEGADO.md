@@ -43,7 +43,7 @@ conexión hacia GitHub, así que no se expone nada a internet.
 ## Abierto
 
 - **(a) 2026-11-14 · Un commit rojo se despliega con el push verde de otro repo.** `desplegar-aqui.sh` `traer` hace ff a `origin/main` de los 4 repos. Arreglo: avanzar solo `GRAFO_REPO` a `GITHUB_SHA`, el repo cuyo CI pasó.
-- **(b) 2026-11-14 · No hay monitor de la VR.** `~/uptime-kuma-setup.py` del Mac solo lista api y web. Arreglo: agregar `grafo-vr` en `:3013`.
+- ~~**(b) 2026-11-14 · No hay monitor de la VR.**~~ Hecho 2026-11-15: en Kuma no había ninguno del grafo (el `~/uptime-kuma-setup.py` del Mac listaba api y web, pero no estaban cargados). Ahora están API `:3007/api/v1/health`, web `:3008` y VR `:3013`, con aviso al Telegram de Hermes. Ojo: ese script borra todos los monitores antes de crear su lista vieja; no correrlo.
 - **(c) 2026-11-14 · D1 dice «la PWA del Quest se reinstala», pero `_CONCEPTO.md:272` dice que Meta no instala PWAs.** Arreglo: cambiar D1 a «URL guardada como favorito» y comprobarlo en el criterio 2.
 - **(d) 2026-11-14 · El lint del CI de api es `eslint --fix`, que nunca falla** (`grafo-tareas.api/package.json:16`, `ci.yml:44`). Arreglo: script `lint:ci` sin `--fix` y que el CI lo llame.
 
