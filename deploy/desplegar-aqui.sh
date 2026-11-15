@@ -64,7 +64,8 @@ trap 'rm -rf "$CANDADO"' EXIT
 
 mkdir -p "$(dirname "$DIR")"
 # La API lee roles.yaml y refs.yaml SOLO al arrancar: si el despliegue los cambia, hay que reiniciarla (abajo).
-huella_area() { cat "$DIR/docs/roles.yaml" "$DIR/refs.yaml" 2>/dev/null | shasum | cut -c1-40; }
+# Tolerante: la primera vez $DIR no existe y `cat` falla; con pipefail eso mataba el script en silencio (huella de vacío).
+huella_area() { { cat "$DIR/docs/roles.yaml" "$DIR/refs.yaml" 2>/dev/null || true; } | shasum | cut -c1-40; }
 AREA_ANTES=$(huella_area)
 traer "$DIR" grafo-tareas
 for repo in $REPOS_INTERNOS; do traer "$DIR/$repo" "$repo"; done
@@ -117,19 +118,33 @@ espera_200() {   # espera_200 <url>: reintenta hasta SEGUNDOS_ESPERA (la API apl
   done
   echo "$codigo"
 }
-cors_patch() {   # cors_patch <origen>: los métodos que el preflight permite desde ese origen
+cors_preflight() {   # cors_preflight <origen>: las cabeceras de la respuesta al preflight de PATCH desde ese origen
   curl -s -D - -o /dev/null -m 10 -X OPTIONS -H "Origin: $1" -H 'Access-Control-Request-Method: PATCH' \
-    "$URL_API/api/v1/nodos" | tr -d '\r' | grep -i '^access-control-allow-methods:' || true
+    "$URL_API/api/v1/nodos" | tr -d '\r' || true
+}
+cabecera() {   # cabecera <respuesta> <nombre>: el valor de la primera cabecera con ese nombre (sin importar mayúsculas)
+  printf '%s\n' "$1" | awk -v nombre="$2" 'BEGIN { nombre = tolower(nombre) }
+    { corte = index($0, ":") }
+    !visto && corte > 0 && tolower(substr($0, 1, corte - 1)) == nombre {
+      valor = substr($0, corte + 1); gsub(/^ +| +$/, "", valor); print valor; visto = 1 }'
 }
 health=$(espera_200 "$URL_API/api/v1/health"); echo "API health: $health"
 web=$(espera_200 "$URL_WEB/"); echo "PWA: $web"
 vr=$(espera_200 "$URL_VR/"); echo "VR: $vr"
-cors_web=$(cors_patch "$URL_WEB"); echo "CORS web: ${cors_web:-sin cabecera}"
-cors_vr=$(cors_patch "$URL_VR"); echo "CORS vr: ${cors_vr:-sin cabecera}"
+respuesta_cors_web=$(cors_preflight "$URL_WEB")
+cors_web=$(cabecera "$respuesta_cors_web" access-control-allow-methods)
+origen_web=$(cabecera "$respuesta_cors_web" access-control-allow-origin)
+echo "CORS web: métodos ${cors_web:-sin cabecera} · origen ${origen_web:-sin cabecera}"
+respuesta_cors_vr=$(cors_preflight "$URL_VR")
+cors_vr=$(cabecera "$respuesta_cors_vr" access-control-allow-methods)
+origen_vr=$(cabecera "$respuesta_cors_vr" access-control-allow-origin)
+echo "CORS vr: métodos ${cors_vr:-sin cabecera} · origen ${origen_vr:-sin cabecera}"
 
 [ "$health" = 200 ] || falla "la API no responde 200 por $URL_API"
 [ "$web" = 200 ] || falla "la PWA no responde 200 por $URL_WEB"
 [ "$vr" = 200 ] || falla "la VR no responde 200 por $URL_VR"
 case "$cors_web" in *PATCH*) ;; *) falla "el preflight no permite PATCH desde $URL_WEB (trampa CORS de la FASE 4)" ;; esac
+[ "$origen_web" = "$URL_WEB" ] || falla "el preflight desde $URL_WEB devuelve access-control-allow-origin '${origen_web:-vacío}': el navegador lo bloquearía"
 case "$cors_vr" in *PATCH*) ;; *) falla "el preflight no permite PATCH desde $URL_VR: la VR no podría guardar posiciones" ;; esac
+[ "$origen_vr" = "$URL_VR" ] || falla "el preflight desde $URL_VR devuelve access-control-allow-origin '${origen_vr:-vacío}': el navegador lo bloquearía"
 echo "listo: PWA $URL_WEB · VR $URL_VR · API $URL_API"
