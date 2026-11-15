@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: deploy/desplegar-aqui.sh de origin/main del orquestador
         run: |
+          set -o pipefail
           git -C "$HOME/apps/grafo-tareas" fetch -q origin main
           git -C "$HOME/apps/grafo-tareas" show origin/main:deploy/desplegar-aqui.sh \
             | GRAFO_REPO=grafo-tareas GRAFO_SHA="$GITHUB_SHA" bash -s

@@ -55,6 +55,7 @@ desde_refs() {   # desde_refs <refs.yaml> <clave>: una clave de `despliegue:` (e
     dentro && $1 == clave":" {print $2; exit}' "$1"
 }
 
+mkdir -p "$(dirname "$DIR")"   # antes del candado: su `mkdir` (sin -p) falla siempre si ~/apps no existe y el `until` esperaría para siempre
 # El candado: mkdir es atómico (macOS no trae flock) y guarda el pid de su dueño. Se espera mientras el dueño viva, sin
 # reloj: con 15 min fijos, el primer build (35 min) dejó a web y vr romperlo y correr tres composes juntos (2026-11-14).
 # Un dueño muerto (job cancelado, Mac reiniciado) no deja el candado tomado. El tope lo pone `timeout-minutes` del job.
@@ -68,7 +69,6 @@ done
 echo $$ > "$CANDADO/pid"
 trap 'rm -rf "$CANDADO"' EXIT
 
-mkdir -p "$(dirname "$DIR")"
 # La API lee roles.yaml y refs.yaml SOLO al arrancar: si el despliegue los cambia, hay que reiniciarla (abajo).
 # Tolerante: la primera vez $DIR no existe y `cat` falla; con pipefail eso mataba el script en silencio (huella de vacío).
 huella_area() { { cat "$DIR/docs/roles.yaml" "$DIR/refs.yaml" 2>/dev/null || true; } | shasum | cut -c1-40; }
