@@ -110,6 +110,12 @@ if [ "$AREA_ANTES" != "$(huella_area)" ]; then
   docker compose restart api >/dev/null 2>&1 && echo "roles.yaml o refs.yaml cambiaron: API reiniciada para leerlos"
 fi
 
+# Cada build local del Mac deja caché de BuildKit (23 GB en 9 días, 2026-11-15) y nada la poda.
+# Solo lo de más de 7 días: lo reciente acelera el próximo build. Si falla, se avisa y el deploy sigue.
+CACHE_BUILD_MAX_EDAD=168h
+docker builder prune -f --filter "until=$CACHE_BUILD_MAX_EDAD" 2>&1 | tail -1 \
+  || echo "aviso: no se pudo podar la caché de build (el deploy sigue)"
+
 "$TAILSCALE" serve --bg --https="$HTTPS_API" "http://127.0.0.1:$PUERTO_API" >/dev/null
 "$TAILSCALE" serve --bg --https="$HTTPS_WEB" "http://127.0.0.1:$PUERTO_WEB" >/dev/null
 "$TAILSCALE" serve --bg --https="$HTTPS_VR" "http://127.0.0.1:$PUERTO_VR" >/dev/null
