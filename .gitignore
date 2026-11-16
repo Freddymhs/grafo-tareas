@@ -3,6 +3,7 @@ reportes/
 _docs/
 .env
 .env.*
+!.env.example
 .claude/settings.local.json
 deploy/respaldos/
 deploy/importar/

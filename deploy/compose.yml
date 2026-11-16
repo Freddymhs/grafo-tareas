@@ -86,6 +86,8 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD}
       DIAS_A_GUARDAR: '14'
       SEGUNDOS_ENTRE_RESPALDOS: '86400'
+      # Uptime Kuma (monitor push, intervalo 25 h): URL sin query, de deploy/.env. Vacía = no avisa. Ver deploy/.env.example.
+      KUMA_PUSH_URL_RESPALDO: ${KUMA_PUSH_URL_RESPALDO:-}
     volumes:
       - ${DIR_RESPALDOS:-./respaldos}:/respaldos
     entrypoint:
@@ -100,6 +102,11 @@ services:
           if pg_dump -h postgres -U grafo -d grafo_tareas -Fc -f "$$archivo.parcial" && [ -s "$$archivo.parcial" ]; then
             mv "$$archivo.parcial" "$$archivo"
             echo "respaldo: $$archivo ($$(du -h "$$archivo" | cut -f1))"
+            # Aviso a Kuma solo tras un dump bueno: si falla 25 h seguidas, Kuma alerta. Si el aviso falla, el respaldo ya está.
+            if [ -n "$$KUMA_PUSH_URL_RESPALDO" ]; then
+              wget -q -O /dev/null -T 15 "$$KUMA_PUSH_URL_RESPALDO?status=up&msg=OK" \
+                || echo "aviso: no se pudo avisar a Kuma (el respaldo sí salió)" >&2
+            fi
             find /respaldos -name 'grafo-*.dump' -mtime +"$$DIAS_A_GUARDAR" -delete
           else
             rm -f "$$archivo.parcial"
