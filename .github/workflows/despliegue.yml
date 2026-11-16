@@ -11,8 +11,60 @@ on:
       - 'docs/roles.yaml'
 
 jobs:
+  verificar:
+    # Sin código que probar, pero sí lo que se ejecuta en producción: se valida en un runner de GitHub (no en el Mac) antes de
+    # que el job `deploy` lo toque. Sin secretos: el .env es de placeholders y el compose solo se resuelve (`config`), no se levanta.
+    name: Verificar compose, scripts, tablero y YAML
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sintaxis de los scripts de despliegue (bash -n)
+        run: |
+          bash -n deploy/desplegar-aqui.sh
+          bash -n bin/desplegar
+          # El adaptador del tablero lo ejercita test_tablero.sh; aquí solo se exige que parseen.
+          for script in bin/adapters/grafo/* bin/adapters/grafo/lib/tablero.sh bin/tests/test_tablero.sh; do
+            [ -f "$script" ] && bash -n "$script"
+          done
+
+      - name: docker compose config con un .env de placeholders
+        run: |
+          # Las variables que exige deploy/compose.yml (`:?`): solo valores falsos, el archivo no sale del runner.
+          cat > "$RUNNER_TEMP/env.prueba" <<'ENV'
+          POSTGRES_PASSWORD=placeholder
+          PUERTO_API=3007
+          PUERTO_WEB=3008
+          PUERTO_VR=3013
+          URL_API=https://api.ejemplo.invalid:8443
+          URL_WEB=https://web.ejemplo.invalid:10000
+          URL_VR=https://vr.ejemplo.invalid:8448
+          ENV
+          docker compose --env-file "$RUNNER_TEMP/env.prueba" -f deploy/compose.yml config -q
+
+      - name: Sintaxis de refs.yaml y docs/roles.yaml
+        run: |
+          python3 -c "import yaml" 2>/dev/null || sudo apt-get install -y -qq python3-yaml
+          python3 - <<'PY'
+          import sys
+          import yaml
+
+          ARCHIVOS = ['refs.yaml', 'docs/roles.yaml']
+          for archivo in ARCHIVOS:
+              with open(archivo, encoding='utf-8') as fh:
+                  if not isinstance(yaml.safe_load(fh), dict):
+                      sys.exit(f'{archivo}: no es un mapa YAML')
+              print(f'ok {archivo}')
+          PY
+
+      - name: Adaptador del tablero (bin/tests/test_tablero.sh, sin red)
+        # El adaptador llama a `ref` (de ~/dotfiles, privado, ausente aquí): bin/tests/ci/ref es su versión mínima para el CI.
+        run: PATH="$PWD/bin/tests/ci:$PATH" bash bin/tests/test_tablero.sh
+
   deploy:
     name: Desplegar en el Mac Mini
+    needs: verificar
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, mac-mini, grafo]
     # Un deploy colgado (2026-11-14: 35 min en `load metadata`) no retiene el runner las 6 h por defecto.

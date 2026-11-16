@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""ref mínimo para el CI: el `ref` real vive en ~/dotfiles (privado) y no está en el runner de GitHub.
+
+Solo lo que usa bin/tests/test_tablero.sh: `ref <clave.con.puntos>` sobre el refs.yaml que haya en REF_DESDE (sin subir
+carpetas), con los mismos exit del real: 0 ok · 1 falta la clave · 2 no hay refs.yaml · 3 apagada (`none`) · 64 uso.
+No resuelve rutas ni mezcla varios refs.yaml: si el adaptador empieza a necesitarlo, se amplía aquí, no en el test.
+"""
+import json
+import os
+import sys
+
+import yaml
+
+APAGADA = "none"
+
+if len(sys.argv) != 2:
+    print("uso: ref <clave.con.puntos>", file=sys.stderr)
+    sys.exit(64)
+archivo = os.path.join(os.environ.get("REF_DESDE", os.getcwd()), "refs.yaml")
+if not os.path.isfile(archivo):
+    print(f"ref: no hay {archivo}", file=sys.stderr)
+    sys.exit(2)
+with open(archivo, encoding="utf-8") as fh:
+    valor = yaml.safe_load(fh) or {}
+for parte in sys.argv[1].split("."):
+    if valor == APAGADA:
+        break
+    if not isinstance(valor, dict) or parte not in valor:
+        print(f"ref: falta la clave '{sys.argv[1]}' en {archivo}", file=sys.stderr)
+        sys.exit(1)
+    valor = valor[parte]
+if valor == APAGADA:
+    print(APAGADA)
+    sys.exit(3)
+print(json.dumps(valor, ensure_ascii=False) if isinstance(valor, (dict, list)) else valor)
