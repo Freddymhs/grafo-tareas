@@ -44,6 +44,9 @@ traer() {
   git -C "$1" merge -q --ff-only "origin/$RAMA"
   echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
 }
+# valor_env <archivo> <clave>: el último valor NO vacío de la clave. Una clave repetida (una vacía y otra con valor, como
+# quedó el .env del Mac el 2026-11-16) no debe borrar el valor en la reescritura ni corromper la contraseña.
+valor_env() { sed -n "s/^$2=//p" "$1" 2>/dev/null | grep -v '^$' | tail -n 1 || true; }
 [ -z "${GRAFO_SOLO_FUNCIONES:-}" ] || return 0   # `source` desde un test: solo las funciones, ningún efecto sobre el Mac
 
 export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"   # ni ssh ni el LaunchAgent del runner cargan el .zshrc
@@ -115,10 +118,10 @@ HTTPS_API="${URL_API##*:}"; HTTPS_WEB="${URL_WEB##*:}"; HTTPS_VR="${URL_VR##*:}"
 ENV="$DIR/deploy/.env"
 # deploy/.env es el `.env` que compose lee solo desde deploy/: así un `docker compose ps` a mano también funciona.
 # La contraseña se crea una vez y se conserva; puertos y URLs se reescriben en cada despliegue (su fuente es este script).
-CLAVE=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$ENV" 2>/dev/null || true)
+CLAVE=$(valor_env "$ENV" POSTGRES_PASSWORD)
 [ -n "$CLAVE" ] || { CLAVE=$(openssl rand -hex 24); echo "contraseña nueva de Postgres en deploy/.env"; }
 # La URL push de Kuma (monitor del respaldo) la pone una persona en deploy/.env y se conserva, como la contraseña.
-KUMA_PUSH_URL_RESPALDO=$(sed -n 's/^KUMA_PUSH_URL_RESPALDO=//p' "$ENV" 2>/dev/null || true)
+KUMA_PUSH_URL_RESPALDO=$(valor_env "$ENV" KUMA_PUSH_URL_RESPALDO)
 # Los dumps van a ~/respaldos/, la carpeta que el ThinkPad copia cada día (lab-respaldo.timer): fuera del Mac (D5).
 DIR_RESPALDOS="$HOME/respaldos/grafo-tareas"
 umask 077

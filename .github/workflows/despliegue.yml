@@ -25,7 +25,7 @@ jobs:
           bash -n deploy/desplegar-aqui.sh
           bash -n bin/desplegar
           # El adaptador del tablero lo ejercita test_tablero.sh; aquí solo se exige que parseen.
-          for script in bin/adapters/grafo/* bin/adapters/grafo/lib/tablero.sh bin/tests/test_tablero.sh bin/tests/test_desplegar_traer.sh; do
+          for script in bin/adapters/grafo/* bin/adapters/grafo/lib/tablero.sh bin/tests/test_tablero.sh bin/tests/test_desplegar_traer.sh bin/tests/test_desplegar_env.sh; do
             [ -f "$script" ] && bash -n "$script"
           done
 
@@ -65,6 +65,10 @@ jobs:
       - name: Qué commit avanza en el Mac (bin/tests/test_desplegar_traer.sh, sin red)
         # `traer` de desplegar-aqui.sh con repos git temporales: SHA actual avanza, viejo no (y sale 0), fuera de main falla, primer clon.
         run: bash bin/tests/test_desplegar_traer.sh
+
+      - name: Lo que el deploy conserva del .env (bin/tests/test_desplegar_env.sh, sin red)
+        # Una clave repetida (vacía y con valor) no debe borrar la URL de Kuma ni corromper la contraseña (real 2026-11-16).
+        run: bash bin/tests/test_desplegar_env.sh
 
   deploy:
     name: Desplegar en el Mac Mini
