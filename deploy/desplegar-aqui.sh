@@ -8,7 +8,44 @@
 #   · bin/desplegar desde el ThinkPad, por ssh: el camino a mano para una emergencia.
 # Repetible: correrlo dos veces seguidas no cambia nada. Lo que no cambió no se reconstruye. El repo que disparó el CI avanza
 # a SU commit (el que pasó los tests); el orquestador, a origin/main; los otros repos se quedan como estaban (ver GRAFO_REPO).
+# Si ese commit ya no es la punta de origin/main (otro push llegó después), no avanza: ver `traer`.
 set -euo pipefail
+GITHUB="${GRAFO_GITHUB:-git@github.com:Freddymhs}"
+RAMA=main
+
+# --- Git: lo único que se prueba sin Docker ni Mac (bin/tests/test_desplegar_traer.sh lo carga con GRAFO_SOLO_FUNCIONES=1) ---
+falla() { echo "desplegar: $*" >&2; exit 1; }
+reintentar() {   # GitHub corta a veces el ssh (`Connection reset by peer`, 2026-10-17); bash 3.2 de macOS: sin mapfile
+  for n in 1 2 3; do "$@" && return 0; echo "reintento $n/3: $*" >&2; sleep 5; done
+  return 1
+}
+# traer <dir> <repo> [<sha>]: clona la primera vez; después solo avanza (nunca pisa: --ff-only). Sin <sha> va a origin/main.
+# Con <sha> (el commit cuyo CI pasó) hay tres casos, igual en un clon nuevo que en uno viejo:
+#   · es la punta de origin/main            → avanza a ella.
+#   · es ancestro de origin/main (hay uno más nuevo: dos pushes seguidos que terminaron al revés) → NO avanza y TERMINA el
+#     script con exit 0: el CI del commit nuevo despliega el suyo, y desplegar el viejo encima lo dejaría atrás.
+#   · no está en origin/main (rama rara)    → error.
+traer() {
+  local sha="${3:-}" completo punta
+  if [ -d "$1/.git" ]; then
+    reintentar git -C "$1" fetch -q origin "$RAMA"
+    git -C "$1" checkout -q "$RAMA"
+  else reintentar git clone -q --branch "$RAMA" "$GITHUB/$2.git" "$1"; fi
+  punta=$(git -C "$1" rev-parse "origin/$RAMA")
+  if [ -n "$sha" ]; then
+    completo=$(git -C "$1" rev-parse --verify -q "$sha^{commit}") || falla "$2: el commit $sha no existe en origin/$RAMA"
+    if [ "$completo" != "$punta" ]; then
+      git -C "$1" merge-base --is-ancestor "$completo" "origin/$RAMA" \
+        || falla "$2: el commit $sha no está en origin/$RAMA (rama rara): no se despliega"
+      echo "$2: $sha ya no es la punta de origin/$RAMA ($punta): hay un commit más nuevo y su CI desplegará el suyo. No avanzo."
+      exit 0
+    fi
+  fi
+  git -C "$1" merge -q --ff-only "origin/$RAMA"
+  echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
+}
+[ -z "${GRAFO_SOLO_FUNCIONES:-}" ] || return 0   # `source` desde un test: solo las funciones, ningún efecto sobre el Mac
+
 export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"   # ni ssh ni el LaunchAgent del runner cargan el .zshrc
 # Sin la attestation de procedencia (lleva la hora del build) el mismo código da la misma imagen y `up --build` no
 # recrea nada. Va por variable: compose 2.x construye con bake y no respeta `provenance: false` (medido 2026-10-17).
@@ -23,8 +60,6 @@ ln -sfn "$HOME/.docker/cli-plugins" "$DOCKER_SIN_AYUDANTE/cli-plugins"
 export DOCKER_CONFIG="$DOCKER_SIN_AYUDANTE" DOCKER_HOST="unix://$HOME/.docker/run/docker.sock"
 
 DIR="$HOME/apps/${GRAFO_APP:-grafo-tareas}"                 # convención del Mac Mini: ~/apps/<app>
-GITHUB="${GRAFO_GITHUB:-git@github.com:Freddymhs}"
-RAMA=main
 REPOS_INTERNOS="grafo-tareas.api grafo-tareas.web grafo-tareas.vr"
 # Qué commit pidió este despliegue (FASE 27 (a)): el job de api, web o vr pasa su repo y su sha, y SOLO ese repo avanza a ese
 # commit; los otros dos se quedan como están. Sin esto, un commit con test rojo en un repo salía con el push verde de otro.
@@ -38,18 +73,6 @@ TAILSCALE=/Applications/Tailscale.app/Contents/MacOS/Tailscale
 SEGUNDOS_ESPERA=180
 CANDADO="$DIR.desplegando"                               # dos pushes a la vez (api y web) no corren compose juntos
 
-falla() { echo "desplegar: $*" >&2; exit 1; }
-reintentar() {   # GitHub corta a veces el ssh (`Connection reset by peer`, 2026-10-17); bash 3.2 de macOS: sin mapfile
-  for n in 1 2 3; do "$@" && return 0; echo "reintento $n/3: $*" >&2; sleep 5; done
-  return 1
-}
-traer() {   # traer <dir> <repo> [<meta>]: clona la primera vez; después solo avanza (nunca pisa: --ff-only) a <meta> (def. origin/main)
-  if [ -d "$1/.git" ]; then
-    reintentar git -C "$1" fetch -q origin "$RAMA"
-    git -C "$1" checkout -q "$RAMA" && git -C "$1" merge -q --ff-only "${3:-origin/$RAMA}"
-  else reintentar git clone -q --branch "$RAMA" "$GITHUB/$2.git" "$1"; fi
-  echo "$2 @ $(git -C "$1" rev-parse --short HEAD)"
-}
 desde_refs() {   # desde_refs <refs.yaml> <clave>: una clave de `despliegue:` (en el Mac Mini no está ~/bin/ref)
   awk -v clave="$2" '/^despliegue:/ {dentro=1; next} dentro && /^[^ #]/ {dentro=0}
     dentro && $1 == clave":" {print $2; exit}' "$1"

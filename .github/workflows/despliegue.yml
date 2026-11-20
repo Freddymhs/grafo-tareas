@@ -25,7 +25,7 @@ jobs:
           bash -n deploy/desplegar-aqui.sh
           bash -n bin/desplegar
           # El adaptador del tablero lo ejercita test_tablero.sh; aquí solo se exige que parseen.
-          for script in bin/adapters/grafo/* bin/adapters/grafo/lib/tablero.sh bin/tests/test_tablero.sh; do
+          for script in bin/adapters/grafo/* bin/adapters/grafo/lib/tablero.sh bin/tests/test_tablero.sh bin/tests/test_desplegar_traer.sh; do
             [ -f "$script" ] && bash -n "$script"
           done
 
@@ -61,6 +61,10 @@ jobs:
       - name: Adaptador del tablero (bin/tests/test_tablero.sh, sin red)
         # El adaptador llama a `ref` (de ~/dotfiles, privado, ausente aquí): bin/tests/ci/ref es su versión mínima para el CI.
         run: PATH="$PWD/bin/tests/ci:$PATH" bash bin/tests/test_tablero.sh
+
+      - name: Qué commit avanza en el Mac (bin/tests/test_desplegar_traer.sh, sin red)
+        # `traer` de desplegar-aqui.sh con repos git temporales: SHA actual avanza, viejo no (y sale 0), fuera de main falla, primer clon.
+        run: bash bin/tests/test_desplegar_traer.sh
 
   deploy:
     name: Desplegar en el Mac Mini
